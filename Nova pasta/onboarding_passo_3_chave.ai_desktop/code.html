@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="pt-BR"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Onboarding Passo 3 - chave.ai</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&amp;family=Sora:wght@400;600;700;800&amp;family=Instrument+Serif&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#7b61ff",
+                        "background-light": "#f6f5f8",
+                        "background-dark": "#0A0A14",
+                        "sidebar-dark": "#18181B",
+                    },
+                    fontFamily: {
+                        "display": ["Space Grotesk", "sans-serif"],
+                        "sora": ["Sora", "sans-serif"],
+                        "serif": ["Instrument Serif", "serif"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "1rem",
+                        "lg": "2rem",
+                        "xl": "3rem",
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+<style>.noise-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    opacity: 0.035;
+    z-index: 50;
+    background-image: url(https://lh3.googleusercontent.com/aida-public/AB6AXuBVLTb6VDgeH5slXpZHuHx4L6SZKtbVtCnXFUgpsXhEzgByQljV6bDjT2mPSYD0jSM6cUYNPL3BmVyp5hE9zflZFAoTBWk9Ls95Txs6G9pgGxiun-9pnpG9ocnnVRDQ9yPsfhmpe6l6NKOsxsJo0TgkB4Cstx2RsgLAwrp7fkNqN6JUpWFy9o8fsvtWsJ5GMoRFZkDzjmjoij22VydZJ69sJlC03MM13qRG0yEfldXWiQqKVG4dQQjTucrpRUmezjJTbvZNwZoiLxo)
+    }
+.plasma-glow {
+    box-shadow: 0 0 25px 2px rgba(123, 97, 255, 0.4)
+    }
+.glass-input {
+    background: rgba(255, 255, 255, 0.03);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.1)
+    }
+.bioluminescent-glow {
+    filter: drop-shadow(0 0 20px rgba(123, 97, 255, 0.6))
+    }</style>
+</head>
+<body class="bg-background-light dark:bg-background-dark font-display text-slate-900 dark:text-slate-100 min-h-screen overflow-hidden">
+<div class="noise-overlay"></div>
+<div class="flex h-screen w-full">
+<!-- Sidebar -->
+<aside class="w-80 bg-sidebar-dark border-r border-white/5 flex flex-col p-8 z-20">
+<div class="flex items-center gap-3 mb-12">
+<div class="size-8 bg-primary rounded-lg flex items-center justify-center text-white">
+<span class="material-symbols-outlined text-xl">key</span>
+</div>
+<h2 class="font-sora font-bold text-xl tracking-tight">chave.ai</h2>
+</div>
+<nav class="flex-1 space-y-6">
+<div class="space-y-2">
+<p class="text-xs font-bold uppercase tracking-widest text-white/30 px-2">Onboarding</p>
+<div class="flex items-center gap-3 p-3 bg-primary/10 rounded text-primary">
+<span class="material-symbols-outlined">person_pin</span>
+<span class="font-medium">Perfil Profissional</span>
+</div>
+<div class="flex items-center gap-3 p-3 text-white/50 hover:bg-white/5 rounded transition-colors">
+<span class="material-symbols-outlined">hub</span>
+<span class="font-medium">Ecossistema</span>
+</div>
+<div class="flex items-center gap-3 p-3 text-white/50 hover:bg-white/5 rounded transition-colors">
+<span class="material-symbols-outlined">settings_suggest</span>
+<span class="font-medium">Preferências</span>
+</div>
+</div>
+</nav>
+<div class="mt-auto pt-8 border-t border-white/5">
+<div class="flex items-center gap-3">
+<div class="size-10 rounded-full bg-gradient-to-br from-primary to-purple-400" data-alt="User avatar abstract gradient purple"></div>
+<div>
+<p class="text-sm font-bold">Usuário Alpha</p>
+<p class="text-xs text-white/40">ID: 8823-X</p>
+</div>
+</div>
+</div>
+</aside>
+<!-- Main Content -->
+<main class="flex-1 flex flex-col relative overflow-y-auto">
+<!-- Top Navigation -->
+<header class="flex items-center justify-between px-12 py-8 w-full max-w-5xl mx-auto">
+<button class="flex items-center gap-2 text-white/60 hover:text-white transition-colors group">
+<span class="material-symbols-outlined text-sm group-hover:-translate-x-1 transition-transform">arrow_back</span>
+<span class="font-medium text-sm">Voltar</span>
+</button>
+<div class="flex flex-col items-end gap-2 min-w-[240px]">
+<div class="flex justify-between w-full text-[10px] font-bold uppercase tracking-widest text-primary">
+<span>Progresso</span>
+<span>Passo 3 de 13</span>
+</div>
+<div class="w-full h-1.5 bg-white/5 rounded-full overflow-hidden">
+<div class="h-full bg-primary plasma-glow rounded-full" style="width: 23%;"></div>
+</div>
+</div>
+</header>
+<!-- Central Hero & Content -->
+<section class="flex-1 flex flex-col items-center justify-center px-6 pb-20 max-w-3xl mx-auto w-full">
+<!-- Icon -->
+<div class="mb-10 relative">
+<div class="absolute inset-0 bg-primary/20 blur-3xl rounded-full scale-150"></div>
+<div class="text-[80px] bioluminescent-glow select-none">🎓</div>
+</div>
+<!-- Text Content -->
+<div class="text-center space-y-4 mb-12">
+<h1 class="font-sora font-extrabold text-4xl md:text-5xl text-white tracking-tight leading-tight">
+                        Quais são suas formações <br/> e experiências?
+                    </h1>
+<p class="text-[#F0EFF4]/50 font-display text-lg max-w-md mx-auto">
+                        Cursos, certificações, vivências profissionais que você acumulou ao longo da sua trajetória.
+                    </p>
+</div>
+<!-- Form Area -->
+<div class="w-full space-y-8">
+<div class="relative group">
+<textarea class="w-full glass-input rounded-lg p-8 text-lg font-display text-white placeholder:text-white/20 focus:ring-2 focus:ring-primary/50 focus:border-primary outline-none min-h-[180px] transition-all resize-none shadow-2xl" placeholder="Descreva sua trajetória profissional, acadêmica e certificações..."></textarea>
+<!-- Decorative glow on focus border -->
+<div class="absolute -inset-0.5 bg-primary/0 group-focus-within:bg-primary/20 rounded-lg blur-sm -z-10 transition-all duration-500"></div>
+</div>
+<div class="flex flex-col items-center gap-6">
+<button class="bg-primary hover:bg-primary/90 text-white font-sora font-bold py-5 px-12 rounded-full text-lg shadow-[0_0_40px_-5px_rgba(123,97,255,0.6)] flex items-center gap-3 transition-all hover:scale-[1.02] active:scale-[0.98]">
+                            Continuar
+                            <span class="material-symbols-outlined">arrow_forward</span>
+</button>
+<p class="text-white/20 text-xs font-medium uppercase tracking-[0.2em]">Pressione Enter para prosseguir</p>
+</div>
+</div>
+</section>
+<!-- Bottom decorative background -->
+<div class="absolute bottom-0 left-1/2 -translate-x-1/2 w-[800px] h-[400px] bg-primary/5 blur-[120px] rounded-full -z-10"></div>
+</main>
+</div>
+<!-- Background Elements -->
+<div class="fixed top-[-10%] right-[-5%] w-[40vw] h-[40vw] bg-primary/10 blur-[150px] rounded-full pointer-events-none"></div>
+<div class="fixed bottom-[-10%] left-[20%] w-[30vw] h-[30vw] bg-purple-900/10 blur-[150px] rounded-full pointer-events-none"></div>
+</body></html>

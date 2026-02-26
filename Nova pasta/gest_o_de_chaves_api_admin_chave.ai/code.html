@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="pt-BR"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>chave.ai | Gestão de Chaves API</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&amp;family=Sora:wght@400;600;700&amp;family=Fira+Code:wght@400;500&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#330df2",
+                        "background-light": "#f6f5f8",
+                        "background-dark": "#0A0A14",
+                        "sidebar-dark": "#18181B",
+                        "neon-amber": "#FBBF24",
+                        "neon-green": "#10B981",
+                        "neon-red": "#EF4444",
+                        "plasma-purple": "#A855F7"
+                    },
+                    fontFamily: {
+                        "display": ["Space Grotesk", "sans-serif"],
+                        "sora": ["Sora", "sans-serif"],
+                        "fira": ["Fira Code", "monospace"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "1rem",
+                        "lg": "2rem",
+                        "xl": "3rem",
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+<style>.noise-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    opacity: 0.035;
+    z-index: 9999;
+    background-image: url(https://lh3.googleusercontent.com/aida-public/AB6AXuCMw5ZY4hrZFdSK4c7K5VITSXmIEX7tMr7PkC_rdUe_UBN0qamZzf8kMpi02vPTxSoO7c8sVHYxc_fczsO718uTA2LFi-Bg2tjEKMiA5-Ch-BGnb4hGzQKTiGS9m_H4gBss9Snn5FIvsLwztjFTGCAtkGrW9BqKEfDJWPca1ovGNyVyr4cUFgBsJv0dVTUj5LVZt_xkmjOkL1RLTf9jJgsByIoIpnadVVU0I743SJ2JnVw4ZQnmWmWEcyc2HjpmQgYqWpHFaY_8MTw)
+    }
+.glass-card {
+    background: rgba(255, 255, 255, 0.03);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.1)
+    }
+.plasma-gradient {
+    background: linear-gradient(90deg, #330df2 0%, #A855F7 100%)
+    }</style>
+</head>
+<body class="bg-background-light dark:bg-background-dark font-display text-slate-900 dark:text-slate-100 antialiased overflow-x-hidden">
+<div class="noise-overlay"></div>
+<div class="flex min-h-screen">
+<!-- Sidebar Navigation -->
+<aside class="w-72 bg-sidebar-dark border-r border-slate-800 flex flex-col fixed h-full z-20">
+<div class="p-8 flex items-center gap-3">
+<div class="w-10 h-10 rounded bg-primary flex items-center justify-center text-white" data-alt="Logotipo minimalista chave.ai">
+<span class="material-symbols-outlined text-2xl">key</span>
+</div>
+<div>
+<h1 class="font-sora font-bold text-xl tracking-tight">chave.ai</h1>
+<p class="text-xs text-slate-500 font-medium">ADMIN CONSOLE</p>
+</div>
+</div>
+<nav class="flex-1 px-4 space-y-2 mt-4">
+<a class="flex items-center gap-3 px-4 py-3 text-slate-400 hover:text-white transition-colors rounded" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="text-sm font-medium">Dashboard</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 bg-primary/10 text-primary border-r-4 border-primary rounded-none" href="#">
+<span class="material-symbols-outlined">vpn_key</span>
+<span class="text-sm font-medium">API Keys</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-slate-400 hover:text-white transition-colors rounded" href="#">
+<span class="material-symbols-outlined">hub</span>
+<span class="text-sm font-medium">Providers</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-slate-400 hover:text-white transition-colors rounded" href="#">
+<span class="material-symbols-outlined">monitoring</span>
+<span class="text-sm font-medium">Usage Metrics</span>
+</a>
+<div class="pt-8 pb-4 px-4">
+<p class="text-[10px] font-bold text-slate-600 uppercase tracking-widest">Configurações</p>
+</div>
+<a class="flex items-center gap-3 px-4 py-3 text-slate-400 hover:text-white transition-colors rounded" href="#">
+<span class="material-symbols-outlined">settings</span>
+<span class="text-sm font-medium">Settings</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-slate-400 hover:text-white transition-colors rounded" href="#">
+<span class="material-symbols-outlined">help</span>
+<span class="text-sm font-medium">Support</span>
+</a>
+</nav>
+<div class="p-6 border-t border-slate-800">
+<div class="flex items-center gap-3 p-2 rounded-lg hover:bg-white/5 cursor-pointer transition-all">
+<div class="w-10 h-10 rounded-full bg-slate-700 overflow-hidden" data-alt="Avatar do usuário administrador" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuB_4jk_sJPiuoKhXpIww7_U6wh08xE99Ce7i86D6VifPaXEy3bulHFXfe96iNw0Z_EwQ4_7N0-PQPetEu7ba8KqPcIX4lbIHoV-8QJ_hCl_-tEuJ3nB4sfMpRDn_hnfsjI5BkvUmXyjjttBqsEOgPiTC5a1WCagfFV80pidZonf5XSrw0if1wm3FvumBVgRtLHOFE4p-rnM18-b7Gntl-SFO27D0gjitJ0fe5KUraDDo_sHIIryniabI6DZePiWpMIFeCvaUXdhXmU')"></div>
+<div class="flex-1 overflow-hidden">
+<p class="text-sm font-semibold truncate">Alex Rivera</p>
+<p class="text-xs text-slate-500 truncate">alex@chave.ai</p>
+</div>
+</div>
+</div>
+</aside>
+<!-- Main Content Area -->
+<main class="flex-1 ml-72 p-10">
+<!-- Top Alert Banner -->
+<div class="mb-10 p-5 rounded-lg border border-neon-amber/30 bg-neon-amber/10 flex items-center justify-between">
+<div class="flex items-center gap-4">
+<span class="material-symbols-outlined text-neon-amber">verified_user</span>
+<p class="font-sora font-bold text-neon-amber tracking-wide">Mantenha suas chaves em segredo absoluto</p>
+</div>
+<button class="text-xs font-bold uppercase tracking-widest text-neon-amber/70 hover:text-neon-amber transition-colors">Segurança Avançada</button>
+</div>
+<!-- Page Header -->
+<div class="flex items-end justify-between mb-12">
+<div>
+<h2 class="text-4xl font-sora font-bold tracking-tight mb-2 text-slate-100">Gestão de Chaves API</h2>
+<p class="text-slate-400 max-w-xl">Gerencie credenciais, limites de tokens e monitoramento em tempo real de seus provedores de IA integrados.</p>
+</div>
+<div class="flex gap-4">
+<button class="flex items-center gap-2 px-6 py-3 bg-white/5 border border-slate-700 rounded-full text-sm font-semibold hover:bg-white/10 transition-all">
+<span class="material-symbols-outlined text-sm">refresh</span>
+                        Atualizar Tudo
+                    </button>
+</div>
+</div>
+<!-- API Provider Grid -->
+<div class="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-8">
+<!-- Card OpenAI -->
+<div class="glass-card rounded-lg p-8 flex flex-col h-full group transition-all hover:border-primary/50">
+<div class="flex justify-between items-start mb-8">
+<div class="w-12 h-12 rounded-lg bg-white/10 flex items-center justify-center" data-alt="Logotipo OpenAI">
+<span class="material-symbols-outlined text-white text-2xl">auto_awesome</span>
+</div>
+<div class="flex items-center gap-2 px-3 py-1.5 rounded-full bg-neon-green/10 border border-neon-green/20">
+<div class="w-2 h-2 rounded-full bg-neon-green shadow-[0_0_8px_rgba(16,185,129,0.8)]"></div>
+<span class="text-[10px] font-bold text-neon-green uppercase tracking-widest">Ativa</span>
+</div>
+</div>
+<div class="mb-6">
+<h3 class="text-xl font-sora font-bold mb-1">OpenAI</h3>
+<div class="flex items-center justify-between bg-black/40 rounded-lg p-3 border border-white/5">
+<code class="font-fira text-slate-400 text-sm tracking-widest">sk-••••••••••••••••</code>
+<div class="flex gap-1">
+<button class="p-1.5 text-slate-500 hover:text-white transition-colors" title="Mostrar"><span class="material-symbols-outlined text-lg">visibility</span></button>
+<button class="p-1.5 text-slate-500 hover:text-white transition-colors" title="Copiar"><span class="material-symbols-outlined text-lg">content_copy</span></button>
+</div>
+</div>
+</div>
+<div class="space-y-4 mb-8">
+<div>
+<div class="flex justify-between text-[11px] font-fira text-slate-500 uppercase mb-2 tracking-widest">
+<span>Token Limit Usage</span>
+<span class="text-plasma-purple">80%</span>
+</div>
+<div class="w-full h-1 bg-white/10 rounded-full overflow-hidden">
+<div class="h-full plasma-gradient rounded-full" style="width: 80%"></div>
+</div>
+</div>
+<div class="grid grid-cols-1 gap-2">
+<div class="flex items-center gap-2 text-xs font-fira text-slate-400">
+<span class="material-symbols-outlined text-xs">trending_up</span>
+                                Requisições hoje: 12.4k
+                            </div>
+<div class="flex items-center gap-2 text-xs font-fira text-slate-400">
+<span class="material-symbols-outlined text-xs">payments</span>
+                                Custo: $42.00
+                            </div>
+<div class="flex items-center gap-2 text-xs font-fira text-slate-500">
+<span class="material-symbols-outlined text-xs">history</span>
+                                Último uso: 2min atrás
+                            </div>
+</div>
+</div>
+<div class="mt-auto pt-6 border-t border-white/5 flex gap-3">
+<button class="flex-1 py-3 text-xs font-bold uppercase tracking-widest text-slate-300 bg-white/5 rounded hover:bg-white/10 transition-all">Atualizar Chave</button>
+<button class="px-4 py-3 text-xs font-bold uppercase tracking-widest text-neon-red/70 hover:text-neon-red hover:bg-neon-red/10 transition-all rounded">Revogar</button>
+</div>
+</div>
+<!-- Card Anthropic -->
+<div class="glass-card rounded-lg p-8 flex flex-col h-full group transition-all hover:border-primary/50">
+<div class="flex justify-between items-start mb-8">
+<div class="w-12 h-12 rounded-lg bg-white/10 flex items-center justify-center" data-alt="Logotipo Anthropic">
+<span class="material-symbols-outlined text-white text-2xl">neurology</span>
+</div>
+<div class="flex items-center gap-2 px-3 py-1.5 rounded-full bg-neon-green/10 border border-neon-green/20">
+<div class="w-2 h-2 rounded-full bg-neon-green shadow-[0_0_8px_rgba(16,185,129,0.8)]"></div>
+<span class="text-[10px] font-bold text-neon-green uppercase tracking-widest">Ativa</span>
+</div>
+</div>
+<div class="mb-6">
+<h3 class="text-xl font-sora font-bold mb-1">Anthropic</h3>
+<div class="flex items-center justify-between bg-black/40 rounded-lg p-3 border border-white/5">
+<code class="font-fira text-slate-400 text-sm tracking-widest">ant-••••••••••••••••</code>
+<div class="flex gap-1">
+<button class="p-1.5 text-slate-500 hover:text-white transition-colors" title="Mostrar"><span class="material-symbols-outlined text-lg">visibility</span></button>
+<button class="p-1.5 text-slate-500 hover:text-white transition-colors" title="Copiar"><span class="material-symbols-outlined text-lg">content_copy</span></button>
+</div>
+</div>
+</div>
+<div class="space-y-4 mb-8">
+<div>
+<div class="flex justify-between text-[11px] font-fira text-slate-500 uppercase mb-2 tracking-widest">
+<span>Token Limit Usage</span>
+<span class="text-plasma-purple">45%</span>
+</div>
+<div class="w-full h-1 bg-white/10 rounded-full overflow-hidden">
+<div class="h-full plasma-gradient rounded-full" style="width: 45%"></div>
+</div>
+</div>
+<div class="grid grid-cols-1 gap-2">
+<div class="flex items-center gap-2 text-xs font-fira text-slate-400">
+<span class="material-symbols-outlined text-xs">trending_up</span>
+                                Requisições hoje: 8.2k
+                            </div>
+<div class="flex items-center gap-2 text-xs font-fira text-slate-400">
+<span class="material-symbols-outlined text-xs">payments</span>
+                                Custo: $18.50
+                            </div>
+<div class="flex items-center gap-2 text-xs font-fira text-slate-500">
+<span class="material-symbols-outlined text-xs">history</span>
+                                Último uso: 15min atrás
+                            </div>
+</div>
+</div>
+<div class="mt-auto pt-6 border-t border-white/5 flex gap-3">
+<button class="flex-1 py-3 text-xs font-bold uppercase tracking-widest text-slate-300 bg-white/5 rounded hover:bg-white/10 transition-all">Atualizar Chave</button>
+<button class="px-4 py-3 text-xs font-bold uppercase tracking-widest text-neon-red/70 hover:text-neon-red hover:bg-neon-red/10 transition-all rounded">Revogar</button>
+</div>
+</div>
+<!-- Card Google Gemini (Error State) -->
+<div class="glass-card rounded-lg p-8 flex flex-col h-full group transition-all border-neon-red/20">
+<div class="flex justify-between items-start mb-8">
+<div class="w-12 h-12 rounded-lg bg-white/10 flex items-center justify-center" data-alt="Logotipo Google Gemini">
+<span class="material-symbols-outlined text-white text-2xl">bubble_chart</span>
+</div>
+<div class="flex items-center gap-2 px-3 py-1.5 rounded-full bg-neon-red/10 border border-neon-red/20">
+<div class="w-2 h-2 rounded-full bg-neon-red shadow-[0_0_8px_rgba(239,68,68,0.8)]"></div>
+<span class="text-[10px] font-bold text-neon-red uppercase tracking-widest">Erro</span>
+</div>
+</div>
+<div class="mb-6">
+<h3 class="text-xl font-sora font-bold mb-1">Google Gemini</h3>
+<div class="flex items-center justify-between bg-black/40 rounded-lg p-3 border border-neon-red/30">
+<code class="font-fira text-neon-red/60 text-sm tracking-widest">goog-••••••••••••••••</code>
+<div class="flex gap-1">
+<button class="p-1.5 text-slate-500 hover:text-white transition-colors" title="Mostrar"><span class="material-symbols-outlined text-lg">visibility</span></button>
+<button class="p-1.5 text-slate-500 hover:text-white transition-colors" title="Copiar"><span class="material-symbols-outlined text-lg">content_copy</span></button>
+</div>
+</div>
+</div>
+<div class="space-y-4 mb-8">
+<div>
+<div class="flex justify-between text-[11px] font-fira text-slate-500 uppercase mb-2 tracking-widest">
+<span>Token Limit Usage</span>
+<span class="text-slate-600">--%</span>
+</div>
+<div class="w-full h-1 bg-white/10 rounded-full overflow-hidden">
+<div class="h-full bg-slate-700 rounded-full" style="width: 0%"></div>
+</div>
+</div>
+<div class="p-3 bg-neon-red/5 rounded border border-neon-red/10 text-[10px] font-fira text-neon-red leading-relaxed">
+                            Error: Authentication Failed. Re-authentication required to resume services.
+                        </div>
+</div>
+<div class="mt-auto pt-6 border-t border-white/5 flex gap-3">
+<button class="flex-1 py-3 text-xs font-bold uppercase tracking-widest text-white bg-primary rounded hover:bg-primary/80 transition-all">Reautenticar</button>
+<button class="px-4 py-3 text-xs font-bold uppercase tracking-widest text-neon-red/70 hover:text-neon-red hover:bg-neon-red/10 transition-all rounded">Remover</button>
+</div>
+</div>
+<!-- Add New Provider Card -->
+<div class="flex flex-col items-center justify-center p-8 h-full rounded-lg border-2 border-dashed border-white/10 hover:border-primary/50 hover:bg-primary/5 cursor-pointer transition-all group min-h-[400px]">
+<div class="w-16 h-16 rounded-full bg-white/5 border border-white/10 flex items-center justify-center mb-6 group-hover:scale-110 group-hover:bg-primary group-hover:text-white transition-all shadow-[0_0_20px_rgba(51,13,242,0)] group-hover:shadow-[0_0_30px_rgba(51,13,242,0.4)]">
+<span class="material-symbols-outlined text-3xl">add</span>
+</div>
+<p class="font-sora font-bold text-lg text-slate-300 group-hover:text-white">+ Adicionar Provider</p>
+<p class="text-slate-500 text-xs mt-2 text-center max-w-[200px]">Integre novos modelos e APIs ao ecossistema chave.ai</p>
+</div>
+</div>
+</main>
+</div>
+</body></html>
