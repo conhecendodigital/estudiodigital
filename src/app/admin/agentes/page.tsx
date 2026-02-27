@@ -225,8 +225,8 @@ export default function GestaoAgentesPage() {
                             <div
                                 key={agent.id}
                                 className={`bg-white/5 backdrop-blur-md border rounded-2xl flex flex-col transition-all duration-500 group hover:-translate-y-1 ${agent.active
-                                        ? 'border-white/10 hover:border-primary/30 hover:shadow-[0_0_25px_rgba(123,97,255,0.1)]'
-                                        : 'border-white/5 opacity-60 hover:opacity-80'
+                                    ? 'border-white/10 hover:border-primary/30 hover:shadow-[0_0_25px_rgba(123,97,255,0.1)]'
+                                    : 'border-white/5 opacity-60 hover:opacity-80'
                                     }`}
                             >
                                 {/* Card Header: Avatar + Toggle */}
@@ -247,8 +247,8 @@ export default function GestaoAgentesPage() {
                                     <button
                                         onClick={() => toggleAgent(agent.id)}
                                         className={`relative w-11 h-6 rounded-full transition-all duration-300 flex-shrink-0 mt-1 ${agent.active
-                                                ? 'bg-primary shadow-[0_0_12px_rgba(123,97,255,0.4)]'
-                                                : 'bg-white/10'
+                                            ? 'bg-primary shadow-[0_0_12px_rgba(123,97,255,0.4)]'
+                                            : 'bg-white/10'
                                             }`}
                                         title={agent.active ? 'Desativar agente' : 'Ativar agente'}
                                     >
@@ -278,10 +278,10 @@ export default function GestaoAgentesPage() {
 
                                 {/* Card Footer: Actions */}
                                 <div className="border-t border-white/5 px-5 py-3 flex items-center">
-                                    <button className="flex items-center gap-1.5 text-slate-500 hover:text-primary hover:bg-primary/10 px-3 py-1.5 rounded-lg transition-all duration-300 text-xs font-semibold">
+                                    <Link href={`/admin/agentes/${agent.id}`} className="flex items-center gap-1.5 text-slate-500 hover:text-primary hover:bg-primary/10 px-3 py-1.5 rounded-lg transition-all duration-300 text-xs font-semibold">
                                         <span className="material-symbols-outlined text-[16px]">edit</span>
                                         Editar
-                                    </button>
+                                    </Link>
                                     <button className="flex items-center gap-1.5 text-slate-500 hover:text-slate-200 hover:bg-white/5 px-3 py-1.5 rounded-lg transition-all duration-300 text-xs font-semibold">
                                         <span className="material-symbols-outlined text-[16px]">content_copy</span>
                                         Duplicar
