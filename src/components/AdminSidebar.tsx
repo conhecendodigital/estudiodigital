@@ -11,6 +11,7 @@ export default function AdminSidebar() {
     const navLinks = [
         { href: '/admin', icon: <LayoutDashboard className="size-5" />, label: 'Visão Geral' },
         { href: '/admin/agentes/novo', icon: <Bot className="size-5" />, label: 'Criar Agente' },
+        { href: '/admin/agentes', icon: <Users className="size-5" />, label: 'Gestão de Agentes' },
         { href: '/admin/integracoes', icon: <Plug className="size-5" />, label: 'Integrações IA' },
         { href: '/admin/pagamentos', icon: <CreditCard className="size-5" />, label: 'Pagamentos' },
         { href: '/admin/clientes', icon: <Users className="size-5" />, label: 'Assinantes' },
