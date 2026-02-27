@@ -13,6 +13,11 @@ export default function Topbar() {
         return null;
     }
 
+    // Hide Topbar on authentication and onboarding routes
+    if (pathname && (pathname === '/login' || pathname.startsWith('/onboarding'))) {
+        return null;
+    }
+
     return (
         <header className="flex items-center justify-between border-b border-white/5 px-6 py-4 glass-panel sticky top-0 z-50 bg-background-dark/80 backdrop-blur-xl w-full">
             <div className="flex items-center gap-4">
@@ -38,18 +43,20 @@ export default function Topbar() {
 
             <nav className="hidden md:flex items-center gap-8">
                 <Link href="/agentes" className="text-slate-400 hover:text-primary transition-colors text-sm font-medium">Agentes</Link>
-                <Link href="/modulos" className="text-slate-400 hover:text-primary transition-colors text-sm font-medium">Módulos</Link>
-                <Link href="/comunidade" className="text-slate-400 hover:text-primary transition-colors text-sm font-medium">Comunidade</Link>
-                <Link href="/configuracoes" className="text-slate-400 hover:text-primary transition-colors text-sm font-medium">Configurações</Link>
+                <Link href="/cofre" className="text-slate-400 hover:text-primary transition-colors text-sm font-medium">Cofre</Link>
+                <Link href="/calendario" className="text-slate-400 hover:text-primary transition-colors text-sm font-medium">Calendário</Link>
+                <Link href="/historico" className="text-slate-400 hover:text-primary transition-colors text-sm font-medium">Histórico</Link>
             </nav>
 
             <div className="flex items-center gap-4">
                 <button className="bg-primary/10 hover:bg-primary/20 text-primary px-4 py-2 rounded-full text-sm font-bold transition-all border border-primary/20">
                     Plano Admin
                 </button>
-                <div className="w-10 h-10 rounded-full border-2 border-primary/30 p-0.5 cursor-pointer hover:border-primary transition-colors">
-                    <div className="w-full h-full rounded-full bg-cover bg-center" style={{ backgroundImage: "url('https://lh3.googleusercontent.com/aida-public/AB6AXuDh6bHL3BwS1lm1TBMgged5oOIBj6DUMQNn6P7yfQZMxDg6zoiHfRD2hBwZ4ZbDV-H5JzfHCN_88ONPW0zczvb3TpDr-NTPnf2WZelACDlbStc1lrOe2UX59nAPk0ryt6rMicNkB49_RT1dpqakVDH_ND9CwCQG1xh_w7aGVmGaePcpIQGqPBvHNYZwyOb4abmuYXr1OA4s1q_XltQuxYcQoO-a5jkPvq2HlR8wCps_oaaFynNRbZ9TYtizP_uVJIlYtdHu_H1n8GU')" }}></div>
-                </div>
+                <Link href="/perfil">
+                    <div className="w-10 h-10 rounded-full border-2 border-primary/30 p-0.5 cursor-pointer hover:border-primary transition-colors">
+                        <div className="w-full h-full rounded-full bg-cover bg-center" style={{ backgroundImage: "url('https://lh3.googleusercontent.com/aida-public/AB6AXuDh6bHL3BwS1lm1TBMgged5oOIBj6DUMQNn6P7yfQZMxDg6zoiHfRD2hBwZ4ZbDV-H5JzfHCN_88ONPW0zczvb3TpDr-NTPnf2WZelACDlbStc1lrOe2UX59nAPk0ryt6rMicNkB49_RT1dpqakVDH_ND9CwCQG1xh_w7aGVmGaePcpIQGqPBvHNYZwyOb4abmuYXr1OA4s1q_XltQuxYcQoO-a5jkPvq2HlR8wCps_oaaFynNRbZ9TYtizP_uVJIlYtdHu_H1n8GU')" }}></div>
+                    </div>
+                </Link>
             </div>
         </header>
     );

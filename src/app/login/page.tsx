@@ -1,26 +1,17 @@
-'use client';
-
 import React from 'react';
 import Link from 'next/link';
-import { EyeIcon } from 'lucide-react';
 
 export default function LoginPage() {
     return (
         <div className="bg-background-dark font-display text-slate-100 min-h-screen flex flex-col relative overflow-hidden">
             {/* Background Effects */}
-            <div className="noise-overlay"></div>
+            <div className="absolute inset-0 opacity-[0.03] pointer-events-none bg-[url('data:image/svg+xml,%3Csvg viewBox=\'0 0 200 200\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cfilter id=\'noiseFilter\'%3E%3CfeTurbulence type=\'fractalNoise\' baseFrequency=\'0.65\' numOctaves=\'3\' stitchTiles=\'stitch\'/%3E%3C/filter%3E%3Crect width=\'100%25\' height=\'100%25\' filter=\'url(%23noiseFilter)\'/%3E%3C/svg%3E')]"></div>
 
-            {/* Bioluminescence orbs */}
-            <div
-                className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] rounded-full pointer-events-none"
-                style={{ background: 'radial-gradient(circle at 50% 50%, rgba(123, 97, 255, 0.15) 0%, transparent 70%)' }}
-            ></div>
-            <div
-                className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] rounded-full pointer-events-none"
-                style={{ background: 'radial-gradient(circle at 50% 50%, rgba(123, 97, 255, 0.15) 0%, transparent 70%)' }}
-            ></div>
+            <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] rounded-full pointer-events-none" style={{ background: 'radial-gradient(circle at 50% 50%, rgba(123, 97, 255, 0.15) 0%, transparent 70%)' }}></div>
+            <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] rounded-full pointer-events-none" style={{ background: 'radial-gradient(circle at 50% 50%, rgba(123, 97, 255, 0.15) 0%, transparent 70%)' }}></div>
 
-            <div className="layout-container flex h-full grow flex-col items-center justify-center p-6 relative z-10">
+            <div className="flex h-full grow flex-col items-center justify-center p-6 relative z-10 min-h-screen">
+
                 {/* Header / Logo */}
                 <header className="mb-12 flex flex-col items-center">
                     <div className="flex items-center gap-2 group cursor-default">
@@ -38,12 +29,12 @@ export default function LoginPage() {
 
                 {/* Central Card */}
                 <main className="w-full max-w-[480px]">
-                    <div className="glass-card rounded-[2rem] p-10 shadow-2xl border border-plasma-purple/30 bg-background-dark/40 backdrop-blur-xl">
+                    <div className="bg-[#120f23]/60 backdrop-blur-md rounded-[2rem] p-10 shadow-2xl border border-primary/20">
                         <h1 className="text-white font-serif italic text-[40px] leading-tight text-center mb-10">
                             Bem-vindo ao sistema.
                         </h1>
 
-                        <form className="space-y-6" onSubmit={(e) => { e.preventDefault(); window.location.href = '/'; }}>
+                        <form className="space-y-6">
                             {/* Email Field */}
                             <div className="relative group">
                                 <label className="block font-sora text-sm font-medium text-slate-400 mb-2 transition-colors group-focus-within:text-primary" htmlFor="email">
@@ -55,6 +46,7 @@ export default function LoginPage() {
                                     name="email"
                                     placeholder="usuario@email.com.br"
                                     type="email"
+                                    required
                                 />
                             </div>
 
@@ -64,9 +56,9 @@ export default function LoginPage() {
                                     <label className="block font-sora text-sm font-medium text-slate-400 transition-colors group-focus-within:text-primary" htmlFor="password">
                                         Senha
                                     </label>
-                                    <Link href="#" className="text-xs font-sora text-slate-500 hover:text-ghost-white transition-colors hover:underline underline-offset-4">
+                                    <a className="text-xs font-sora text-slate-500 hover:text-slate-200 transition-colors hover:underline underline-offset-4" href="#">
                                         Esqueci minha senha
-                                    </Link>
+                                    </a>
                                 </div>
                                 <div className="relative flex items-center">
                                     <input
@@ -75,21 +67,21 @@ export default function LoginPage() {
                                         name="password"
                                         placeholder="••••••••"
                                         type="password"
+                                        required
                                     />
                                     <button className="absolute right-4 text-slate-500 hover:text-primary transition-colors" type="button">
-                                        <EyeIcon size={20} />
+                                        <span className="material-symbols-outlined">visibility</span>
                                     </button>
                                 </div>
                             </div>
 
                             {/* Login Button */}
                             <div className="pt-4">
-                                <button
-                                    className="btn-magnetic w-full bg-primary hover:bg-primary/90 text-white font-sora font-bold text-lg py-5 rounded-full shadow-lg"
-                                    type="submit"
-                                >
-                                    Entrar
-                                </button>
+                                <Link href="/" className="block w-full">
+                                    <button className="w-full bg-primary hover:bg-primary/90 text-white font-sora font-bold text-lg py-5 rounded-full shadow-[0_0_20px_rgba(123,97,255,0.3)] transition-all hover:scale-[1.02] active:scale-[0.98]">
+                                        Entrar
+                                    </button>
+                                </Link>
                             </div>
                         </form>
 
@@ -97,7 +89,7 @@ export default function LoginPage() {
                         <div className="mt-10 text-center">
                             <p className="font-sora text-slate-400 text-sm">
                                 Novo por aqui?
-                                <Link className="text-ghost-white font-semibold hover:underline underline-offset-4 transition-all ml-1" href="#">
+                                <Link className="text-slate-200 font-semibold hover:underline underline-offset-4 transition-all ml-1" href="/onboarding">
                                     Criar conta
                                 </Link>
                             </p>
@@ -107,7 +99,7 @@ export default function LoginPage() {
 
                 {/* Decorative Footer */}
                 <footer className="mt-12 opacity-40">
-                    <div className="flex gap-6 text-[10px] tracking-widest uppercase font-sora text-ghost-white">
+                    <div className="flex gap-6 text-[10px] tracking-widest uppercase font-sora text-slate-300">
                         <span className="cursor-default">Privacidade</span>
                         <span className="cursor-default">Termos</span>
                         <span className="cursor-default">Suporte</span>

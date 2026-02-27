@@ -10,9 +10,9 @@ export default function Sidebar() {
     const navLinks = [
         { href: '/', icon: 'home', label: 'Início' },
         { href: '/agentes', icon: 'smart_toy', label: 'Agentes' },
-        { href: '/modulos', icon: 'extension', label: 'Módulos' },
-        { href: '/comunidade', icon: 'group', label: 'Comunidade' },
-        { href: '/configuracoes', icon: 'settings', label: 'Configurações' },
+        { href: '/cofre', icon: 'folder_open', label: 'Cofre' },
+        { href: '/calendario', icon: 'calendar_month', label: 'Calendário' },
+        { href: '/historico', icon: 'history', label: 'Histórico' },
     ];
 
     return (
@@ -37,7 +37,7 @@ export default function Sidebar() {
             </nav>
 
             <div className="p-6 border-t border-white/5 bg-black/10">
-                <div className="flex items-center gap-4 p-2 rounded-lg hover:bg-white/5 transition-all cursor-pointer">
+                <Link href="/perfil" className="flex items-center gap-4 p-2 rounded-lg hover:bg-white/5 transition-all cursor-pointer">
                     <div className="relative">
                         <div className="w-10 h-10 rounded-full border border-white/10 bg-gradient-to-tr from-primary/30 to-accent-neon/30 flex items-center justify-center overflow-hidden">
                             <span className="text-accent-neon font-bold font-display text-sm">MS</span>
@@ -49,7 +49,7 @@ export default function Sidebar() {
                         <p className="text-xs text-primary font-mono tracking-tighter">Admin Master</p>
                     </div>
                     <span className="material-symbols-outlined text-slate-500 text-sm">more_vert</span>
-                </div>
+                </Link>
             </div>
         </aside>
     );

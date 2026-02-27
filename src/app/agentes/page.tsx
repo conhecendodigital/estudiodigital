@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import Link from 'next/link';
 import Sidebar from '@/components/Sidebar';
 
 export default function AgentesLibraryPage() {
@@ -56,10 +57,10 @@ export default function AgentesLibraryPage() {
                             <p className="text-sm text-slate-400 font-sora leading-relaxed mb-8 flex-grow">
                                 Criação de roteiros virais e legendas magnéticas otimizadas para retenção.
                             </p>
-                            <button className="btn-magnetic w-full py-3 rounded-xl bg-white/5 hover:bg-primary text-slate-100 font-bold transition-all flex items-center justify-center gap-2">
+                            <Link href="/chat" className="btn-magnetic w-full py-3 rounded-xl bg-white/5 hover:bg-primary text-slate-100 font-bold transition-all flex items-center justify-center gap-2">
                                 Acessar
                                 <span className="material-symbols-outlined text-sm pt-0.5">arrow_forward</span>
-                            </button>
+                            </Link>
                         </div>
 
                         {/* Agent Card: Active 2 */}
@@ -74,10 +75,10 @@ export default function AgentesLibraryPage() {
                             <p className="text-sm text-slate-400 font-sora leading-relaxed mb-8 flex-grow">
                                 Sequências persuasivas para fechamento imediato e quebra de objeções.
                             </p>
-                            <button className="btn-magnetic w-full py-3 rounded-xl bg-white/5 hover:bg-primary text-slate-100 font-bold transition-all flex items-center justify-center gap-2">
+                            <Link href="/chat" className="btn-magnetic w-full py-3 rounded-xl bg-white/5 hover:bg-primary text-slate-100 font-bold transition-all flex items-center justify-center gap-2">
                                 Acessar
                                 <span className="material-symbols-outlined text-sm pt-0.5">arrow_forward</span>
-                            </button>
+                            </Link>
                         </div>
 
                         {/* Agent Card: Active 3 */}
@@ -92,10 +93,10 @@ export default function AgentesLibraryPage() {
                             <p className="text-sm text-slate-400 font-sora leading-relaxed mb-8 flex-grow">
                                 Otimização técnica e estratégica de palavras-chave para mecanismos de busca.
                             </p>
-                            <button className="btn-magnetic w-full py-3 rounded-xl bg-white/5 hover:bg-primary text-slate-100 font-bold transition-all flex items-center justify-center gap-2">
+                            <Link href="/chat" className="btn-magnetic w-full py-3 rounded-xl bg-white/5 hover:bg-primary text-slate-100 font-bold transition-all flex items-center justify-center gap-2">
                                 Acessar
                                 <span className="material-symbols-outlined text-sm pt-0.5">arrow_forward</span>
-                            </button>
+                            </Link>
                         </div>
 
                         {/* Agent Card: Active 4 */}
@@ -110,10 +111,10 @@ export default function AgentesLibraryPage() {
                             <p className="text-sm text-slate-400 font-sora leading-relaxed mb-8 flex-grow">
                                 Organização e respostas inteligentes para seu inbox com priorização automática.
                             </p>
-                            <button className="btn-magnetic w-full py-3 rounded-xl bg-white/5 hover:bg-primary text-slate-100 font-bold transition-all flex items-center justify-center gap-2">
+                            <Link href="/chat" className="btn-magnetic w-full py-3 rounded-xl bg-white/5 hover:bg-primary text-slate-100 font-bold transition-all flex items-center justify-center gap-2">
                                 Acessar
                                 <span className="material-symbols-outlined text-sm pt-0.5">arrow_forward</span>
-                            </button>
+                            </Link>
                         </div>
 
                         {/* Agent Card: Locked 1 */}
