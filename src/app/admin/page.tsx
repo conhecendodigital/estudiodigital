@@ -1,11 +1,11 @@
 import React from 'react';
-import Sidebar from '@/components/Sidebar';
+import AdminSidebar from '@/components/AdminSidebar';
 
 export default function AdminDashboard() {
     return (
         <div className="flex min-h-screen bg-background-dark font-display text-slate-100">
-            {/* Using the standard Sidebar for now, can be swapped for an AdminSidebar later if needed */}
-            <Sidebar />
+            {/* Admin specific sidebar */}
+            <AdminSidebar />
 
             {/* Main Content */}
             <main className="flex-1 ml-72 p-10 overflow-y-auto w-full relative">

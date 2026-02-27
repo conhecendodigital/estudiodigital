@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="pt-br"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>chave.ai | Histórico de Gerações</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&amp;family=Sora:wght@400;600;800&amp;family=Fira+Code:wght@400;500&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#7b61ff",
+                        "background-light": "#f6f5f8",
+                        "background-dark": "#0A0A14",
+                    },
+                    fontFamily: {
+                        "display": ["Space Grotesk", "sans-serif"],
+                        "sora": ["Sora", "sans-serif"],
+                        "fira": ["Fira Code", "monospace"]
+                    },
+                    borderRadius: {"DEFAULT": "1rem", "lg": "2rem", "xl": "3rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+<style>
+        .glass {
+            background: rgba(123, 97, 255, 0.05);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(123, 97, 255, 0.1);
+        }
+        .biolume {
+            box-shadow: 0 0 15px rgba(123, 97, 255, 0.2);
+        }
+        .biolume-accent {
+            box-shadow: 0 0 10px rgba(123, 97, 255, 0.4);
+        }
+    </style>
+</head>
+<body class="bg-background-dark text-slate-100 font-display selection:bg-primary/30">
+<div class="relative flex h-auto min-h-screen w-full flex-col bg-background-dark overflow-x-hidden">
+<header class="sticky top-0 z-50 flex items-center justify-between whitespace-nowrap border-b border-primary/10 bg-background-dark/80 backdrop-blur-md px-6 md:px-10 py-4">
+<div class="flex items-center gap-8">
+<div class="flex items-center gap-3 text-primary">
+<div class="size-8 flex items-center justify-center rounded-lg bg-primary/10 biolume-accent">
+<span class="material-symbols-outlined text-primary">auto_awesome</span>
+</div>
+<h2 class="text-slate-100 text-xl font-sora font-extrabold leading-tight tracking-tight">chave.ai</h2>
+</div>
+<nav class="hidden lg:flex items-center gap-9">
+<a class="text-primary text-sm font-medium leading-normal flex items-center gap-2" href="#">
+<span class="material-symbols-outlined text-sm">history</span> Histórico
+                    </a>
+<a class="text-slate-400 hover:text-white transition-colors text-sm font-medium leading-normal" href="#">Agentes</a>
+<a class="text-slate-400 hover:text-white transition-colors text-sm font-medium leading-normal" href="#">Configurações</a>
+</nav>
+</div>
+<div class="flex flex-1 justify-end gap-6 items-center">
+<label class="hidden md:flex flex-col min-w-40 h-10 max-w-64">
+<div class="flex w-full flex-1 items-stretch rounded-full glass overflow-hidden">
+<div class="text-slate-400 flex items-center justify-center pl-4">
+<span class="material-symbols-outlined">search</span>
+</div>
+<input class="form-input flex w-full min-w-0 flex-1 border-none bg-transparent focus:ring-0 placeholder:text-slate-500 px-4 text-sm" placeholder="Buscar no log..." value=""/>
+</div>
+</label>
+<div class="flex items-center gap-3 border-l border-primary/10 pl-6">
+<div class="text-right hidden sm:block">
+<p class="text-xs font-fira text-primary">SYSTEM_READY</p>
+<p class="text-sm font-sora font-semibold">User_04</p>
+</div>
+<div class="bg-primary/20 p-0.5 rounded-full biolume">
+<img class="size-9 rounded-full" data-alt="Avatar circular do usuário com tons roxos" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDyI8bp8EsobH8iBx9p1fQdNgzadnmgeUs4wklVLFLQWnMV_fs1pIo1p30GUA5DSjUXycM6JNXqG2BqkV-Z0oDv4iqIkjO_I_qqyyh02Zu2jnWQ4aCVRG9QzbN5TKXKEKKMOgkU3u4p-IgXfkIY-A-I04BJGFV2gHekYx2PZVZ-Doufrg44LArBXpnI0jr7gRyiSncBER6W5r6lTBLpXS9uFj6r3NXuTJiw_rmM_snMupmHnuISlHx1recYnkRwKP4uY3-bzZmtFvU"/>
+</div>
+</div>
+</div>
+</header>
+<main class="flex-1 flex flex-col lg:flex-row">
+<aside class="w-full lg:w-72 border-r border-primary/5 p-6 flex flex-col gap-8">
+<div class="flex flex-col gap-1">
+<h1 class="text-2xl font-sora font-bold text-slate-100">Gerações</h1>
+<p class="text-slate-500 text-xs font-fira">v2.0.4-stable-biolume</p>
+</div>
+<div class="flex flex-col gap-2">
+<p class="text-[10px] uppercase tracking-widest text-slate-600 font-bold mb-2">Monitoramento</p>
+<div class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-primary/5 text-slate-400 cursor-pointer transition-all">
+<span class="material-symbols-outlined">dashboard</span>
+<p class="text-sm font-medium">Dashboard</p>
+</div>
+<div class="flex items-center gap-3 px-4 py-3 rounded-xl bg-primary/10 text-primary biolume border border-primary/20 cursor-pointer">
+<span class="material-symbols-outlined">terminal</span>
+<p class="text-sm font-medium">Log do Sistema</p>
+</div>
+<div class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-primary/5 text-slate-400 cursor-pointer transition-all">
+<span class="material-symbols-outlined">smart_toy</span>
+<p class="text-sm font-medium">Agentes</p>
+</div>
+<div class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-primary/5 text-slate-400 cursor-pointer transition-all">
+<span class="material-symbols-outlined">database</span>
+<p class="text-sm font-medium">Dataset</p>
+</div>
+</div>
+<div class="mt-auto glass p-4 rounded-xl border border-primary/10">
+<div class="flex items-center justify-between mb-3">
+<p class="text-xs font-fira text-primary">CRÉDITOS</p>
+<span class="text-xs font-fira">842 / 1000</span>
+</div>
+<div class="h-1.5 w-full bg-slate-800 rounded-full overflow-hidden">
+<div class="h-full bg-primary w-[84%] biolume-accent"></div>
+</div>
+</div>
+</aside>
+<section class="flex-1 p-6 md:p-10 max-w-7xl mx-auto w-full">
+<div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 mb-8">
+<div>
+<h2 class="text-3xl font-sora font-extrabold text-white mb-2 tracking-tight">Histórico de Execução</h2>
+<p class="text-slate-400 font-fira text-sm flex items-center gap-2">
+<span class="size-2 rounded-full bg-green-500 animate-pulse"></span>
+                            Aguardando novas entradas do pipeline...
+                        </p>
+</div>
+<div class="flex gap-2 glass p-1 rounded-full">
+<button class="px-4 py-1.5 rounded-full bg-primary text-white text-xs font-sora font-medium biolume">Diário</button>
+<button class="px-4 py-1.5 rounded-full text-slate-400 text-xs font-sora font-medium hover:text-white transition-colors">Semanal</button>
+<button class="px-4 py-1.5 rounded-full text-slate-400 text-xs font-sora font-medium hover:text-white transition-colors">Total</button>
+</div>
+</div>
+<div class="flex flex-wrap gap-2 mb-10 pb-4 border-b border-primary/5 overflow-x-auto">
+<button class="flex items-center gap-2 px-4 py-2 rounded-full glass border-primary/30 text-primary text-xs font-fira font-medium">
+<span class="material-symbols-outlined text-sm">filter_list</span> ALL_CATEGORIES
+                    </button>
+<button class="flex items-center gap-2 px-4 py-2 rounded-full glass text-slate-400 hover:text-white transition-all text-xs font-fira">
+                        #PRODUTIVIDADE
+                    </button>
+<button class="flex items-center gap-2 px-4 py-2 rounded-full glass text-slate-400 hover:text-white transition-all text-xs font-fira">
+                        #VENDAS
+                    </button>
+<button class="flex items-center gap-2 px-4 py-2 rounded-full glass text-slate-400 hover:text-white transition-all text-xs font-fira">
+                        #MARKETING
+                    </button>
+<button class="flex items-center gap-2 px-4 py-2 rounded-full glass text-slate-400 hover:text-white transition-all text-xs font-fira">
+                        #DEV_CORE
+                    </button>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+<div class="group relative flex flex-col glass rounded-xl border border-primary/10 overflow-hidden hover:border-primary/40 transition-all duration-300">
+<div class="h-40 w-full relative overflow-hidden">
+<div class="absolute inset-0 bg-gradient-to-t from-background-dark to-transparent z-10"></div>
+<img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" data-alt="Abstrato digital fluido em cores roxas e azuis" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCYXZdujkDUb2t88ioZ6bhgquTmHQPHcj6SvPsrSjI1g2qTO7eGGWRb_6rjXMcexjztmGbVK-uV-JgrvoHlfXJqPYBmzTg4FGX0WRVqmHjYPbDrf49A4j9G3pAj15QhmSPSUfpZ558loxiQYNpA7Ibfe_WGm-9EZWB1942UzOm5OQjQeQ85PiKW1-lOhzgRanKhsxEA1eoiDXX9XrbW94tSn4g7js1IiIGpT3bvGNFLOEfRgoDAKjO49o2g7JjxcB9_IENBJ1iCiaY"/>
+<span class="absolute top-3 right-3 z-20 px-2 py-1 bg-background-dark/80 backdrop-blur rounded text-[10px] font-fira text-primary border border-primary/30">SUCCESS</span>
+</div>
+<div class="p-5 flex flex-col gap-4">
+<div class="flex justify-between items-start">
+<div>
+<h3 class="text-white font-sora font-bold text-lg leading-tight">Agente Analista de SEO</h3>
+<p class="text-slate-500 text-[11px] font-fira mt-1 uppercase tracking-wider">Ref: 0x9823-MARKETING</p>
+</div>
+<div class="bg-primary/10 p-2 rounded-lg">
+<span class="material-symbols-outlined text-primary text-xl">insights</span>
+</div>
+</div>
+<div class="flex items-center justify-between mt-2 pt-4 border-t border-primary/5">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-sm text-slate-500">calendar_today</span>
+<span class="text-xs font-fira text-slate-400">22 JAN 2024, 14:32</span>
+</div>
+<button class="text-primary hover:text-white transition-colors">
+<span class="material-symbols-outlined">open_in_new</span>
+</button>
+</div>
+</div>
+</div>
+<div class="group relative flex flex-col glass rounded-xl border border-primary/10 overflow-hidden hover:border-primary/40 transition-all duration-300">
+<div class="h-40 w-full relative overflow-hidden">
+<div class="absolute inset-0 bg-gradient-to-t from-background-dark to-transparent z-10"></div>
+<img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" data-alt="Código de programação complexo iluminado com luz neon roxa" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAAxAwevE_m0SC0GxM8CSMNpdrsi4iulcXvpKp4ACRd5vDE-A2IqhieH4KNt8cj7r5LyGrteRbG6NOMCJ5rMFendO4Lc9OG2n5QEc6p9qAwtrTvI4qy3qU0qYHPP9Z3_FtT4IXxfir3WB-MjN_YgFIxHKxcQOn5J6I-ogZpbecF2dFheRQG13CKSYFkVndB8JGHXrB327W7m0dHOrV4F64jxVx34mVRMbgno-iLeSsUMRJbaTL5ErnTkNysL3G5eLibFRUlG7hCYdc"/>
+<span class="absolute top-3 right-3 z-20 px-2 py-1 bg-background-dark/80 backdrop-blur rounded text-[10px] font-fira text-primary border border-primary/30">SUCCESS</span>
+</div>
+<div class="p-5 flex flex-col gap-4">
+<div class="flex justify-between items-start">
+<div>
+<h3 class="text-white font-sora font-bold text-lg leading-tight">Refatorador de Código</h3>
+<p class="text-slate-500 text-[11px] font-fira mt-1 uppercase tracking-wider">Ref: 0xA114-DEV_CORE</p>
+</div>
+<div class="bg-primary/10 p-2 rounded-lg">
+<span class="material-symbols-outlined text-primary text-xl">code</span>
+</div>
+</div>
+<div class="flex items-center justify-between mt-2 pt-4 border-t border-primary/5">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-sm text-slate-500">calendar_today</span>
+<span class="text-xs font-fira text-slate-400">22 JAN 2024, 11:15</span>
+</div>
+<button class="text-primary hover:text-white transition-colors">
+<span class="material-symbols-outlined">open_in_new</span>
+</button>
+</div>
+</div>
+</div>
+<div class="group relative flex flex-col glass rounded-xl border border-primary/10 overflow-hidden hover:border-primary/40 transition-all duration-300">
+<div class="h-40 w-full relative overflow-hidden">
+<div class="absolute inset-0 bg-gradient-to-t from-background-dark to-transparent z-10"></div>
+<img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" data-alt="Esferas bioluminescentes flutuando em fundo escuro" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAVit8ckuxQAEQEeY7SMf-v-uaVU1NF3knpYMeG4U9hT2GFgNEMg6HWzNLDaYbp-73FnbPT4AcyH3QLm9OP18i_JE7W1Glf-xSgzPnmOTA8pS8-YDA6elWdZQqRSfKHFPnTmqexG7HJGQoobocGpVt7dMVoB8lWcWiuI1KGXoFFHj_f_DvdTBfxBFuyU-bCYYK-YM7bi3RDJuHzB95HZFOjjDsY97krV_lL5m-4UWQQFupHT-UfDGvdRlXFtc7SRP0L4Qe8OgvTU2s"/>
+<span class="absolute top-3 right-3 z-20 px-2 py-1 bg-background-dark/80 backdrop-blur rounded text-[10px] font-fira text-yellow-500 border border-yellow-500/30">RUNNING</span>
+</div>
+<div class="p-5 flex flex-col gap-4">
+<div class="flex justify-between items-start">
+<div>
+<h3 class="text-white font-sora font-bold text-lg leading-tight">Redator Persuasivo</h3>
+<p class="text-slate-500 text-[11px] font-fira mt-1 uppercase tracking-wider">Ref: 0xCF21-VENDAS</p>
+</div>
+<div class="bg-primary/10 p-2 rounded-lg">
+<span class="material-symbols-outlined text-primary text-xl">edit_note</span>
+</div>
+</div>
+<div class="flex items-center justify-between mt-2 pt-4 border-t border-primary/5">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-sm text-slate-500 animate-spin">sync</span>
+<span class="text-xs font-fira text-slate-400">PROCESSING_REALTIME...</span>
+</div>
+<button class="text-primary hover:text-white transition-colors">
+<span class="material-symbols-outlined">pause_circle</span>
+</button>
+</div>
+</div>
+</div>
+<div class="group relative flex flex-col glass rounded-xl border border-primary/10 overflow-hidden hover:border-primary/40 transition-all duration-300">
+<div class="h-40 w-full relative overflow-hidden">
+<div class="absolute inset-0 bg-gradient-to-t from-background-dark to-transparent z-10"></div>
+<img class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" data-alt="Representação artística de rede neural com brilho púrpura" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAtzlOX31JlhK9IRaiOF6_9cCs4PI5EGtIcPHoenhTrV1aC9uq1_xa5dj19ywfo9VNzVhhALvOg0jhMdgdRoEqJ8ZeWF-U3vzT5mmgjc_sA5NN-M7yHkthiK0l1MA2c0fw6aq6FXhsRkagjBNEbzda08MDPVfF_QrmnPUlqFOKPcMGCXFPJk8Mh4BI0TZIYgHUBphGsuq1O1bqui-VrT6Qh3BT7mT-Yu7y68QiPCBXCJcO8ckKrAGMKPeCHKmF6efC5iWX2m_PXSdk"/>
+<span class="absolute top-3 right-3 z-20 px-2 py-1 bg-background-dark/80 backdrop-blur rounded text-[10px] font-fira text-primary border border-primary/30">SUCCESS</span>
+</div>
+<div class="p-5 flex flex-col gap-4">
+<div class="flex justify-between items-start">
+<div>
+<h3 class="text-white font-sora font-bold text-lg leading-tight">Assistente Executivo</h3>
+<p class="text-slate-500 text-[11px] font-fira mt-1 uppercase tracking-wider">Ref: 0x334E-PRODUTIVIDADE</p>
+</div>
+<div class="bg-primary/10 p-2 rounded-lg">
+<span class="material-symbols-outlined text-primary text-xl">event_available</span>
+</div>
+</div>
+<div class="flex items-center justify-between mt-2 pt-4 border-t border-primary/5">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-sm text-slate-500">calendar_today</span>
+<span class="text-xs font-fira text-slate-400">21 JAN 2024, 09:12</span>
+</div>
+<button class="text-primary hover:text-white transition-colors">
+<span class="material-symbols-outlined">open_in_new</span>
+</button>
+</div>
+</div>
+</div>
+<div class="flex flex-col items-center justify-center p-8 glass rounded-xl border-dashed border-2 border-primary/20 hover:border-primary/50 transition-all cursor-pointer group">
+<div class="bg-primary/5 size-14 rounded-full flex items-center justify-center mb-4 group-hover:biolume transition-all">
+<span class="material-symbols-outlined text-primary text-3xl">add</span>
+</div>
+<p class="font-sora font-bold text-slate-300">Nova Geração</p>
+<p class="text-xs font-fira text-slate-500 mt-1">START_NEW_INSTANCE</p>
+</div>
+</div>
+<div class="mt-12 p-6 glass rounded-xl border border-primary/10">
+<h4 class="text-sm font-fira text-primary mb-4 flex items-center gap-2">
+<span class="material-symbols-outlined text-sm">terminal</span> SYSTEM_CONSOLE_LOG
+                    </h4>
+<div class="space-y-2 font-fira text-[11px] text-slate-500">
+<p><span class="text-primary">[14:32:01]</span> AGENT_SEO_ANALYSIS: Processamento concluído com 98% de precisão.</p>
+<p><span class="text-primary">[11:15:44]</span> CODE_REFRACTOR: Reescrita de 12 funções finalizada. Economia de 24% em runtime.</p>
+<p><span class="text-yellow-500">[09:55:12]</span> PERSUASIVE_WRITER: Iniciando geração de thread para LinkedIn (ID: 0xCF21).</p>
+<p><span class="text-slate-600">[08:00:00]</span> SYSTEM_KERNEL: Ciclo de manutenção diária concluído com sucesso.</p>
+</div>
+</div>
+</section>
+</main>
+</div>
+</body></html>

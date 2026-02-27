@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="pt-BR"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Perfil e Configurações | chave.ai</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&amp;family=Sora:wght@400;600;700;800&amp;family=Fira+Code:wght@400;500&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#7b61ff",
+                        "background-light": "#f6f5f8",
+                        "background-dark": "#0A0A14",
+                        "surface-dark": "#18181B",
+                        "plasma": "#9d50bb",
+                        "cyan-glow": "#2af5ff"
+                    },
+                    fontFamily: {
+                        "display": ["Space Grotesk", "sans-serif"],
+                        "sora": ["Sora", "sans-serif"],
+                        "code": ["Fira Code", "monospace"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "1rem",
+                        "lg": "2rem",
+                        "xl": "3rem",
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+<style>.glass-card {
+    background: rgba(123, 97, 255, 0.05);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.1)
+    }
+.plasma-bar {
+    background: linear-gradient(90deg, #7b61ff 0%, #9d50bb 100%);
+    box-shadow: 0 0 15px rgba(123, 97, 255, 0.5)
+    }
+.noise-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    content: "";
+    opacity: 0.03;
+    pointer-events: none;
+    background-image: url(https://lh3.googleusercontent.com/aida-public/AB6AXuC7TlNk63G874g2WDbJp0ShJaLrlNdrC4pNQksRakKLbSnIWksSTZPf6KACxskVRZFpoXtCmLbB55JesLS-CtFQyrtJzBhr0rxVfOeWxo04AF9E43rSlaC_CWuGQQzIbZaMuvLE2LgSGlzanoOUimq_EPTHJafTcI6NFHeLfPTcd4vHKauZ8atjIYjCOhLcApH9Z-Xk3mqPG7HbWz5PYHIsxVQibEz0bPD50YotPDTDAdO6KKtH64uwFcb7BTALdwiZ3hXzwaP5CVg);
+    z-index: 50
+    }
+.gradient-border-card {
+    position: relative;
+    background: #18181B;
+    border-radius: 2rem;
+    padding: 2px;
+    background-image: linear-gradient(45deg, #7b61ff, #2af5ff)
+    }
+.inner-card {
+    background: #18181B;
+    border-radius: calc(2rem - 2px)
+    }</style>
+</head>
+<body class="bg-background-dark font-display text-slate-100 overflow-x-hidden">
+<div class="noise-overlay"></div>
+<div class="flex min-h-screen">
+<!-- Sidebar Navigation -->
+<aside class="w-72 bg-surface-dark flex flex-col border-r border-white/5 fixed h-full z-40">
+<div class="p-8">
+<div class="flex items-center gap-3 mb-10">
+<div class="w-10 h-10 bg-primary rounded-full flex items-center justify-center">
+<span class="material-symbols-outlined text-white">key</span>
+</div>
+<span class="font-sora font-bold text-xl tracking-tight">chave.ai</span>
+</div>
+<nav class="space-y-2">
+<a class="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-400 hover:bg-white/5 transition-all" href="#">
+<span class="material-symbols-outlined">grid_view</span>
+<span class="font-medium">Dashboard</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-400 hover:bg-white/5 transition-all" href="#">
+<span class="material-symbols-outlined">auto_awesome</span>
+<span class="font-medium">IA Studio</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-400 hover:bg-white/5 transition-all" href="#">
+<span class="material-symbols-outlined">database</span>
+<span class="font-medium">Base de Dados</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 rounded-xl bg-primary/10 text-primary" href="#">
+<span class="material-symbols-outlined">settings</span>
+<span class="font-medium">Configurações</span>
+</a>
+</nav>
+</div>
+<div class="mt-auto p-8 space-y-4">
+<div class="p-4 bg-white/5 rounded-2xl border border-white/10">
+<p class="text-xs text-slate-500 uppercase tracking-widest font-bold mb-2">Suporte Premium</p>
+<button class="w-full py-2 bg-primary/20 hover:bg-primary/30 text-primary rounded-lg text-sm font-semibold transition-all">
+                        Falar com Consultor
+                    </button>
+</div>
+<button class="flex items-center gap-3 px-4 py-3 w-full text-red-400/80 hover:text-red-400 transition-all rounded-xl hover:bg-red-500/5">
+<span class="material-symbols-outlined">logout</span>
+<span class="font-medium">Sair da Conta</span>
+</button>
+</div>
+</aside>
+<!-- Main Content -->
+<main class="flex-1 ml-72 p-12 max-w-[1160px] mx-auto">
+<!-- Header Profile -->
+<header class="flex items-center justify-between mb-12">
+<div class="flex items-center gap-6">
+<div class="relative">
+<div class="w-24 h-24 rounded-full p-1 bg-gradient-to-tr from-primary to-cyan-glow animate-pulse">
+<img alt="Mariana Silva" class="w-full h-full rounded-full object-cover border-4 border-background-dark" data-alt="User profile photo showing Mariana Silva smiling" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAGMSInky33W3-2jpCCSptrN07rWl9TmNEZPlLBznk3jPnFOgxkhk2fr3wEZq7Ic0UVyEZJn0X5mQ_urH9z0U9GD7XdoJ9RdedXLcVLqHjhmUZAjZCIjeFP9barImX_0J5vidHeFB29ic0BRoQ8uwg4jW2TFWDw0oQvNvjrucST3YDQtblZ2n4kawqtwr-2Bvabt08DDASM6xLBN8wA3MHNnclJSVmYDlBQmirH0mb6vKrS4SScycKlMXgB8sOCtAj95g51Df2AxNQ"/>
+</div>
+<div class="absolute bottom-0 right-0 w-6 h-6 bg-green-500 border-4 border-background-dark rounded-full"></div>
+</div>
+<div>
+<h1 class="text-4xl font-sora font-bold tracking-tight mb-2">Mariana Silva</h1>
+<span class="inline-flex items-center px-3 py-1 rounded-full bg-primary/10 text-primary text-sm font-bold border border-primary/20">
+                            Plano Performance
+                        </span>
+</div>
+</div>
+<div class="flex gap-4">
+<button class="px-6 py-3 rounded-full bg-white/5 border border-white/10 text-sm font-semibold hover:bg-white/10 transition-all">
+                        Ver histórico
+                    </button>
+<button class="px-6 py-3 rounded-full bg-primary text-white text-sm font-bold shadow-lg shadow-primary/20 hover:scale-105 transition-all">
+                        Upgrade Pro
+                    </button>
+</div>
+</header>
+<div class="grid grid-cols-12 gap-8">
+<!-- Left Column -->
+<div class="col-span-7 space-y-8">
+<!-- Edit Profile Section -->
+<section class="bg-surface-dark rounded-lg p-8 border border-white/5">
+<h2 class="text-xl font-sora font-semibold mb-8 flex items-center gap-2">
+<span class="material-symbols-outlined text-primary">person_edit</span>
+                            Personalização de Marca
+                        </h2>
+<div class="space-y-6">
+<div class="grid grid-cols-2 gap-6">
+<div class="space-y-2">
+<label class="text-sm font-medium text-slate-400 ml-1">Seu Nicho</label>
+<input class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-slate-200 focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all outline-none" type="text" value="Marketing Digital &amp; Tech"/>
+</div>
+<div class="space-y-2">
+<label class="text-sm font-medium text-slate-400 ml-1">Tom de Voz</label>
+<select class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-slate-200 focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all outline-none appearance-none">
+<option selected="">Profissional &amp; Persuasivo</option>
+<option>Casual &amp; Amigável</option>
+<option>Autoritário</option>
+</select>
+</div>
+</div>
+<div class="space-y-2">
+<label class="text-sm font-medium text-slate-400 ml-1">Perfil Instagram</label>
+<div class="relative">
+<span class="absolute left-4 top-1/2 -translate-y-1/2 text-primary font-code font-bold">@</span>
+<input class="w-full bg-white/5 border border-white/10 rounded-xl pl-10 pr-4 py-3 text-slate-200 focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all outline-none" type="text" value="mariana.silva_digital"/>
+</div>
+</div>
+<div class="pt-4 flex items-center justify-between border-t border-white/5">
+<button class="text-slate-400 text-sm font-medium hover:text-white transition-all flex items-center gap-2 group">
+<span class="material-symbols-outlined text-lg group-hover:rotate-12 transition-transform">lock_reset</span>
+                                    Alterar Senha
+                                </button>
+<button class="bg-primary hover:bg-primary/90 text-white px-8 py-3 rounded-xl font-bold transition-all">
+                                    Salvar Alterações
+                                </button>
+</div>
+</div>
+</section>
+<!-- Notifications -->
+<section class="bg-surface-dark rounded-lg p-8 border border-white/5">
+<h2 class="text-xl font-sora font-semibold mb-8 flex items-center gap-2">
+<span class="material-symbols-outlined text-primary">notifications_active</span>
+                            Preferências de Alerta
+                        </h2>
+<div class="space-y-6">
+<div class="flex items-center justify-between">
+<div>
+<p class="font-medium text-slate-200">Notificações por E-mail</p>
+<p class="text-sm text-slate-400">Resumos semanais e atualizações de novos recursos.</p>
+</div>
+<label class="relative inline-flex items-center cursor-pointer">
+<input checked="" class="sr-only peer" type="checkbox"/>
+<div class="w-11 h-6 bg-slate-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary peer-checked:shadow-[0_0_10px_rgba(123,97,255,0.6)]"></div>
+</label>
+</div>
+<div class="flex items-center justify-between">
+<div>
+<p class="font-medium text-slate-200">Push Mobile</p>
+<p class="text-sm text-slate-400">Alertas em tempo real quando sua IA completar tarefas.</p>
+</div>
+<label class="relative inline-flex items-center cursor-pointer">
+<input class="sr-only peer" type="checkbox"/>
+<div class="w-11 h-6 bg-slate-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary peer-checked:shadow-[0_0_10px_rgba(123,97,255,0.6)]"></div>
+</label>
+</div>
+</div>
+</section>
+</div>
+<!-- Right Column -->
+<div class="col-span-5 space-y-8">
+<!-- Credits Card -->
+<div class="glass-card rounded-lg p-8 relative overflow-hidden group">
+<div class="absolute -top-12 -right-12 w-48 h-48 bg-primary/20 blur-3xl rounded-full"></div>
+<div class="relative z-10">
+<p class="text-slate-400 text-sm font-bold uppercase tracking-widest mb-2">Créditos Disponíveis</p>
+<div class="flex items-baseline gap-2 mb-8">
+<h3 class="text-5xl font-sora font-extrabold text-white">1.250</h3>
+<span class="text-slate-400 font-medium">tokens</span>
+</div>
+<div class="space-y-4">
+<div class="flex justify-between text-sm">
+<span class="text-slate-300">Uso mensal</span>
+<span class="font-code text-primary">62% consumido</span>
+</div>
+<div class="h-3 w-full bg-white/5 rounded-full overflow-hidden border border-white/5">
+<div class="plasma-bar h-full rounded-full" style="width: 62%;"></div>
+</div>
+<p class="text-xs text-slate-500 italic">Próxima renovação em 12 de Outubro</p>
+</div>
+<button class="w-full mt-8 bg-white text-background-dark font-bold py-4 rounded-xl hover:bg-primary hover:text-white transition-all transform hover:-translate-y-1 active:translate-y-0">
+                                Comprar Mais Créditos
+                            </button>
+</div>
+</div>
+<!-- Upsell Card -->
+<div class="gradient-border-card group cursor-pointer overflow-hidden">
+<div class="inner-card p-8">
+<div class="flex items-start justify-between mb-4">
+<div class="w-12 h-12 bg-white/5 rounded-2xl flex items-center justify-center border border-white/10 group-hover:border-primary/50 transition-colors">
+<span class="material-symbols-outlined text-cyan-glow">rocket_launch</span>
+</div>
+<span class="bg-cyan-glow/10 text-cyan-glow text-[10px] font-black uppercase px-2 py-1 rounded">Promoção</span>
+</div>
+<h4 class="text-xl font-sora font-bold mb-2">Upgrade para Plano Anual</h4>
+<p class="text-slate-400 text-sm mb-6 leading-relaxed">Poupe 30% e desbloqueie acesso prioritário aos modelos GPT-5 customizados.</p>
+<button class="flex items-center gap-2 text-white font-bold group-hover:gap-4 transition-all">
+                                Ver Planos
+                                <span class="material-symbols-outlined text-primary">trending_flat</span>
+</button>
+</div>
+</div>
+<!-- Security Badge -->
+<div class="bg-white/5 border border-white/10 rounded-lg p-6 flex items-center gap-4">
+<div class="p-3 bg-green-500/10 rounded-full">
+<span class="material-symbols-outlined text-green-500">verified_user</span>
+</div>
+<div>
+<p class="text-sm font-semibold text-slate-200">Sua conta está segura</p>
+<p class="text-xs text-slate-500">Autenticação em duas etapas ativa.</p>
+</div>
+</div>
+</div>
+</div>
+<!-- Footer Meta -->
+<footer class="mt-12 flex justify-between items-center text-slate-600 text-sm border-t border-white/5 pt-8">
+<p>© 2024 chave.ai - Inteligência Gerativa de Ponta</p>
+<div class="flex gap-6">
+<a class="hover:text-slate-400" href="#">Termos de Uso</a>
+<a class="hover:text-slate-400" href="#">Privacidade</a>
+</div>
+</footer>
+</main>
+</div>
+</body></html>

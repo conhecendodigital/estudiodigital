@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&amp;family=Sora:wght@400;600;700;800&amp;family=Fira+Code:wght@400;500&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              colors: {
+                "primary": "#7b61ff",
+                "background-light": "#f6f5f8",
+                "background-dark": "#120f23",
+              },
+              fontFamily: {
+                "display": ["Space Grotesk", "sans-serif"],
+                "heading": ["Sora", "sans-serif"],
+                "mono": ["Fira Code", "monospace"]
+              },
+              borderRadius: {"DEFAULT": "1rem", "lg": "2rem", "xl": "3rem", "full": "9999px"},
+            },
+          },
+        }
+    </script>
+<style>
+        body {
+            font-family: 'Space Grotesk', sans-serif;
+        }
+        .heading-font {
+            font-family: 'Sora', sans-serif;
+        }
+        .mono-font {
+            font-family: 'Fira Code', monospace;
+        }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 min-h-screen">
+<div class="relative flex h-auto min-h-screen w-full flex-col overflow-x-hidden">
+<div class="layout-container flex h-full grow flex-col">
+<!-- Top Navigation Bar -->
+<header class="flex items-center justify-between whitespace-nowrap border-b border-solid border-primary/20 px-6 py-4 lg:px-20 bg-background-dark/50 backdrop-blur-md sticky top-0 z-50">
+<div class="flex items-center gap-4 text-primary">
+<div class="size-8">
+<svg fill="none" viewbox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
+<path d="M13.8261 30.5736C16.7203 29.8826 20.2244 29.4783 24 29.4783C27.7756 29.4783 31.2797 29.8826 34.1739 30.5736C36.9144 31.2278 39.9967 32.7669 41.3563 33.8352L24.8486 7.36089C24.4571 6.73303 23.5429 6.73303 23.1514 7.36089L6.64374 33.8352C8.00331 32.7669 11.0856 31.2278 13.8261 30.5736Z" fill="currentColor"></path>
+<path clip-rule="evenodd" d="M39.998 35.764C39.9944 35.7463 39.9875 35.7155 39.9748 35.6706C39.9436 35.5601 39.8949 35.4259 39.8346 35.2825C39.8168 35.2403 39.7989 35.1993 39.7813 35.1602C38.5103 34.2887 35.9788 33.0607 33.7095 32.5189C30.9875 31.8691 27.6413 31.4783 24 31.4783C20.3587 31.4783 17.0125 31.8691 14.2905 32.5189C12.0012 33.0654 9.44505 34.3104 8.18538 35.1832C8.17384 35.2075 8.16216 35.233 8.15052 35.2592C8.09919 35.3751 8.05721 35.4886 8.02977 35.589C8.00356 35.6848 8.00039 35.7333 8.00004 35.7388C8.00004 35.739 8 35.7393 8.00004 35.7388C8.00004 35.7641 8.0104 36.0767 8.68485 36.6314C9.34546 37.1746 10.4222 37.7531 11.9291 38.2772C14.9242 39.319 19.1919 40 24 40C28.8081 40 33.0758 39.319 36.0709 38.2772C37.5778 37.7531 38.6545 37.1746 39.3151 36.6314C39.9006 36.1499 39.9857 35.8511 39.998 35.764ZM4.95178 32.7688L21.4543 6.30267C22.6288 4.4191 25.3712 4.41909 26.5457 6.30267L43.0534 32.777C43.0709 32.8052 43.0878 32.8338 43.104 32.8629L41.3563 33.8352C43.104 32.8629 43.1038 32.8626 43.104 32.8629L43.1051 32.865L43.1065 32.8675L43.1101 32.8739L43.1199 32.8918C43.1276 32.906 43.1377 32.9246 43.1497 32.9473C43.1738 32.9925 43.2062 33.0545 43.244 33.1299C43.319 33.2792 43.4196 33.489 43.5217 33.7317C43.6901 34.1321 44 34.9311 44 35.7391C44 37.4427 43.003 38.7775 41.8558 39.7209C40.6947 40.6757 39.1354 41.4464 37.385 42.0552C33.8654 43.2794 29.133 44 24 44C18.867 44 14.1346 43.2794 10.615 42.0552C8.86463 41.4464 7.30529 40.6757 6.14419 39.7209C4.99695 38.7775 3.99999 37.4427 3.99999 35.7391C3.99999 34.8725 4.29264 34.0922 4.49321 33.6393C4.60375 33.3898 4.71348 33.1804 4.79687 33.0311C4.83898 32.9556 4.87547 32.8935 4.9035 32.8471C4.91754 32.8238 4.92954 32.8043 4.93916 32.7889L4.94662 32.777L4.95178 32.7688ZM35.9868 29.004L24 9.77997L12.0131 29.004C12.4661 28.8609 12.9179 28.7342 13.3617 28.6282C16.4281 27.8961 20.0901 27.4783 24 27.4783C27.9099 27.4783 31.5719 27.8961 34.6383 28.6282C35.082 28.7342 35.5339 28.8609 35.9868 29.004Z" fill="currentColor" fill-rule="evenodd"></path>
+</svg>
+</div>
+<h2 class="heading-font text-2xl font-extrabold tracking-tight">chave.ai</h2>
+</div>
+<div class="hidden md:flex flex-1 justify-end gap-8 items-center">
+<nav class="flex gap-8">
+<a class="text-slate-400 hover:text-primary transition-colors text-sm font-medium" href="#">Features</a>
+<a class="text-white text-sm font-bold border-b-2 border-primary pb-1" href="#">Upgrade</a>
+<a class="text-slate-400 hover:text-primary transition-colors text-sm font-medium" href="#">Docs</a>
+</nav>
+<div class="w-10 h-10 rounded-full border border-primary/30 p-0.5 overflow-hidden">
+<img class="w-full h-full object-cover rounded-full" data-alt="User avatar profile picture" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC6PnRGC_zgNZBqSIPWyHOyWG50LB1bySWlzUm85TC26_hqnM7tdmcrTKeelPG3tK_5XvyvpG0q2AyitIeI1mXNNZ5DwAfHe9cqYW8xmBkfdnEZVlg3fm_W_nWfW4V_QVzT5uWs7ySdrmjC6UpHJLbHDKwq1lqglrML4yb5jWqr5h43aktPft1cUNR7zipgZFilcpB1_Po3N4njnA5cOIBzej2nn0R749A-E4ytZdP-gklYGtqb1GShYXMO_HUkLNTT9mmlqnvZNY8"/>
+</div>
+</div>
+</header>
+<main class="flex-1 max-w-7xl mx-auto w-full px-6 py-12 lg:px-10">
+<!-- Hero Section -->
+<div class="mb-12 text-center max-w-3xl mx-auto">
+<span class="px-4 py-1 rounded-full bg-primary/10 text-primary text-xs font-bold uppercase tracking-widest mb-4 inline-block">Elevate your workflow</span>
+<h1 class="heading-font text-4xl lg:text-6xl font-black text-slate-100 mb-6 leading-tight">Upgrade to <span class="text-primary">Quantum</span> Plan</h1>
+<p class="text-slate-400 text-lg lg:text-xl font-normal">Experience the pinnacle of AI-driven orchestration with unlimited resources and multi-agent capabilities.</p>
+</div>
+<div class="grid lg:grid-cols-12 gap-10 items-start">
+<!-- Left Column: Upsell & Benefits -->
+<div class="lg:col-span-7 space-y-8">
+<!-- Plan Comparison Cards -->
+<div class="grid sm:grid-cols-2 gap-4">
+<div class="flex flex-col gap-3 rounded-xl p-8 bg-slate-800/40 border border-slate-700/50 backdrop-blur-sm">
+<p class="text-slate-400 text-sm font-medium uppercase tracking-wider">Current Plan</p>
+<p class="heading-font text-white text-3xl font-bold">Standard</p>
+<div class="flex items-center gap-2 text-slate-500 mt-2">
+<span class="material-symbols-outlined text-sm">check_circle</span>
+<span class="text-sm">Limited tokens</span>
+</div>
+<div class="flex items-center gap-2 text-slate-500">
+<span class="material-symbols-outlined text-sm">check_circle</span>
+<span class="text-sm">Single agent usage</span>
+</div>
+</div>
+<div class="flex flex-col gap-3 rounded-xl p-8 bg-primary/10 border-2 border-primary shadow-[0_0_30px_-10px_rgba(123,97,255,0.4)] relative overflow-hidden group">
+<div class="absolute top-4 right-4 bg-primary text-white text-[10px] font-bold px-2 py-1 rounded uppercase tracking-tighter">Recommended</div>
+<p class="text-primary text-sm font-medium uppercase tracking-wider">Quantum Plan</p>
+<p class="heading-font text-white text-3xl font-bold">Premium</p>
+<div class="flex items-center gap-2 text-emerald-400 mt-2">
+<span class="material-symbols-outlined text-sm">rocket_launch</span>
+<span class="text-sm font-bold">10x Performance Boost</span>
+</div>
+<p class="text-primary text-2xl font-black mt-2">+$59<span class="text-sm font-normal text-slate-400">/mo</span></p>
+</div>
+</div>
+<!-- Quantum Benefits Section -->
+<div class="space-y-6">
+<h2 class="heading-font text-2xl font-bold text-white flex items-center gap-2">
+<span class="material-symbols-outlined text-primary">auto_awesome</span>
+                                Quantum Benefits
+                            </h2>
+<div class="grid sm:grid-cols-3 gap-6">
+<div class="flex flex-col gap-4 group">
+<div class="w-full aspect-video relative rounded-xl overflow-hidden mb-2">
+<div class="absolute inset-0 bg-gradient-to-br from-primary/40 to-indigo-600/40 z-10"></div>
+<img class="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-500" data-alt="Futuristic digital token visualization" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAQ1OmxNxH5TpPD4H5823FDbLq80nGwNbbY86V35_J5oZIVl5XJ898n4odX8uRqzX8kwFPD4UXlJwYM51Scp5mdbzYMS2UZ4abK8wN1AEObPgRi43Ktxu_6W7orpsnSm4PzD0Nbkv0rvX_bgcpctwobO-R9EMl-Ac5YdCBVYAQGs1o-uL5f3glUr40NeZUHuX3cgSLRgBHmUH1Xh2az8tDgrfBc5b6C-ori7CJiDgrm_fMiJiUoFs1Huoh-2mLipQlpSbRB4NQusho"/>
+</div>
+<div>
+<p class="text-white text-lg font-bold">Infinite Tokens</p>
+<p class="text-slate-400 text-sm leading-relaxed">No limits on your creativity or processing. Generate content without boundaries.</p>
+</div>
+</div>
+<div class="flex flex-col gap-4 group">
+<div class="w-full aspect-video relative rounded-xl overflow-hidden mb-2">
+<div class="absolute inset-0 bg-gradient-to-br from-primary/40 to-purple-600/40 z-10"></div>
+<img class="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-500" data-alt="Global network nodes connecting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCQ5Vy60YEcd57GjlGXP0ROB7_UncT0DF80BVbVabdw8LZiCIl3rKsG1ajlbLGhboSi_ABmHr5fSp0CRC13D5_ruhlDf-EQ5tyo19GmpkYUM10p8HT5YbhoYqE4uHvmKMeJYTBSjbqIhgMHCxYlwZts6lkCtZgK3-ihIrBqZAyuuvyUWtKfLKWZxrgTmSR3oCzkJ-t2Vcc8fe-o-Jr48HKJt15Xnh9wu9mlB23-H9kilhfE_Z0napG_XQyzbB4-QbTSVkCnk64D5C8"/>
+</div>
+<div>
+<p class="text-white text-lg font-bold">Multi-agent Orchestration</p>
+<p class="text-slate-400 text-sm leading-relaxed">Deploy complex autonomous agent networks working in parallel for you.</p>
+</div>
+</div>
+<div class="flex flex-col gap-4 group">
+<div class="w-full aspect-video relative rounded-xl overflow-hidden mb-2">
+<div class="absolute inset-0 bg-gradient-to-br from-primary/40 to-blue-600/40 z-10"></div>
+<img class="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-500" data-alt="Technical support dashboard visualization" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBZx8cKHAojgkKFp3bXLkTAmUOtiFKFz-AKl_tNI_WgR3Zofq5u9Lu7deIPH-9fwoTG5vS57LKgiR1gWiYvXnrnd87ruVOvVINwH8pAqr6Uu5_cein_kco6gAFMo59WR_OL-tJr8aBKXQ_Tr-NuxbQuypa-fI2KtjYPcfV2JkNNHmpftLUmpscunMG0XMpdSGxKUIjF6n8B3rH26YiNhEfKvmjkf5J0RxygtTuwhgvxljxTUn4tqNoN9_D2M1PkpguGH18TPnJWX-U"/>
+</div>
+<div>
+<p class="text-white text-lg font-bold">Priority Support</p>
+<p class="text-slate-400 text-sm leading-relaxed">24/7 dedicated engineering support with sub-15 minute response times.</p>
+</div>
+</div>
+</div>
+</div>
+<!-- Technical Specs Comparison -->
+<div class="rounded-xl border border-slate-700/50 bg-slate-900/30 overflow-hidden">
+<div class="bg-slate-800/50 px-6 py-4 border-b border-slate-700/50">
+<h3 class="mono-font text-xs font-bold text-slate-400 uppercase tracking-widest">Technical Specifications</h3>
+</div>
+<div class="p-6">
+<table class="w-full text-left mono-font text-sm">
+<tbody>
+<tr class="border-b border-slate-800">
+<td class="py-3 text-slate-400">Context Window</td>
+<td class="py-3 text-white text-right">256k <span class="text-primary">→ 2M tokens</span></td>
+</tr>
+<tr class="border-b border-slate-800">
+<td class="py-3 text-slate-400">API Latency</td>
+<td class="py-3 text-white text-right">~250ms <span class="text-primary">→ ~45ms</span></td>
+</tr>
+<tr>
+<td class="py-3 text-slate-400">Parallel Agents</td>
+<td class="py-3 text-white text-right">3 <span class="text-primary">→ Unlimited</span></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<!-- Right Column: Checkout Form -->
+<div class="lg:col-span-5">
+<div class="bg-slate-800/30 rounded-xl border border-slate-700/50 p-8 sticky top-28 shadow-2xl">
+<h2 class="heading-font text-2xl font-bold text-white mb-8">Secure Checkout</h2>
+<!-- Payment Methods -->
+<div class="flex gap-4 mb-8">
+<button class="flex-1 py-3 px-4 rounded-lg bg-primary/20 border-2 border-primary text-white text-sm font-bold flex items-center justify-center gap-2">
+<span class="material-symbols-outlined text-lg">credit_card</span>
+                                    Card
+                                </button>
+<button class="flex-1 py-3 px-4 rounded-lg bg-slate-700/30 border border-slate-600 text-slate-300 text-sm font-bold flex items-center justify-center gap-2 hover:bg-slate-700 transition-colors">
+<span class="material-symbols-outlined text-lg">qr_code_2</span>
+                                    PIX
+                                </button>
+</div>
+<!-- Form -->
+<form class="space-y-6">
+<div>
+<label class="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-2 px-1">Cardholder Name</label>
+<input class="w-full bg-slate-900/50 border border-slate-700 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-primary transition-colors uppercase tracking-wider mono-font" placeholder="ALEX MERCER" type="text"/>
+</div>
+<div>
+<label class="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-2 px-1">Card Number</label>
+<div class="relative">
+<input class="w-full bg-slate-900/50 border border-slate-700 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-primary transition-colors mono-font" placeholder="•••• •••• •••• ••••" type="text"/>
+<div class="absolute right-3 top-1/2 -translate-y-1/2 flex gap-1">
+<div class="w-8 h-5 bg-slate-700 rounded-sm"></div>
+<div class="w-8 h-5 bg-slate-700 rounded-sm"></div>
+</div>
+</div>
+</div>
+<div class="grid grid-cols-2 gap-4">
+<div>
+<label class="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-2 px-1">Expiry</label>
+<input class="w-full bg-slate-900/50 border border-slate-700 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-primary transition-colors mono-font" placeholder="MM/YY" type="text"/>
+</div>
+<div>
+<label class="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-2 px-1">CVC</label>
+<input class="w-full bg-slate-900/50 border border-slate-700 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-primary transition-colors mono-font" placeholder="•••" type="text"/>
+</div>
+</div>
+<div class="pt-6 border-t border-slate-700/50 space-y-4">
+<div class="flex justify-between text-slate-400">
+<span>Subtotal (Annual)</span>
+<span>$708.00</span>
+</div>
+<div class="flex justify-between text-emerald-400">
+<span>Upgrade Credit</span>
+<span>-$120.00</span>
+</div>
+<div class="flex justify-between items-end">
+<span class="text-white font-bold">Total Due Now</span>
+<span class="text-white text-2xl font-black">$588.00</span>
+</div>
+</div>
+<button class="w-full bg-primary hover:bg-primary/90 text-white py-4 rounded-xl font-black text-lg shadow-lg shadow-primary/20 transition-all active:scale-[0.98]" type="submit">
+                                    UPGRADE TO QUANTUM
+                                </button>
+<div class="flex items-center justify-center gap-6 pt-4">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-emerald-500 text-xl">verified_user</span>
+<div class="leading-none">
+<p class="text-[10px] font-bold text-white uppercase tracking-tighter">7-Day</p>
+<p class="text-[10px] text-slate-400 uppercase tracking-tighter">Guarantee</p>
+</div>
+</div>
+<div class="w-px h-8 bg-slate-700"></div>
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-slate-400 text-xl">lock</span>
+<div class="leading-none">
+<p class="text-[10px] font-bold text-white uppercase tracking-tighter">AES-256</p>
+<p class="text-[10px] text-slate-400 uppercase tracking-tighter">Encrypted</p>
+</div>
+</div>
+</div>
+</form>
+</div>
+</div>
+</div>
+</main>
+<!-- Footer Small -->
+<footer class="mt-auto px-6 py-8 border-t border-slate-800/50 text-center">
+<p class="text-slate-500 text-xs mono-font">© 2024 CHAVE.AI • VERSION 4.2.0-QUANTUM • STATUS: OPTIMIZED</p>
+</footer>
+</div>
+</div>
+</body></html>

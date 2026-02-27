@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="pt-BR"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Onboarding Passo 9 - chave.ai</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&amp;family=Instrument+Serif&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#7b61ff",
+                        "background-light": "#f6f5f8",
+                        "background-dark": "#0A0A14",
+                        "sidebar-dark": "#18181B",
+                    },
+                    fontFamily: {
+                        "display": ["Space Grotesk", "sans-serif"],
+                        "serif": ["Instrument Serif", "serif"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "1rem",
+                        "lg": "2rem",
+                        "xl": "3rem",
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+<style>body {
+    background-color: #0A0A14;
+    position: relative;
+    overflow: hidden
+    }
+/* Noise Overlay Effect */
+body::before {
+    content: "";
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0.035;
+    z-index: 50;
+    pointer-events: none;
+    background-image: url(https://lh3.googleusercontent.com/aida-public/AB6AXuC54hQ7GoBL99oyICQR0YwZ020mBFuDDEzkTMwmw1GMfPXCPj79MMauIPQdeL0V4ccCgEvYcNY-k5HGJ1jQGdBmodSPFDsKQbAXTyMN2LpfudTFG_7Uj6arvi57ciXNwKGn9zk5mfXrP9738iTI-GnK0YCJX9I4NA2kd-yuu1UbIjOAJAERGQavLiwPh8p6fGmkT4XPJHNuNcfe168GGAbluZVGvRyw6rtb9eUiLIDLn7F3t-nfcIWtSx24yRKs_Fxj_G1DuHb7StE);
+    background-repeat: repeat
+    }
+/* Plasma Glows */
+.plasma-glow-purple {
+    filter: blur(80px);
+    background: radial-gradient(circle, rgba(123, 97, 255, 0.4) 0%, rgba(123, 97, 255, 0) 70%)
+    }
+.plasma-glow-cyan {
+    filter: blur(60px);
+    background: radial-gradient(circle, rgba(0, 240, 255, 0.2) 0%, rgba(0, 240, 255, 0) 70%)
+    }
+.glass-morphism {
+    background: rgba(24, 24, 27, 0.6);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(123, 97, 255, 0.2)
+    }
+.input-focus-glow:focus {
+    box-shadow: 0 0 20px rgba(123, 97, 255, 0.3);
+    border-color: #7b61ff;
+    outline: none
+    }</style>
+</head>
+<body class="font-display text-slate-100 antialiased selection:bg-primary/30">
+<div class="flex h-screen w-full overflow-hidden bg-background-dark">
+<!-- Sidebar -->
+<aside class="w-80 flex-shrink-0 bg-sidebar-dark border-r border-white/5 flex flex-col p-8 z-20">
+<div class="flex items-center gap-3 mb-12">
+<div class="size-8 bg-primary rounded flex items-center justify-center">
+<span class="material-symbols-outlined text-white text-xl">temp_preferences_custom</span>
+</div>
+<h2 class="text-xl font-bold tracking-tight text-white">chave.ai</h2>
+</div>
+<nav class="flex-1 space-y-2">
+<div class="flex items-center gap-3 px-4 py-3 rounded-lg text-slate-400 hover:text-white transition-colors cursor-pointer">
+<span class="material-symbols-outlined">person</span>
+<span class="text-sm font-medium">Perfil</span>
+</div>
+<div class="flex items-center gap-3 px-4 py-3 rounded-lg text-slate-400 hover:text-white transition-colors cursor-pointer">
+<span class="material-symbols-outlined">settings</span>
+<span class="text-sm font-medium">Configurações</span>
+</div>
+<div class="flex items-center gap-3 px-4 py-3 rounded-lg text-slate-400 hover:text-white transition-colors cursor-pointer">
+<span class="material-symbols-outlined">memory</span>
+<span class="text-sm font-medium">Ecossistema</span>
+</div>
+<div class="flex items-center gap-3 px-4 py-3 rounded-xl bg-primary/10 text-primary border border-primary/20">
+<span class="material-symbols-outlined">track_changes</span>
+<span class="text-sm font-semibold">Concorrência</span>
+</div>
+<div class="flex items-center gap-3 px-4 py-3 rounded-lg text-slate-400 hover:text-white transition-colors cursor-pointer">
+<span class="material-symbols-outlined">cable</span>
+<span class="text-sm font-medium">Integrações</span>
+</div>
+</nav>
+<div class="mt-auto pt-6 border-t border-white/5">
+<div class="flex flex-col gap-4">
+<div class="flex justify-between items-end">
+<div class="space-y-1">
+<p class="text-[10px] uppercase tracking-widest text-slate-500 font-bold">Progresso</p>
+<p class="text-2xl font-bold text-white">Etapa 9 <span class="text-slate-500 text-lg font-normal">/ 13</span></p>
+</div>
+<span class="text-xs font-bold text-primary px-2 py-1 bg-primary/10 rounded-md">69%</span>
+</div>
+<div class="h-1.5 w-full bg-white/5 rounded-full overflow-hidden">
+<div class="h-full bg-primary rounded-full shadow-[0_0_15px_rgba(123,97,255,0.8)]" style="width: 69%;"></div>
+</div>
+<p class="text-xs text-slate-500 font-medium">Análise de mercado e referências</p>
+</div>
+</div>
+</aside>
+<!-- Main Content -->
+<main class="relative flex-1 flex flex-col items-center justify-center p-12 overflow-y-auto">
+<!-- Background Decorations -->
+<div class="absolute top-1/4 left-1/4 w-[500px] h-[500px] plasma-glow-purple rounded-full pointer-events-none opacity-40"></div>
+<div class="absolute bottom-1/4 right-1/4 w-[400px] h-[400px] plasma-glow-cyan rounded-full pointer-events-none opacity-20"></div>
+<!-- Top Header Actions -->
+<div class="absolute top-8 left-12 right-12 flex justify-between items-center z-10">
+<button class="flex items-center gap-2 px-4 py-2 text-slate-400 hover:text-white transition-all group">
+<span class="material-symbols-outlined text-lg group-hover:-translate-x-1 transition-transform">arrow_back</span>
+<span class="text-sm font-semibold">Voltar</span>
+</button>
+<div class="flex gap-4">
+<div class="size-10 rounded-full border border-white/10 flex items-center justify-center text-slate-400 hover:border-primary/50 transition-colors cursor-pointer">
+<span class="material-symbols-outlined text-xl">help</span>
+</div>
+</div>
+</div>
+<!-- Central Card Area -->
+<div class="w-full max-w-3xl flex flex-col items-center text-center space-y-12 z-10">
+<!-- Hero Visual -->
+<div class="relative">
+<div class="absolute inset-0 bg-primary/30 blur-[60px] rounded-full"></div>
+<div class="relative size-32 glass-morphism rounded-full flex items-center justify-center border border-white/20 shadow-2xl">
+<span class="material-symbols-outlined text-6xl text-white drop-shadow-[0_0_12px_rgba(123,97,255,0.8)]">search</span>
+<!-- Orbiting particles -->
+<div class="absolute -top-2 -right-2 size-4 bg-cyan-400 rounded-full blur-[2px] animate-pulse shadow-[0_0_10px_#22d3ee]"></div>
+</div>
+</div>
+<!-- Text Content -->
+<div class="space-y-4">
+<h1 class="text-5xl md:text-6xl font-bold tracking-tight text-white leading-[1.1]">
+                        Liste <span class="text-primary">5 concorrentes</span> ou referências do seu nicho
+                    </h1>
+<p class="text-xl text-[#F0EFF4]/50 font-normal max-w-xl mx-auto">
+                        Pessoas ou empresas que falam do mesmo assunto e já possuem os resultados que você deseja alcançar.
+                    </p>
+</div>
+<!-- Input Area -->
+<div class="w-full group">
+<label class="sr-only" for="competitors">Concorrentes</label>
+<textarea class="w-full bg-background-dark/80 glass-morphism rounded-lg p-8 text-xl text-white placeholder:text-slate-600 border-2 border-white/5 transition-all input-focus-glow resize-none" id="competitors" placeholder="Ex: Alura, Rock Content, Pedro Sobral..." rows="3"></textarea>
+<div class="flex justify-between mt-4 px-2">
+<span class="text-xs font-semibold text-slate-500 uppercase tracking-widest">Pressione Shift + Enter para quebrar linha</span>
+<span class="text-xs font-semibold text-slate-500 uppercase tracking-widest">0 / 5 Referências</span>
+</div>
+</div>
+<!-- Action Button -->
+<div class="pt-8 w-full max-w-xs">
+<button class="relative w-full group overflow-hidden bg-primary py-5 rounded-full text-white font-bold text-lg shadow-[0_10px_40px_-10px_rgba(123,97,255,0.6)] hover:shadow-[0_15px_50px_-5px_rgba(123,97,255,0.8)] transition-all hover:-translate-y-1 active:scale-95">
+<span class="relative z-10 flex items-center justify-center gap-2">
+                            Continuar
+                            <span class="material-symbols-outlined group-hover:translate-x-1 transition-transform">arrow_forward</span>
+</span>
+<!-- Magnetic Hover Effect Background -->
+<div class="absolute inset-0 bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+</button>
+<p class="mt-4 text-xs text-slate-500 font-medium">Pressione <strong>Enter ↵</strong> para continuar</p>
+</div>
+</div>
+<!-- Footer Small Credits -->
+<footer class="absolute bottom-8 text-[10px] uppercase tracking-[0.2em] text-slate-600 font-bold">
+                Powered by chave.ai Neural Ecosystem
+            </footer>
+</main>
+</div>
+<!-- Background Grid Pattern -->
+<div class="fixed inset-0 pointer-events-none opacity-[0.02] z-0" style="background-image: radial-gradient(#7b61ff 1px, transparent 1px); background-size: 40px 40px;"></div>
+</body></html>

@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="pt-br"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Cofre de Referências | chave.ai</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&amp;family=Instrument+Serif:ital@0;1&amp;family=Sora:wght@400;600;700&amp;family=Fira+Code:wght@400;500&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#7b61ff",
+                        "background-light": "#f6f5f8",
+                        "background-dark": "#0A0A14",
+                        "sidebar-dark": "#18181B",
+                        "card-dark": "#1d1b28",
+                    },
+                    fontFamily: {
+                        "display": ["Space Grotesk", "sans-serif"],
+                        "sora": ["Sora", "sans-serif"],
+                        "instrument": ["Instrument Serif", "serif"],
+                        "fira": ["Fira Code", "monospace"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "1rem",
+                        "lg": "2rem",
+                        "xl": "3rem",
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+<style>.glass-input {
+    background: rgba(123, 97, 255, 0.05);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(123, 97, 255, 0.2)
+    }
+.plasma-glow {
+    box-shadow: 0 0 20px rgba(123, 97, 255, 0.3)
+    }
+.noise-overlay {
+    background-image: url(https://lh3.googleusercontent.com/aida-public/AB6AXuDOogaeOrZpup4wR5z8nRtYrHlegCc_EJul9zemi5VJVBl6pWMo2TVak7zs_Gm2smemcUihLdGhmUgY-5N-zh198EbFfFLQEiU_Vn3MVyBeiZZXITlUvwosekKzGZw1_r-w6m5WFaJOkoNx_kZ10DkNa8OdachIKA6kBLQlHwz-PTXDNT44XX-d_pSRZegSyMKG-gar0YohE01402YubMSa_1GItJc_v1N6GtNKaIY445hU8Fxb4NjWjLmpD7zp-OQ2k7Gv94XqJE8);
+    opacity: 0.035
+    }</style>
+</head>
+<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 font-display selection:bg-primary/30">
+<div class="flex h-screen overflow-hidden">
+<!-- Sidebar Navigation -->
+<aside class="w-72 bg-sidebar-dark border-r border-white/5 flex flex-col shrink-0">
+<div class="p-8 flex flex-col h-full">
+<!-- Brand -->
+<div class="flex items-center gap-3 mb-12">
+<div class="size-10 rounded-xl bg-gradient-to-tr from-primary to-purple-400 flex items-center justify-center text-white shadow-lg shadow-primary/20">
+<span class="material-symbols-outlined font-bold">key</span>
+</div>
+<div>
+<h1 class="font-sora font-bold text-xl tracking-tight">chave.ai</h1>
+<p class="text-[10px] uppercase tracking-widest text-primary/70 font-bold">Ecossistema de IA</p>
+</div>
+</div>
+<!-- Nav Links -->
+<nav class="flex-1 space-y-2">
+<a class="flex items-center gap-3 px-4 py-3 rounded-full text-slate-400 hover:text-white hover:bg-white/5 transition-all" href="#">
+<span class="material-symbols-outlined">home</span>
+<span class="text-sm font-medium">Início</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 rounded-full bg-primary/10 text-primary border border-primary/20 shadow-sm" href="#">
+<span class="material-symbols-outlined">cached</span>
+<span class="text-sm font-bold">Cofre de Referências</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 rounded-full text-slate-400 hover:text-white hover:bg-white/5 transition-all" href="#">
+<span class="material-symbols-outlined">analytics</span>
+<span class="text-sm font-medium">Minhas Análises</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 rounded-full text-slate-400 hover:text-white hover:bg-white/5 transition-all" href="#">
+<span class="material-symbols-outlined">dashboard_customize</span>
+<span class="text-sm font-medium">Templates</span>
+</a>
+</nav>
+<!-- Settings & Profile -->
+<div class="pt-8 border-t border-white/5 space-y-2">
+<a class="flex items-center gap-3 px-4 py-3 rounded-full text-slate-400 hover:text-white hover:bg-white/5 transition-all" href="#">
+<span class="material-symbols-outlined">settings</span>
+<span class="text-sm font-medium">Configurações</span>
+</a>
+<div class="flex items-center gap-3 px-4 py-4 mt-4 bg-white/5 rounded-2xl">
+<div class="size-10 rounded-full bg-slate-700 overflow-hidden">
+<img alt="Avatar" data-alt="User profile photo avatar circular image" src="https://lh3.googleusercontent.com/aida-public/AB6AXuApirR37a5AAc3UKo8B0q1hyhVi4FlnjWgnGjcgI4_6JpCaudmKvR1PaX1ZuRc6wgEYcVyFwNIwVySvwG2Xfrh1aPGspXcbCbpn9V7p5r-vXUVG-7sXOP-25_8fUcDpU_tPDxQFTE0K9eRXQGeehRiowe8gWbvR4dTYHe-2mfca253OPH6EaxYbIK0X9osWLA9lvHpgaFJ2KiWC5xHG4qCFS9BZao45xa8Cm8q0rfJlWucJ3dL8cfnJX2swD-_or_nKB_JOVcvjfos"/>
+</div>
+<div class="flex flex-col">
+<span class="text-xs font-bold">Lucas Mendes</span>
+<span class="text-[10px] text-slate-500">Plano Pro</span>
+</div>
+</div>
+</div>
+</div>
+</aside>
+<!-- Main Content Area -->
+<main class="flex-1 overflow-y-auto bg-background-dark relative">
+<!-- Decorative Accents -->
+<div class="absolute top-0 right-0 w-[500px] h-[500px] bg-primary/10 blur-[120px] rounded-full -mr-48 -mt-48 pointer-events-none"></div>
+<div class="max-w-7xl mx-auto px-12 py-12 relative z-10">
+<!-- Header Section -->
+<header class="mb-12">
+<h1 class="font-sora text-5xl font-bold tracking-tight mb-2">Cofre de Referências</h1>
+<p class="font-instrument text-3xl italic text-slate-400">Armazene e analise conteúdos virais com IA.</p>
+</header>
+<!-- Link Input Section -->
+<section class="mb-16">
+<div class="flex items-center gap-4 max-w-4xl">
+<div class="relative flex-1 group">
+<div class="absolute inset-y-0 left-5 flex items-center pointer-events-none text-primary/50">
+<span class="material-symbols-outlined">link</span>
+</div>
+<input class="w-full glass-input h-16 pl-14 pr-6 rounded-lg text-white placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-primary/40 transition-all font-display" placeholder="Cole aqui o link do TikTok ou Reels..." type="text"/>
+</div>
+<button class="bg-primary hover:bg-primary/90 text-white font-sora font-bold px-10 h-16 rounded-lg flex items-center gap-2 transition-all plasma-glow active:scale-95 group">
+<span>Salvar</span>
+<span class="material-symbols-outlined text-xl transition-transform group-hover:translate-x-1">bolt</span>
+</button>
+</div>
+</section>
+<!-- Filters -->
+<div class="flex items-center gap-8 mb-8 border-b border-white/5 pb-2">
+<button class="pb-4 border-b-2 border-primary text-primary font-bold text-sm tracking-wide">Todos</button>
+<button class="pb-4 border-b-2 border-transparent text-slate-500 hover:text-slate-300 font-bold text-sm tracking-wide transition-colors">TikTok</button>
+<button class="pb-4 border-b-2 border-transparent text-slate-500 hover:text-slate-300 font-bold text-sm tracking-wide transition-colors">Instagram Reels</button>
+<button class="pb-4 border-b-2 border-transparent text-slate-500 hover:text-slate-300 font-bold text-sm tracking-wide transition-colors">YouTube Shorts</button>
+</div>
+<!-- Gallery Grid -->
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+<!-- Card 1 -->
+<div class="bg-card-dark rounded-lg overflow-hidden border border-white/5 flex flex-col group hover:border-primary/30 transition-all hover:translate-y-[-4px]">
+<div class="relative aspect-[9/16] overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="Vertical mobile social media video preview thumbnail" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBuVTiN_-f-1bQQ_82h8wg8dtZH4jR5K1F1gWtWquPH-TMXE52rdE-L2LnqWclGXFInUmZcFSbj5nVF7sMNBw4TyDPGtYLufQQjrU2qxFD5cLCgDhfMaEka5ZtUKP590fWSOeXWsPZr8RxmsKcTv3tkzYFMjVAJk-wpqIIAhmq19LREVd24MoSGSylrBN_dldQh1lRwYyupOckQwXWP-JyysOzpc5JsjeFSb23Q3us-LD3mue47wEFH2kKWvdeE9n_scJ4Z9jZdcSw"/>
+<div class="absolute inset-0 bg-gradient-to-t from-background-dark via-transparent to-transparent"></div>
+<div class="absolute inset-0 noise-overlay"></div>
+<!-- Source Badge -->
+<div class="absolute top-4 left-4">
+<span class="bg-cyan-500/20 backdrop-blur-md text-cyan-400 text-[10px] font-bold px-3 py-1.5 rounded-full border border-cyan-500/30 uppercase tracking-tighter">TikTok</span>
+</div>
+<div class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+<button class="size-14 bg-primary rounded-full flex items-center justify-center text-white plasma-glow shadow-xl">
+<span class="material-symbols-outlined text-3xl">play_arrow</span>
+</button>
+</div>
+</div>
+<div class="p-5 flex flex-col flex-1">
+<h3 class="font-sora font-semibold text-sm line-clamp-2 mb-3 leading-relaxed">Como hooks visuais aumentam a retenção em 40%</h3>
+<div class="mt-auto flex items-center justify-between">
+<span class="font-fira text-[10px] text-slate-500 uppercase">24 OUT 2023</span>
+<div class="flex items-center gap-2">
+<button class="size-8 rounded-full border border-white/10 flex items-center justify-center text-slate-400 hover:text-red-400 hover:border-red-400/30 transition-colors">
+<span class="material-symbols-outlined text-sm">delete</span>
+</button>
+<button class="bg-primary px-4 py-2 rounded-full text-[11px] font-bold text-white plasma-glow hover:scale-105 transition-transform">
+                                        Analisar
+                                    </button>
+</div>
+</div>
+</div>
+</div>
+<!-- Card 2 -->
+<div class="bg-card-dark rounded-lg overflow-hidden border border-white/5 flex flex-col group hover:border-primary/30 transition-all hover:translate-y-[-4px]">
+<div class="relative aspect-[9/16] overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="Vertical mobile social media content video thumbnail" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDU7nPSTVA2ZvdzcjBP8Y3Bv9QH5tX1a86FjTRaoLgvcT7PB_jo1HNjpGdn30OxJtDbYNRuX3LRTiRT3Ya5gPVg04NzQk3jpqDleTQm16u_6McyBHXUDfQTyfXY2wKuBfN-t9Uw5lQeSUkQ5mSGi2GUl3h3-SJO2-4XUdx1vHYrAx3kKAfuK_eSkyQIblNB5K-CE-Uf1lYwiCK2wt1JOTORerrTbPJjqjaTjzRKhNZW5Pwm_J52EfaAcqSCFcFIaxIFnoDKNcuwP5I"/>
+<div class="absolute inset-0 bg-gradient-to-t from-background-dark via-transparent to-transparent"></div>
+<div class="absolute inset-0 noise-overlay"></div>
+<div class="absolute top-4 left-4">
+<span class="bg-[#FF0050]/20 backdrop-blur-md text-[#FF0050] text-[10px] font-bold px-3 py-1.5 rounded-full border border-[#FF0050]/30 uppercase tracking-tighter">Reels</span>
+</div>
+</div>
+<div class="p-5 flex flex-col flex-1">
+<h3 class="font-sora font-semibold text-sm line-clamp-2 mb-3 leading-relaxed">Transições de corte seco para vídeos de lifestyle e luxo</h3>
+<div class="mt-auto flex items-center justify-between">
+<span class="font-fira text-[10px] text-slate-500 uppercase">22 OUT 2023</span>
+<div class="flex items-center gap-2">
+<button class="size-8 rounded-full border border-white/10 flex items-center justify-center text-slate-400 hover:text-red-400 transition-colors">
+<span class="material-symbols-outlined text-sm">delete</span>
+</button>
+<button class="bg-primary px-4 py-2 rounded-full text-[11px] font-bold text-white plasma-glow hover:scale-105 transition-transform">
+                                        Analisar
+                                    </button>
+</div>
+</div>
+</div>
+</div>
+<!-- Card 3 -->
+<div class="bg-card-dark rounded-lg overflow-hidden border border-white/5 flex flex-col group hover:border-primary/30 transition-all hover:translate-y-[-4px]">
+<div class="relative aspect-[9/16] overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="Social media app interface on mobile screen" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAkRP-4LNki2DwEMT15wriUZ0b8R4YEuHqC15W64He1E9ivHMj4KGE-Pc7Gk2W_98qYHlZxFUOGgJKY4CtcD-iOh4d7kEVwSNGXdzwFACLICWqXtCTXCzQ5i6BAlnklhcCS9A3swohSqLDbwul_lwIzaGGtH0QITJ8vd63JzNBnjgQa8ge6hHng3evwTs84wxfEnkHg8owpC7zWOikgD9qwH0KqE337GnqQ7JlGL05fOegptgQoDnvOnohw1XmBmgyr69_bo7MWxuU"/>
+<div class="absolute inset-0 bg-gradient-to-t from-background-dark via-transparent to-transparent"></div>
+<div class="absolute inset-0 noise-overlay"></div>
+<div class="absolute top-4 left-4">
+<span class="bg-cyan-500/20 backdrop-blur-md text-cyan-400 text-[10px] font-bold px-3 py-1.5 rounded-full border border-cyan-500/30 uppercase tracking-tighter">TikTok</span>
+</div>
+</div>
+<div class="p-5 flex flex-col flex-1">
+<h3 class="font-sora font-semibold text-sm line-clamp-2 mb-3 leading-relaxed">Estratégia de Storytelling para SaaS B2B no TikTok</h3>
+<div class="mt-auto flex items-center justify-between">
+<span class="font-fira text-[10px] text-slate-500 uppercase">18 OUT 2023</span>
+<div class="flex items-center gap-2">
+<button class="size-8 rounded-full border border-white/10 flex items-center justify-center text-slate-400 hover:text-red-400 transition-colors">
+<span class="material-symbols-outlined text-sm">delete</span>
+</button>
+<button class="bg-primary px-4 py-2 rounded-full text-[11px] font-bold text-white plasma-glow hover:scale-105 transition-transform">
+                                        Analisar
+                                    </button>
+</div>
+</div>
+</div>
+</div>
+<!-- Card 4 -->
+<div class="bg-card-dark rounded-lg overflow-hidden border border-white/5 flex flex-col group hover:border-primary/30 transition-all hover:translate-y-[-4px]">
+<div class="relative aspect-[9/16] overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="Vibrant digital content on vertical display screen" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBMLjLvlDHpvZHHRFJzw1vouR8cAtBjwpdOuLPUrVScSFxXg5S6uf6hWJYz9WxTNtFZe3EyIby00SgGkeHnwiEDjW_zuEm3mgoQAjU0oQmv5TNx9ZAXdAJrGFE-jm7AxLCixlY9D5X4I2rWrDuKCkk2PA12sU361FXdSpduAjtVwplKQ_LosHyItR4gSVVW5OwUasHuwnPT_5AUcpGYgB965S5S74zb2pD9BwQW9vcp1AynkwJMIhDHvpEmtTql4RPvCF1sVkceWzM"/>
+<div class="absolute inset-0 bg-gradient-to-t from-background-dark via-transparent to-transparent"></div>
+<div class="absolute inset-0 noise-overlay"></div>
+<div class="absolute top-4 left-4">
+<span class="bg-[#FF0050]/20 backdrop-blur-md text-[#FF0050] text-[10px] font-bold px-3 py-1.5 rounded-full border border-[#FF0050]/30 uppercase tracking-tighter">Reels</span>
+</div>
+</div>
+<div class="p-5 flex flex-col flex-1">
+<h3 class="font-sora font-semibold text-sm line-clamp-2 mb-3 leading-relaxed">Análise de Iluminação: O segredo dos vídeos high-end</h3>
+<div class="mt-auto flex items-center justify-between">
+<span class="font-fira text-[10px] text-slate-500 uppercase">15 OUT 2023</span>
+<div class="flex items-center gap-2">
+<button class="size-8 rounded-full border border-white/10 flex items-center justify-center text-slate-400 hover:text-red-400 transition-colors">
+<span class="material-symbols-outlined text-sm">delete</span>
+</button>
+<button class="bg-primary px-4 py-2 rounded-full text-[11px] font-bold text-white plasma-glow hover:scale-105 transition-transform">
+                                        Analisar
+                                    </button>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+</div>
+</body></html>

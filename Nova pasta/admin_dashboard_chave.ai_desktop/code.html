@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="pt-BR"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Admin Dashboard | chave.ai</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&amp;family=Fira+Code:wght@400;500&amp;family=Sora:wght@400;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#617bff",
+                        "plasma": "#7B61FF",
+                        "background-light": "#f5f6f8",
+                        "background-dark": "#0A0A14",
+                        "sidebar": "#18181B",
+                        "glass": "rgba(255, 255, 255, 0.03)",
+                    },
+                    fontFamily: {
+                        "display": ["Space Grotesk", "sans-serif"],
+                        "sora": ["Sora", "sans-serif"],
+                        "fira": ["Fira Code", "monospace"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "1rem",
+                        "lg": "2rem",
+                        "xl": "3rem",
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+<style>body {
+    font-family: "Space Grotesk", sans-serif;
+    position: relative
+    }
+.noise-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    content: "";
+    opacity: 0.035;
+    z-index: 9999;
+    pointer-events: none;
+    background-image: url(https://lh3.googleusercontent.com/aida-public/AB6AXuAtmKV83KgibnSq6vhw1tzEm2n7bE3jqLkfIK3Q3LB9H2fqb1a48OLLCQwcp1KD4qV6Aaf2vAZeHLfqq0g_l3xCTBflErdWdBSov75a_evGngAbJ0ECCKlqP5wzFU01PC6uH73mhH9bcqdpUNO9aG6gZaWHnfflWSv3guBdkNgJcIDaE_2SgR94dyhJaaBPy1oedFlWBeF87QYTlpIjPcSHFmWQiZEXfOOO8Lx6C4M2HArO5Ml2eAmu3nQucqwsYCNhPLBz5N9nv0o)
+    }
+.glass-card {
+    background: rgba(255, 255, 255, 0.03);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.1)
+    }
+.plasma-text {
+    color: #7B61FF;
+    text-shadow: 0 0 20px rgba(123, 97, 255, 0.3)
+    }
+.neon-dot {
+    box-shadow: 0 0 8px currentColor
+    }</style>
+</head>
+<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 min-h-screen overflow-x-hidden">
+<div class="noise-overlay"></div>
+<div class="flex h-screen overflow-hidden">
+<!-- Sidebar -->
+<aside class="w-64 bg-sidebar border-r border-white/5 flex flex-col z-20">
+<div class="p-6 flex items-center gap-3">
+<div class="w-10 h-10 rounded-full bg-gradient-to-tr from-primary to-plasma flex items-center justify-center">
+<span class="material-symbols-outlined text-white">key</span>
+</div>
+<div>
+<h1 class="font-sora font-bold text-lg leading-tight">chave.ai</h1>
+<p class="text-[10px] uppercase tracking-widest text-slate-500 font-bold">Ecossistema</p>
+</div>
+</div>
+<nav class="flex-1 px-4 mt-6 space-y-2">
+<div class="flex items-center gap-3 px-4 py-3 rounded-xl bg-primary/10 text-primary">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="font-medium text-sm">Dashboard</span>
+</div>
+<div class="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-400 hover:bg-white/5 transition-colors">
+<span class="material-symbols-outlined">group</span>
+<span class="font-medium text-sm">Usuários</span>
+</div>
+<div class="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-400 hover:bg-white/5 transition-colors">
+<span class="material-symbols-outlined">payments</span>
+<span class="font-medium text-sm">Planos</span>
+</div>
+<div class="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-400 hover:bg-white/5 transition-colors">
+<span class="material-symbols-outlined">analytics</span>
+<span class="font-medium text-sm">Requisições</span>
+</div>
+<div class="flex items-center gap-3 px-4 py-3 rounded-xl text-slate-400 hover:bg-white/5 transition-colors">
+<span class="material-symbols-outlined">settings</span>
+<span class="font-medium text-sm">Configurações</span>
+</div>
+</nav>
+<div class="p-4 border-t border-white/5">
+<div class="flex items-center gap-3 p-3 rounded-xl hover:bg-white/5 cursor-pointer text-slate-400 transition-colors">
+<span class="material-symbols-outlined">logout</span>
+<span class="font-medium text-sm">Sair</span>
+</div>
+</div>
+</aside>
+<!-- Main Content -->
+<main class="flex-1 overflow-y-auto bg-background-dark relative">
+<!-- Header -->
+<header class="sticky top-0 z-10 bg-background-dark/80 backdrop-blur-md border-b border-white/5 px-8 py-5 flex items-center justify-between">
+<h2 class="font-sora font-bold text-2xl tracking-tight">Visão Geral do Sistema</h2>
+<div class="flex items-center gap-6">
+<div class="flex items-center gap-3 px-4 py-2 bg-slate-900/50 rounded-full border border-white/10">
+<span class="material-symbols-outlined text-xs text-green-400 neon-dot">circle</span>
+<span class="font-fira text-xs text-slate-300">Todos os sistemas operacionais</span>
+</div>
+<div class="flex items-center gap-3">
+<div class="text-right">
+<p class="text-xs font-bold text-slate-200">Admin User</p>
+<p class="text-[10px] text-slate-500">Super Admin</p>
+</div>
+<div class="w-10 h-10 rounded-full border-2 border-primary/30 p-0.5">
+<img alt="User Avatar" class="w-full h-full rounded-full bg-slate-800" data-alt="Profile avatar of the administrator" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB03vMqgzwCsfKhHN7F6WknJJPwPbbvUqyH4L7UiD-8rfgkOjx4SDaDCDGRPOTKMqtoAnyquLqmUXjuAJAY4dkXxqjQjjsZpfVwWxnLXTtNgpYp08vcqZ0wCtuRRhjENpMgo5GSZfRdvH_TPDSivmGDorhS7kGq-ollRBvNWDQbK1dZUQxSy-xgkWS7tHewTfkV5SkpX-mh_acHdKZT8x1lgG5YZ2MHxBG2FPzzqBbUfbTznFljvGetTTjE0kZcoii31EqPEHgcze8"/>
+</div>
+</div>
+</div>
+</header>
+<div class="p-8 space-y-8">
+<!-- KPI Row -->
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+<div class="glass-card rounded-lg p-6 flex flex-col justify-between h-40">
+<p class="text-sm font-medium text-slate-400">Usuários Ativos</p>
+<h3 class="font-sora font-bold text-4xl">1.248</h3>
+<div class="flex items-center gap-1 text-green-400 text-xs font-medium">
+<span class="material-symbols-outlined text-sm">trending_up</span> +12% vs mês anterior
+                        </div>
+</div>
+<div class="glass-card rounded-lg p-6 flex flex-col justify-between h-40">
+<p class="text-sm font-medium text-slate-400">Receita do Mês</p>
+<h3 class="font-sora font-bold text-4xl plasma-text">R$ 83.616,00</h3>
+<div class="flex items-center gap-1 text-slate-500 text-xs font-medium">
+                            Projeção: R$ 92k
+                        </div>
+</div>
+<div class="glass-card rounded-lg p-6 flex flex-col justify-between h-40">
+<p class="text-sm font-medium text-slate-400">Requisições Hoje</p>
+<h3 class="font-fira font-medium text-4xl text-slate-100">14.205</h3>
+<div class="w-full bg-white/5 h-1 rounded-full overflow-hidden mt-2">
+<div class="bg-primary h-full w-[65%]"></div>
+</div>
+</div>
+<div class="glass-card rounded-lg p-6 flex flex-col justify-between h-40">
+<p class="text-sm font-medium text-slate-400">Custo API Hoje</p>
+<h3 class="font-sora font-bold text-4xl text-[#F8F8FF]"> $ 142.12</h3>
+<div class="flex items-center gap-1 text-red-400 text-xs font-medium">
+<span class="material-symbols-outlined text-sm">warning</span> 5% acima da média
+                        </div>
+</div>
+</div>
+<!-- Charts Row -->
+<div class="grid grid-cols-1 lg:grid-cols-5 gap-6">
+<!-- Bar Chart -->
+<div class="lg:col-span-3 glass-card rounded-lg p-8">
+<div class="flex justify-between items-center mb-8">
+<h4 class="font-sora font-bold text-lg">Requisições por Agente</h4>
+<select class="bg-white/5 border-none text-xs rounded-full px-4 py-2 text-slate-400 focus:ring-1 focus:ring-primary">
+<option>Últimos 7 dias</option>
+<option>Hoje</option>
+</select>
+</div>
+<div class="flex items-end justify-between h-48 gap-4 px-2">
+<div class="flex-1 flex flex-col items-center gap-3">
+<div class="w-full bg-gradient-to-t from-plasma/20 to-plasma rounded-t-xl" style="height: 85%"></div>
+<span class="text-[10px] font-fira text-slate-500 uppercase">Agente A</span>
+</div>
+<div class="flex-1 flex flex-col items-center gap-3">
+<div class="w-full bg-gradient-to-t from-plasma/20 to-plasma rounded-t-xl" style="height: 60%"></div>
+<span class="text-[10px] font-fira text-slate-500 uppercase">Agente B</span>
+</div>
+<div class="flex-1 flex flex-col items-center gap-3">
+<div class="w-full bg-gradient-to-t from-plasma/20 to-plasma rounded-t-xl" style="height: 95%"></div>
+<span class="text-[10px] font-fira text-slate-500 uppercase">Agente C</span>
+</div>
+<div class="flex-1 flex flex-col items-center gap-3">
+<div class="w-full bg-gradient-to-t from-plasma/20 to-plasma rounded-t-xl" style="height: 40%"></div>
+<span class="text-[10px] font-fira text-slate-500 uppercase">Agente D</span>
+</div>
+<div class="flex-1 flex flex-col items-center gap-3">
+<div class="w-full bg-gradient-to-t from-plasma/20 to-plasma rounded-t-xl" style="height: 75%"></div>
+<span class="text-[10px] font-fira text-slate-500 uppercase">Agente E</span>
+</div>
+</div>
+</div>
+<!-- Donut Chart -->
+<div class="lg:col-span-2 glass-card rounded-lg p-8 flex flex-col">
+<h4 class="font-sora font-bold text-lg mb-8">Custo por Modelo</h4>
+<div class="flex-1 flex items-center justify-center relative">
+<!-- SVG Donut Placeholder -->
+<svg class="w-40 h-40 transform -rotate-90">
+<circle class="text-white/5" cx="80" cy="80" fill="transparent" r="70" stroke="currentColor" stroke-width="12"></circle>
+<circle class="text-primary neon-dot" cx="80" cy="80" fill="transparent" r="70" stroke="currentColor" stroke-dasharray="440" stroke-dashoffset="110" stroke-width="12"></circle>
+<circle class="text-plasma neon-dot" cx="80" cy="80" fill="transparent" r="70" stroke="currentColor" stroke-dasharray="440" stroke-dashoffset="280" stroke-width="12"></circle>
+<circle class="text-cyan-400 neon-dot" cx="80" cy="80" fill="transparent" r="70" stroke="currentColor" stroke-dasharray="440" stroke-dashoffset="380" stroke-width="12"></circle>
+</svg>
+<div class="absolute flex flex-col items-center">
+<span class="text-xs text-slate-500 font-bold uppercase">Total</span>
+<span class="font-fira font-bold text-xl">$142</span>
+</div>
+</div>
+<div class="grid grid-cols-3 gap-4 mt-8">
+<div class="text-center">
+<p class="text-[10px] text-slate-500 font-bold uppercase mb-1">GPT-4o</p>
+<div class="h-1 bg-primary rounded-full mb-2"></div>
+<p class="text-xs font-fira">55%</p>
+</div>
+<div class="text-center">
+<p class="text-[10px] text-slate-500 font-bold uppercase mb-1">Claude</p>
+<div class="h-1 bg-plasma rounded-full mb-2"></div>
+<p class="text-xs font-fira">30%</p>
+</div>
+<div class="text-center">
+<p class="text-[10px] text-slate-500 font-bold uppercase mb-1">Gemini</p>
+<div class="h-1 bg-cyan-400 rounded-full mb-2"></div>
+<p class="text-xs font-fira">15%</p>
+</div>
+</div>
+</div>
+</div>
+<!-- Bottom Section -->
+<div class="grid grid-cols-1 lg:grid-cols-10 gap-6 pb-12">
+<!-- Recent Users -->
+<div class="lg:col-span-6 glass-card rounded-lg overflow-hidden flex flex-col">
+<div class="p-6 border-b border-white/5 flex justify-between items-center">
+<h4 class="font-sora font-bold text-lg">Usuários Recentes</h4>
+<button class="text-xs text-primary font-bold hover:underline">Ver todos</button>
+</div>
+<div class="flex-1 overflow-x-auto">
+<table class="w-full text-left">
+<thead>
+<tr class="text-[10px] uppercase tracking-widest text-slate-500 border-b border-white/5">
+<th class="px-6 py-4 font-bold">Usuário</th>
+<th class="px-6 py-4 font-bold">Plano</th>
+<th class="px-6 py-4 font-bold">Status</th>
+<th class="px-6 py-4 font-bold text-right">Data</th>
+</tr>
+</thead>
+<tbody class="text-sm divide-y divide-white/5">
+<tr class="hover:bg-white/5 transition-colors">
+<td class="px-6 py-4 flex items-center gap-3">
+<img class="w-8 h-8 rounded-full bg-slate-800" data-alt="Avatar for John Doe" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCTuualqP_skwFUe4D020ETsAXNp1dkGItoYhOz3-bARBj6Ftan_G1jIStKYMgRz-IK9EOtdmcFs8JCJCZ5T6BxrTy3sn3nBgy32qlVFzw3FeGiKiceHnR2hoFIaP9gA1Bgh4oZoQfCW7-f_F-pwyHNqJVyMvWWbPOY7zxRMjg-Zbyd9P9TUzgP-Jst95Pjqoen-7MF1-UXstSlunXWhMCafHbRYpl4nC8gcQSpr8gZ7B09FSUZGes6nW8AVE-1rHchLLMSmi7_y-4"/>
+<div>
+<p class="font-medium">João Silva</p>
+<p class="text-xs text-slate-500">joao@empresa.com.br</p>
+</div>
+</td>
+<td class="px-6 py-4">
+<span class="px-2 py-1 rounded-full bg-plasma/10 text-plasma text-[10px] font-bold uppercase">Enterprise</span>
+</td>
+<td class="px-6 py-4">
+<div class="flex items-center gap-2">
+<span class="w-2 h-2 rounded-full bg-green-500 neon-dot"></span>
+<span class="text-xs text-slate-300">Ativo</span>
+</div>
+</td>
+<td class="px-6 py-4 text-right font-fira text-xs text-slate-500">14:23</td>
+</tr>
+<tr class="hover:bg-white/5 transition-colors">
+<td class="px-6 py-4 flex items-center gap-3">
+<img class="w-8 h-8 rounded-full bg-slate-800" data-alt="Avatar for Anna Maria" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBX8b4L2uHghs3rQQRN5WbP8zPU99maIufNBOXen7avlnb0tuwRy31sv616slOna3DCT_5O44nI7yevsiui3ateJA1likrJKS9ivJPSyL_8-xzs-deffKXQdrVZWRI_IqBY7Ls08h1SsrWaw55dk_bewD6q8OrROpycoL2ehI9_blbdy1V1W7QvFcnIsw2snERdDgkn76J5WpjQzrQnGxNRG8hLffeFApzKUpEpWy6UNtLKTK_Oi8-XeVwXwaQLftFTabJGieyixZY"/>
+<div>
+<p class="font-medium">Ana Martins</p>
+<p class="text-xs text-slate-500">ana.m@startup.io</p>
+</div>
+</td>
+<td class="px-6 py-4">
+<span class="px-2 py-1 rounded-full bg-primary/10 text-primary text-[10px] font-bold uppercase">Pro Plus</span>
+</td>
+<td class="px-6 py-4">
+<div class="flex items-center gap-2">
+<span class="w-2 h-2 rounded-full bg-green-500 neon-dot"></span>
+<span class="text-xs text-slate-300">Ativo</span>
+</div>
+</td>
+<td class="px-6 py-4 text-right font-fira text-xs text-slate-500">13:05</td>
+</tr>
+<tr class="hover:bg-white/5 transition-colors">
+<td class="px-6 py-4 flex items-center gap-3">
+<img class="w-8 h-8 rounded-full bg-slate-800" data-alt="Avatar for Robert C" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBENSmABsJaQbPuJLo71h90-oPG0qqvGH8KnW90EQurpoyCicGn-xmtA-iM8BRTlg7s0K8UHeEY5McABpQwB60qdFBpvCCVoa5zrNP3DURJjpurKVbCiVJMwI9HLnQ0K0vVTDI2Vh9KjLTEbZ88XwtN14hN-9F9g-o7zAmBycLGv0B5ITKfGP3GxNE5DZtlQFonM72KvDst4o3oEbatDuaRJp0OPQggfrYnP1M2vZzXxAsx7lnw64mAzs0Imu_bVFwd_x6j6vt5_fk"/>
+<div>
+<p class="font-medium">Ricardo Costa</p>
+<p class="text-xs text-slate-500">rc@tech.com</p>
+</div>
+</td>
+<td class="px-6 py-4">
+<span class="px-2 py-1 rounded-full bg-slate-800 text-slate-400 text-[10px] font-bold uppercase">Trial</span>
+</td>
+<td class="px-6 py-4">
+<div class="flex items-center gap-2">
+<span class="w-2 h-2 rounded-full bg-yellow-500 neon-dot"></span>
+<span class="text-xs text-slate-300">Pendente</span>
+</div>
+</td>
+<td class="px-6 py-4 text-right font-fira text-xs text-slate-500">11:42</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<!-- Alerts & Notifications -->
+<div class="lg:col-span-4 flex flex-col gap-6">
+<div class="glass-card rounded-lg p-6 flex-1">
+<h4 class="font-sora font-bold text-lg mb-6 flex items-center gap-2">
+<span class="material-symbols-outlined text-primary">notifications</span>
+                                Alertas e Notificações
+                            </h4>
+<div class="space-y-4">
+<div class="p-4 rounded-xl bg-amber-500/10 border border-amber-500/20 flex gap-4">
+<span class="material-symbols-outlined text-amber-500 shrink-0">warning</span>
+<div>
+<p class="text-sm font-bold text-amber-200">Limite de API crítico</p>
+<p class="text-xs text-amber-200/70 mt-1">API Claude atingiu 85% do limite contratado. Recomenda-se upgrade imediato.</p>
+</div>
+</div>
+<div class="p-4 rounded-xl bg-cyan-500/10 border border-cyan-500/20 flex gap-4">
+<span class="material-symbols-outlined text-cyan-500 shrink-0">info</span>
+<div>
+<p class="text-sm font-bold text-cyan-200">Novo modelo disponível</p>
+<p class="text-xs text-cyan-200/70 mt-1">Integração com GPT-4o-mini já pode ser habilitada para clientes Enterprise.</p>
+</div>
+</div>
+<div class="p-4 rounded-xl bg-white/5 border border-white/10 flex gap-4 opacity-70">
+<span class="material-symbols-outlined text-slate-400 shrink-0">check_circle</span>
+<div>
+<p class="text-sm font-bold text-slate-300">Backup concluído</p>
+<p class="text-xs text-slate-500 mt-1">A rotina de backup semanal foi finalizada com sucesso às 03:00 AM.</p>
+</div>
+</div>
+</div>
+<button class="w-full mt-6 py-3 rounded-xl border border-white/10 text-xs font-bold text-slate-400 hover:bg-white/5 transition-colors">
+                                Marcar todos como lidos
+                            </button>
+</div>
+</div>
+</div>
+</div>
+</main>
+</div>
+</body></html>

@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="pt-br"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Monitoramento de Custos Admin chave.ai</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&amp;family=Sora:wght@400;600;700&amp;family=Fira+Code:wght@400;500&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#6d51fb",
+                        "accent-cyan": "#00f5ff",
+                        "background-light": "#f6f5f8",
+                        "background-dark": "#0A0A14",
+                        "sidebar-dark": "#18181B",
+                    },
+                    fontFamily: {
+                        "display": ["Sora", "Space Grotesk", "sans-serif"],
+                        "mono": ["Fira Code", "monospace"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "1rem",
+                        "lg": "2rem",
+                        "xl": "3rem",
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+<style>.noise-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    opacity: 0.035;
+    z-index: 9999;
+    background-image: url(https://lh3.googleusercontent.com/aida-public/AB6AXuATss6l1PjTFVtKzhfwxcNRMezP3Vcp-1OSsqG4gs8USTEULvX8W7I5pBMACY6dsCewRmgOgZaORXFmuNQGWXjGQC9HPee38rHLjEe06NkCy-4YwYg79DB-kWRF2Acm-nQbnw4A22qadcxbZy6vkJ5-hMNT72gK5lcJ-r0fUug-Z6W5YIbLL0P_oglsQqdS_USvyEIx7yYyfxPIOz9EuYX8vj0u1MROejO1h4RkTqs7iDylnmbRiyfNfFz_lUpWF2NT2tYvMq_eSzY)
+    }
+.glass-card {
+    background: rgba(255, 255, 255, 0.03);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.08)
+    }
+.plasma-gradient {
+    background: linear-gradient(135deg, #6d51fb 0%, #00f5ff 100%)
+    }
+.plasma-text {
+    background: linear-gradient(135deg, #6d51fb 0%, #00f5ff 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent
+    }</style>
+</head>
+<body class="bg-background-light dark:bg-background-dark font-display text-slate-900 dark:text-slate-100 min-h-screen flex">
+<div class="noise-overlay"></div>
+<!-- Fixed Sidebar -->
+<aside class="w-72 bg-sidebar-dark border-r border-slate-800 flex flex-col fixed h-full z-50">
+<div class="p-8 flex items-center gap-3">
+<div class="size-10 rounded-full bg-primary flex items-center justify-center">
+<span class="material-symbols-outlined text-white">key</span>
+</div>
+<div>
+<h1 class="text-xl font-bold tracking-tight text-white">chave.ai</h1>
+<p class="text-xs text-slate-400 uppercase tracking-widest">Admin Console</p>
+</div>
+</div>
+<nav class="flex-1 px-4 space-y-2 mt-4">
+<a class="flex items-center gap-3 px-4 py-3 text-slate-400 hover:text-white hover:bg-white/5 rounded-lg transition-all" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="text-sm font-medium">Dashboard</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 bg-primary/10 text-primary rounded-lg transition-all border border-primary/20" href="#">
+<span class="material-symbols-outlined">payments</span>
+<span class="text-sm font-medium">Financeiro</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-slate-400 hover:text-white hover:bg-white/5 rounded-lg transition-all" href="#">
+<span class="material-symbols-outlined">group</span>
+<span class="text-sm font-medium">Usuárias</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-slate-400 hover:text-white hover:bg-white/5 rounded-lg transition-all" href="#">
+<span class="material-symbols-outlined">smart_toy</span>
+<span class="text-sm font-medium">Agentes</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-slate-400 hover:text-white hover:bg-white/5 rounded-lg transition-all" href="#">
+<span class="material-symbols-outlined">settings</span>
+<span class="text-sm font-medium">Configurações</span>
+</a>
+</nav>
+<div class="p-6">
+<div class="glass-card rounded-xl p-4 flex flex-col gap-4">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary">auto_awesome</span>
+<p class="text-xs font-semibold uppercase tracking-tighter text-slate-300">Upgrade Plan</p>
+</div>
+<button class="w-full py-2 bg-primary hover:bg-primary/90 text-white rounded-lg text-sm font-bold transition-all">
+                    Unlock Enterprise
+                </button>
+</div>
+</div>
+</aside>
+<!-- Main Content -->
+<main class="ml-72 flex-1 p-10">
+<!-- Header Section -->
+<header class="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-10">
+<div>
+<h2 class="text-3xl font-bold tracking-tight dark:text-white">Monitoramento Financeiro</h2>
+<p class="text-slate-400 mt-1">Visão geral do consumo de tokens e infraestrutura</p>
+</div>
+<div class="flex items-center gap-2 bg-slate-800/40 p-1.5 rounded-full border border-slate-700/50 backdrop-blur-md">
+<button class="px-5 py-2 text-xs font-bold rounded-full bg-primary text-white shadow-lg shadow-primary/20">Hoje</button>
+<button class="px-5 py-2 text-xs font-medium text-slate-400 hover:text-white transition-colors">7 dias</button>
+<button class="px-5 py-2 text-xs font-medium text-slate-400 hover:text-white transition-colors">30 dias</button>
+<button class="px-5 py-2 text-xs font-medium text-slate-400 hover:text-white transition-colors flex items-center gap-2">
+                    Custom <span class="material-symbols-outlined text-[16px]">calendar_today</span>
+</button>
+</div>
+</header>
+<!-- KPI Row -->
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+<div class="glass-card rounded-lg p-6 flex flex-col justify-between">
+<div>
+<p class="text-sm font-medium text-slate-400 mb-1">Custo Total</p>
+<h3 class="text-2xl font-bold text-white tracking-tight">$ 4,240.00</h3>
+</div>
+<div class="mt-4 flex items-center gap-2">
+<span class="flex items-center gap-1 px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 text-xs font-bold">
+<span class="material-symbols-outlined text-xs">trending_up</span> +12%
+                    </span>
+<span class="text-xs text-slate-500">vs. mês anterior</span>
+</div>
+</div>
+<div class="glass-card rounded-lg p-6 flex flex-col justify-between">
+<div>
+<p class="text-sm font-medium text-slate-400 mb-1">Requisições</p>
+<h3 class="text-2xl font-bold text-white tracking-tight">842k</h3>
+</div>
+<div class="mt-4 flex items-center gap-2">
+<span class="flex items-center gap-1 px-2 py-0.5 rounded-full bg-rose-500/10 text-rose-400 text-xs font-bold">
+<span class="material-symbols-outlined text-xs">trending_down</span> -3%
+                    </span>
+<span class="text-xs text-slate-500">vs. ontem</span>
+</div>
+</div>
+<div class="glass-card rounded-lg p-6 flex flex-col justify-between">
+<div>
+<p class="text-sm font-medium text-slate-400 mb-1">Custo por Usuária</p>
+<h3 class="text-2xl font-mono font-medium text-white tracking-tight">$ 3.40</h3>
+</div>
+<div class="mt-4 flex items-center gap-2">
+<span class="flex items-center gap-1 px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 text-xs font-bold">
+                        Estável
+                    </span>
+</div>
+</div>
+<div class="glass-card rounded-lg p-6 flex flex-col justify-between relative overflow-hidden">
+<div class="absolute top-0 right-0 w-32 h-32 plasma-gradient blur-3xl opacity-10 -mr-16 -mt-16"></div>
+<div>
+<p class="text-sm font-medium text-slate-400 mb-1">Margem Estimada</p>
+<h3 class="text-2xl font-bold plasma-text tracking-tight">68%</h3>
+</div>
+<div class="mt-4 flex items-center gap-2">
+<div class="w-full bg-slate-800 rounded-full h-1.5">
+<div class="plasma-gradient h-1.5 rounded-full" style="width: 68%"></div>
+</div>
+</div>
+</div>
+</div>
+<!-- Main Chart Section -->
+<div class="glass-card rounded-lg p-8 mb-8 border-t-2 border-t-primary/40">
+<div class="flex items-center justify-between mb-8">
+<div>
+<h4 class="text-xl font-bold text-white">Custo Diário</h4>
+<p class="text-sm text-slate-400">Análise temporal de gastos infra</p>
+</div>
+<div class="flex items-center gap-4 text-xs font-medium text-slate-400">
+<div class="flex items-center gap-1.5">
+<span class="size-2 rounded-full bg-primary"></span> Atual
+                    </div>
+<div class="flex items-center gap-1.5">
+<span class="size-2 rounded-full bg-slate-600"></span> Projetado
+                    </div>
+</div>
+</div>
+<div class="h-80 w-full relative">
+<!-- SVG Chart Mockup -->
+<svg class="w-full h-full overflow-visible" viewbox="0 0 1000 200">
+<defs>
+<lineargradient id="chartGradient" x1="0" x2="0" y1="0" y2="1">
+<stop offset="0%" stop-color="#6d51fb" stop-opacity="0.5"></stop>
+<stop offset="100%" stop-color="#00f5ff" stop-opacity="0"></stop>
+</lineargradient>
+</defs>
+<path d="M0,150 Q50,140 100,100 T200,80 T300,120 T400,90 T500,60 T600,85 T700,50 T800,70 T900,40 T1000,30 L1000,200 L0,200 Z" fill="url(#chartGradient)"></path>
+<path d="M0,150 Q50,140 100,100 T200,80 T300,120 T400,90 T500,60 T600,85 T700,50 T800,70 T900,40 T1000,30" fill="none" stroke="#6d51fb" stroke-linecap="round" stroke-width="3"></path>
+<!-- Tooltip Point -->
+<circle cx="700" cy="50" fill="#6d51fb" r="6"></circle>
+<circle cx="700" cy="50" fill="#6d51fb" fill-opacity="0.3" r="10"></circle>
+</svg>
+<!-- Chart Labels -->
+<div class="absolute bottom-0 left-0 right-0 flex justify-between px-2 pt-4 border-t border-slate-800 text-[10px] uppercase font-bold text-slate-500 tracking-wider">
+<span>01 Out</span>
+<span>05 Out</span>
+<span>10 Out</span>
+<span>15 Out</span>
+<span>20 Out</span>
+<span>25 Out</span>
+<span>31 Out</span>
+</div>
+</div>
+</div>
+<!-- Bottom Grid -->
+<div class="grid grid-cols-1 lg:grid-cols-10 gap-8">
+<!-- Consumo por Agente Table -->
+<div class="lg:col-span-7 glass-card rounded-lg p-6">
+<div class="flex items-center justify-between mb-6">
+<h4 class="text-lg font-bold text-white">Consumo por Agente</h4>
+<button class="text-sm text-primary font-medium hover:underline">Ver todos</button>
+</div>
+<div class="overflow-x-auto">
+<table class="w-full text-left">
+<thead>
+<tr class="text-[11px] uppercase tracking-widest text-slate-500 border-b border-slate-800/50">
+<th class="pb-4 font-bold">Agente</th>
+<th class="pb-4 font-bold">Modelo</th>
+<th class="pb-4 font-bold">Requisições</th>
+<th class="pb-4 font-bold text-right">Tokens</th>
+<th class="pb-4 font-bold text-right">Custo</th>
+<th class="pb-4 font-bold w-32">% Uso</th>
+</tr>
+</thead>
+<tbody class="text-sm">
+<tr class="border-b border-slate-800/30 hover:bg-white/[0.02] transition-colors group">
+<td class="py-4 font-semibold text-slate-200">Suporte VIP</td>
+<td class="py-4">
+<span class="px-2 py-1 rounded-md bg-slate-800 text-slate-300 text-[10px] font-mono border border-slate-700">GPT-4o</span>
+</td>
+<td class="py-4 text-slate-400">142,500</td>
+<td class="py-4 font-mono text-slate-400 text-right">12.4M</td>
+<td class="py-4 font-bold text-white text-right">$ 840.20</td>
+<td class="py-4">
+<div class="w-full bg-slate-800 rounded-full h-1.5">
+<div class="plasma-gradient h-1.5 rounded-full" style="width: 45%"></div>
+</div>
+</td>
+</tr>
+<tr class="border-b border-slate-800/30 hover:bg-white/[0.02] transition-colors group">
+<td class="py-4 font-semibold text-slate-200">Sales Pro</td>
+<td class="py-4">
+<span class="px-2 py-1 rounded-md bg-slate-800 text-slate-300 text-[10px] font-mono border border-slate-700">Claude 3.5</span>
+</td>
+<td class="py-4 text-slate-400">98,200</td>
+<td class="py-4 font-mono text-slate-400 text-right">8.1M</td>
+<td class="py-4 font-bold text-white text-right">$ 612.45</td>
+<td class="py-4">
+<div class="w-full bg-slate-800 rounded-full h-1.5">
+<div class="plasma-gradient h-1.5 rounded-full" style="width: 32%"></div>
+</div>
+</td>
+</tr>
+<tr class="border-b border-slate-800/30 hover:bg-white/[0.02] transition-colors group">
+<td class="py-4 font-semibold text-slate-200">Dev Assistant</td>
+<td class="py-4">
+<span class="px-2 py-1 rounded-md bg-slate-800 text-slate-300 text-[10px] font-mono border border-slate-700">o1-preview</span>
+</td>
+<td class="py-4 text-slate-400">45,100</td>
+<td class="py-4 font-mono text-slate-400 text-right">24.8M</td>
+<td class="py-4 font-bold text-white text-right">$ 1,240.00</td>
+<td class="py-4">
+<div class="w-full bg-slate-800 rounded-full h-1.5">
+<div class="plasma-gradient h-1.5 rounded-full" style="width: 78%"></div>
+</div>
+</td>
+</tr>
+<tr class="border-b border-slate-800/30 hover:bg-white/[0.02] transition-colors group">
+<td class="py-4 font-semibold text-slate-200">Social Manager</td>
+<td class="py-4">
+<span class="px-2 py-1 rounded-md bg-slate-800 text-slate-300 text-[10px] font-mono border border-slate-700">GPT-4o mini</span>
+</td>
+<td class="py-4 text-slate-400">320,400</td>
+<td class="py-4 font-mono text-slate-400 text-right">5.2M</td>
+<td class="py-4 font-bold text-white text-right">$ 45.10</td>
+<td class="py-4">
+<div class="w-full bg-slate-800 rounded-full h-1.5">
+<div class="plasma-gradient h-1.5 rounded-full" style="width: 15%"></div>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<!-- Top 10 Usuárias Section -->
+<div class="lg:col-span-3 glass-card rounded-lg p-6">
+<div class="flex items-center justify-between mb-6">
+<h4 class="text-lg font-bold text-white">Top 10 Usuárias</h4>
+<span class="material-symbols-outlined text-slate-500 text-xl cursor-pointer hover:text-white transition-colors">more_vert</span>
+</div>
+<div class="space-y-6">
+<div class="flex items-center justify-between group cursor-pointer">
+<div class="flex items-center gap-3">
+<div class="relative">
+<img alt="Profile" class="size-10 rounded-full border border-primary/30" data-alt="Avatar of user Elena" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD6Y8A9UYksWZs8b8G7zmDEfTGTUnWyQd6s32RsIa_9hItWAaKVYr2-TthKaTklRAF56aFubtQnOchN6aRvsbKGI4WgZLa3Bdng2m9-D3ODLDvV57I8St0DUX4uD7T7jPQv8ghLg0zN7HE0RZQAa5rmpIzX5oEhyucqqSa8zx2Fd022hj-bUXcKGZfoRMUmQJOin1KWFq01lmjqB4J49aSwGfP9CLtd6-Us3wCJs9aR6clQqG5_70dSH2xR274dzXvOpn958adWYYA"/>
+<div class="absolute -bottom-1 -right-1 size-4 bg-emerald-500 border-2 border-[#120f23] rounded-full"></div>
+</div>
+<div>
+<p class="text-sm font-semibold text-slate-100 group-hover:text-primary transition-colors">Elena Silva</p>
+<p class="text-[11px] text-slate-500 uppercase tracking-wider">1.2M Tokens</p>
+</div>
+</div>
+<p class="text-sm font-bold text-white">$ 124.50</p>
+</div>
+<div class="flex items-center justify-between group cursor-pointer">
+<div class="flex items-center gap-3">
+<div class="relative">
+<img alt="Profile" class="size-10 rounded-full border border-primary/30" data-alt="Avatar of user Marcus" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAkpzyAUxaKY4Iu5DJGs565mJIaOlJd4OPtp31D1beDlZCFX5yogIVGC7wrxpparnhlUOGq3y32P7bP5EUezbl-RisZAFVCkXdRUQTWLvO_pi0IH-ehDOdASCQL7oOB3CU6Dn13740qO8fsR5wQ_dRxFAh5yGA0GJeiw7DjozAiJJRJDd_gSwwtRw0dFC4iT9iw2tFzDUAkfsNRlP7pltrG-QhfA5S17R3vW31yEqJca1xIJwPs5-KeczzwswvEv1DBUJHuDmYw4m4"/>
+<div class="absolute -bottom-1 -right-1 size-4 bg-emerald-500 border-2 border-[#120f23] rounded-full"></div>
+</div>
+<div>
+<p class="text-sm font-semibold text-slate-100 group-hover:text-primary transition-colors">Marcus Costa</p>
+<p class="text-[11px] text-slate-500 uppercase tracking-wider">940k Tokens</p>
+</div>
+</div>
+<p class="text-sm font-bold text-white">$ 92.20</p>
+</div>
+<div class="flex items-center justify-between group cursor-pointer">
+<div class="flex items-center gap-3">
+<div class="relative">
+<img alt="Profile" class="size-10 rounded-full border border-primary/30" data-alt="Avatar of user Julia" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBAaQEcMmcfNosRycJU8-x43z14VMabS4T5sp3guZJB2onvf-03sJ7By7vFn3wTGKHWIpbgOZIh8IzN7bZH224m_IBG_aRWBgB3JMyVrbOYm8lf5AT5yczWXTO9_NzE_KXhdvgVsIIfCAVFsUqZ1_GZQqh2WCkMWgKoMlhPtiosFCnwLjml7FCieDKVvfgJNSh-NrdDGXxsD4Z_PBKTw2sQbwrg6Vb1Tv45WfWZ56UvlSTddhq3IwPOlvFzn6Osop9pBQO6mgkDRhI"/>
+<div class="absolute -bottom-1 -right-1 size-4 bg-slate-500 border-2 border-[#120f23] rounded-full"></div>
+</div>
+<div>
+<p class="text-sm font-semibold text-slate-100 group-hover:text-primary transition-colors">Julia Santos</p>
+<p class="text-[11px] text-slate-500 uppercase tracking-wider">850k Tokens</p>
+</div>
+</div>
+<p class="text-sm font-bold text-white">$ 84.10</p>
+</div>
+<div class="flex items-center justify-between group cursor-pointer">
+<div class="flex items-center gap-3">
+<div class="relative">
+<img alt="Profile" class="size-10 rounded-full border border-primary/30" data-alt="Avatar of user Ricardo" src="https://lh3.googleusercontent.com/aida-public/AB6AXuClkQH7dr6btBtz_UF9cp0kmHxW2Q4u1CEfN3182-MBfLaI4RQCCQgyqk5qQP-REMjmC-zzgbdD3iiTK3mrrfUVCTxrbCMhOO9N8zmiWvRbu9vVLG7aQ5hiAEEwRxU2FH_dhJ4pz5X192_CoC-D7wDZLBA7Mn7JSjmtvAyL7JMqzv0pwcThcv3b2bTDjwXjvTdYmBXTh9aKs3HqYC5l1KKfp2M4rrg3iqyf-ABHpiOQv_D5FCUD2ykp_O8gUuh2440Qm2XVEp3FYZc"/>
+<div class="absolute -bottom-1 -right-1 size-4 bg-emerald-500 border-2 border-[#120f23] rounded-full"></div>
+</div>
+<div>
+<p class="text-sm font-semibold text-slate-100 group-hover:text-primary transition-colors">Ricardo Lima</p>
+<p class="text-[11px] text-slate-500 uppercase tracking-wider">720k Tokens</p>
+</div>
+</div>
+<p class="text-sm font-bold text-white">$ 72.80</p>
+</div>
+<div class="flex items-center justify-between group cursor-pointer">
+<div class="flex items-center gap-3">
+<div class="relative">
+<img alt="Profile" class="size-10 rounded-full border border-primary/30" data-alt="Avatar of user Beatriz" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDbDOlHRYI9QCHd7Zkyte3eiXCRO7gJhvF6hiNerc3Ew7njNGWUnLLx0pWktASoPYw6_U1gEFw2HiDIjAvRXyu2uMRnOea5WUoT1NIg4bOArhRozSMnKK3TqTfK6FdwV0ErCKpOpCE_o_omPqNblRYxGutcX4jBqc6PNJlevC1idzf7P5GAP1WBOiE5b_ha8wUxzWfPHm6DSe0Wu4UfZjeSftJZzilm2eQ_E1yZs_X9WB2EmyYgkfBfDLtWJOCfZPWhYOz6WN7DfFs"/>
+<div class="absolute -bottom-1 -right-1 size-4 bg-amber-500 border-2 border-[#120f23] rounded-full"></div>
+</div>
+<div>
+<p class="text-sm font-semibold text-slate-100 group-hover:text-primary transition-colors">Beatriz Rocha</p>
+<p class="text-[11px] text-slate-500 uppercase tracking-wider">680k Tokens</p>
+</div>
+</div>
+<p class="text-sm font-bold text-white">$ 64.90</p>
+</div>
+</div>
+<button class="w-full mt-8 py-3 border border-slate-800 rounded-xl text-xs font-bold text-slate-400 hover:text-white hover:bg-white/5 transition-all">
+                    Relatório Completo
+                </button>
+</div>
+</div>
+</main>
+</body></html>
