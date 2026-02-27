@@ -7,6 +7,25 @@ import { usePathname } from 'next/navigation';
 export default function Sidebar() {
     const pathname = usePathname();
 
+    const [profileImage, setProfileImage] = React.useState<string | null>(null);
+
+    React.useEffect(() => {
+        // Function to load image
+        const loadImage = () => {
+            const savedImage = localStorage.getItem('profileImage');
+            if (savedImage) {
+                setProfileImage(`url('${savedImage}')`);
+            }
+        };
+
+        // Load initially
+        loadImage();
+
+        // Listen for updates from the profile page
+        window.addEventListener('profileImageUpdated', loadImage);
+        return () => window.removeEventListener('profileImageUpdated', loadImage);
+    }, []);
+
     const navLinks = [
         { href: '/', icon: 'home', label: 'Início' },
         { href: '/agentes', icon: 'smart_toy', label: 'Agentes' },
@@ -39,9 +58,14 @@ export default function Sidebar() {
             <div className="p-6 border-t border-white/5 bg-black/10">
                 <Link href="/perfil" className="flex items-center gap-4 p-2 rounded-lg hover:bg-white/5 transition-all cursor-pointer">
                     <div className="relative">
-                        <div className="w-10 h-10 rounded-full border border-white/10 bg-gradient-to-tr from-primary/30 to-accent-neon/30 flex items-center justify-center overflow-hidden">
-                            <span className="text-accent-neon font-bold font-display text-sm">MS</span>
-                        </div>
+                        {profileImage ? (
+                            <div className="w-10 h-10 rounded-full border border-white/10 bg-cover bg-center flex items-center justify-center overflow-hidden" style={{ backgroundImage: profileImage }}>
+                            </div>
+                        ) : (
+                            <div className="w-10 h-10 rounded-full border border-white/10 bg-gradient-to-tr from-primary/30 to-accent-neon/30 flex items-center justify-center overflow-hidden">
+                                <span className="text-accent-neon font-bold font-display text-sm">MS</span>
+                            </div>
+                        )}
                         <div className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 border-2 border-sidebar-dark rounded-full"></div>
                     </div>
                     <div className="flex-1">

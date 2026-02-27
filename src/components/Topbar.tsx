@@ -52,11 +52,6 @@ export default function Topbar() {
                 <button className="bg-primary/10 hover:bg-primary/20 text-primary px-4 py-2 rounded-full text-sm font-bold transition-all border border-primary/20">
                     Plano Admin
                 </button>
-                <Link href="/perfil">
-                    <div className="w-10 h-10 rounded-full border-2 border-primary/30 p-0.5 cursor-pointer hover:border-primary transition-colors">
-                        <div className="w-full h-full rounded-full bg-cover bg-center" style={{ backgroundImage: "url('https://lh3.googleusercontent.com/aida-public/AB6AXuDh6bHL3BwS1lm1TBMgged5oOIBj6DUMQNn6P7yfQZMxDg6zoiHfRD2hBwZ4ZbDV-H5JzfHCN_88ONPW0zczvb3TpDr-NTPnf2WZelACDlbStc1lrOe2UX59nAPk0ryt6rMicNkB49_RT1dpqakVDH_ND9CwCQG1xh_w7aGVmGaePcpIQGqPBvHNYZwyOb4abmuYXr1OA4s1q_XltQuxYcQoO-a5jkPvq2HlR8wCps_oaaFynNRbZ9TYtizP_uVJIlYtdHu_H1n8GU')" }}></div>
-                    </div>
-                </Link>
             </div>
         </header>
     );

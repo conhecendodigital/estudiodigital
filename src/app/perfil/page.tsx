@@ -1,8 +1,86 @@
-import React from 'react';
+'use client';
+
+import React, { useState, useRef } from 'react';
 import Sidebar from '@/components/Sidebar';
 import { Camera, Save, User, UserCircle, Briefcase, Share2, MessageSquare, Diamond } from 'lucide-react';
 
 export default function PerfilPage() {
+    const fileInputRef = useRef<HTMLInputElement>(null);
+    const [profileImage, setProfileImage] = useState("url('https://lh3.googleusercontent.com/aida-public/AB6AXuDh6bHL3BwS1lm1TBMgged5oOIBj6DUMQNn6P7yfQZMxDg6zoiHfRD2hBwZ4ZbDV-H5JzfHCN_88ONPW0zczvb3TpDr-NTPnf2WZelACDlbStc1lrOe2UX59nAPk0ryt6rMicNkB49_RT1dpqakVDH_ND9CwCQG1xh_w7aGVmGaePcpIQGqPBvHNYZwyOb4abmuYXr1OA4s1q_XltQuxYcQoO-a5jkPvq2HlR8wCps_oaaFynNRbZ9TYtizP_uVJIlYtdHu_H1n8GU')");
+
+    // Mock data for the 13 onboarding questions
+    const [onboardingData, setOnboardingData] = useState<Record<string, string>>({
+        nicho: 'Marketing Digital',
+        domina: 'Instagram para negócios locais',
+        experiencias: 'Graduação em Marketing, experiência de 5 anos em agências',
+        resultados: 'Mais de 10.000 alunos formados',
+        diferencial: 'Na minha área de marketing digital, eu sempre foco em entregar conteúdo prático e autêntico.',
+        publico: 'Empreendedores digitais entre 25-40 anos',
+        dor: 'Falta de tempo para criar conteúdo consistente.',
+        tentativas: 'Comprar cursos de marketing vagos ou delegar para agências',
+        concorrentes: '1. Agência X\n2. Mentor Y',
+        proposito: 'Quero escalar minhas vendas de forma orgânica.',
+        tempo: '1_hora',
+        receio: 'Tenho um pouco de dificuldade com a câmera no início.',
+        restricoes: 'Política partidária, fofocas, termos técnicos excessivos'
+    });
+
+    const updateOnboarding = (key: string, value: string) => {
+        setOnboardingData(prev => ({ ...prev, [key]: value }));
+    };
+
+    const ONBOARDING_FIELDS = [
+        { id: 'nicho', label: 'Qual é o seu nicho ou área de atuação?', type: 'text' },
+        { id: 'domina', label: 'Qual assunto específico você domina?', type: 'text' },
+        { id: 'experiencias', label: 'Quais são suas formações e experiências?', type: 'textarea' },
+        { id: 'resultados', label: 'Qual resultado você já conquistou?', type: 'textarea' },
+        { id: 'diferencial', label: 'O que te diferencia dos outros?', type: 'textarea' },
+        { id: 'publico', label: 'Para quem você quer falar?', type: 'textarea' },
+        { id: 'dor', label: 'Qual a maior dor ou problema dessa pessoa?', type: 'textarea' },
+        { id: 'tentativas', label: 'O que essa pessoa já tentou e não funcionou?', type: 'textarea' },
+        { id: 'concorrentes', label: 'Liste 5 concorrentes ou referências do seu nicho', type: 'textarea' },
+        { id: 'proposito', label: 'Qual seu propósito em crescer nas redes?', type: 'textarea' },
+        {
+            id: 'tempo', label: 'Quanto tempo por dia pode dedicar?', type: 'select',
+            options: [
+                { label: '30 minutos', value: '30_min' },
+                { label: '1 hora', value: '1_hora' },
+                { label: '2 horas', value: '2_horas' },
+                { label: 'Mais de 2 horas', value: '2_horas_plus' }
+            ]
+        },
+        { id: 'receio', label: 'Tem algum receio em gravar ou aparecer?', type: 'textarea' },
+        { id: 'restricoes', label: 'O que você NÃO quer falar?', type: 'textarea' }
+    ];
+
+    // Load from localStorage on mount
+    React.useEffect(() => {
+        const savedImage = localStorage.getItem('profileImage');
+        if (savedImage) {
+            setProfileImage(`url('${savedImage}')`);
+        }
+    }, []);
+
+    const handleImageClick = () => {
+        fileInputRef.current?.click();
+    };
+
+    const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onloadend = () => {
+                const base64String = reader.result as string;
+                setProfileImage(`url('${base64String}')`);
+                localStorage.setItem('profileImage', base64String);
+
+                // Dispatch a custom event to notify other components (like Sidebar)
+                window.dispatchEvent(new Event('profileImageUpdated'));
+            };
+            reader.readAsDataURL(file);
+        }
+    };
+
     return (
         <div className="bg-background-dark font-display text-slate-100 min-h-screen overflow-hidden flex">
             {/* Sidebar */}
@@ -34,14 +112,25 @@ export default function PerfilPage() {
                                 <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
 
                                 <div className="relative mb-6">
-                                    <div className="w-32 h-32 rounded-full border-4 border-primary/20 p-1">
-                                        <div className="w-full h-full rounded-full bg-cover bg-center overflow-hidden relative" style={{ backgroundImage: "url('https://lh3.googleusercontent.com/aida-public/AB6AXuDh6bHL3BwS1lm1TBMgged5oOIBj6DUMQNn6P7yfQZMxDg6zoiHfRD2hBwZ4ZbDV-H5JzfHCN_88ONPW0zczvb3TpDr-NTPnf2WZelACDlbStc1lrOe2UX59nAPk0ryt6rMicNkB49_RT1dpqakVDH_ND9CwCQG1xh_w7aGVmGaePcpIQGqPBvHNYZwyOb4abmuYXr1OA4s1q_XltQuxYcQoO-a5jkPvq2HlR8wCps_oaaFynNRbZ9TYtizP_uVJIlYtdHu_H1n8GU')" }}>
+                                    <div className="w-32 h-32 rounded-full border-4 border-primary/20 p-1 relative">
+                                        <div
+                                            className="w-full h-full rounded-full bg-cover bg-center overflow-hidden relative group"
+                                            style={{ backgroundImage: profileImage }}
+                                            onClick={handleImageClick}
+                                        >
                                             <div className="absolute inset-0 bg-black/50 flex flex-col items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer backdrop-blur-sm">
                                                 <Camera className="text-white size-8 mb-1" />
                                                 <span className="text-[10px] font-bold text-white uppercase tracking-wider">Alterar</span>
                                             </div>
                                         </div>
                                     </div>
+                                    <input
+                                        type="file"
+                                        ref={fileInputRef}
+                                        onChange={handleImageChange}
+                                        accept="image/*"
+                                        className="hidden"
+                                    />
                                     <div className="absolute bottom-2 right-2 w-5 h-5 bg-green-500 border-2 border-background-dark rounded-full"></div>
                                 </div>
                                 <h3 className="text-xl font-bold font-sora text-white mb-2">Mariana Silva</h3>
@@ -152,44 +241,53 @@ export default function PerfilPage() {
                                             <Briefcase className="size-5" />
                                         </div>
                                         <div>
-                                            <h3 className="text-xl font-bold font-sora text-slate-100">Identidade da Marca</h3>
-                                            <p className="text-xs text-slate-400 mt-1">Definido no <span className="text-primary font-bold">Onboarding Inicial</span>.</p>
+                                            <h3 className="text-xl font-bold font-sora text-slate-100">Identidade da Marca (Onboarding)</h3>
+                                            <p className="text-xs text-slate-400 mt-1">Todas as suas respostas da configuração inicial. <span className="text-primary font-bold">Ajuste conforme sua marca evolui.</span></p>
                                         </div>
                                     </div>
-                                    <button className="text-[10px] font-bold uppercase tracking-wider text-primary bg-primary/10 hover:bg-primary/20 px-4 py-2 flex items-center gap-2 rounded-full transition-colors border border-primary/20 hidden md:flex">
-                                        <span className="material-symbols-outlined text-[16px]">edit_square</span>
-                                        Editar Essência
-                                    </button>
                                 </div>
 
-                                <div className="space-y-8 pl-2">
-                                    {/* Onboarding Answer 1 */}
-                                    <div className="space-y-3">
-                                        <label className="text-xs font-bold text-slate-300 flex items-start gap-2 leading-relaxed">
-                                            <MessageSquare className="size-4 text-primary shrink-0 mt-0.5" />
-                                            <span>Da lista abaixo, qual melhor descreve o seu nicho atual onde você atende ou os clientes ou parceiros?</span>
-                                        </label>
-                                        <div className="bg-black/40 border border-white/5 rounded-xl px-5 py-4 text-sm text-slate-200 font-medium">
-                                            <span className="inline-block bg-primary/20 text-primary border border-primary/30 px-3 py-1 rounded-md text-xs mb-2">Selecionado na Etapa 4</span>
-                                            <p>Marketing Digital</p>
-                                        </div>
-                                    </div>
+                                <div className="space-y-6 pl-2">
+                                    {ONBOARDING_FIELDS.map((field, index) => (
+                                        <div key={field.id} className="space-y-2 bg-black/20 p-5 rounded-xl border border-white/5 hover:border-white/10 transition-colors">
+                                            <label className="text-sm font-bold text-slate-300 flex flex-col gap-1 leading-relaxed">
+                                                <div className="flex items-center gap-2 mb-2">
+                                                    <span className="bg-primary/20 text-primary w-6 h-6 rounded-md flex items-center justify-center text-[10px] font-black shrink-0">{index + 1}</span>
+                                                    <span>{field.label}</span>
+                                                </div>
+                                            </label>
 
-                                    {/* Onboarding Answer 2 */}
-                                    <div className="space-y-3">
-                                        <label className="text-xs font-bold text-slate-300 flex items-start gap-2 leading-relaxed">
-                                            <MessageSquare className="size-4 text-primary shrink-0 mt-0.5" />
-                                            <span>Qual a essência da sua marca e qual é o seu maior diferencial perante o mercado?</span>
-                                        </label>
-                                        <div className="bg-black/40 border border-white/5 rounded-xl px-5 py-4 text-sm text-slate-200 font-medium leading-relaxed">
-                                            <span className="inline-block bg-secondary/20 text-secondary border border-secondary/30 px-3 py-1 rounded-md text-xs mb-2">Escrito por você na Etapa 7</span>
-                                            <p>Na minha área de marketing digital, eu sempre foco em entregar conteúdo prático e autêntico. Meu principal objetivo é conectar marcas e pessoas através de jornadas emocionantes e conversões baseadas em propósitos. Uso IAs não como muleta, mas como motor criativo, garantindo que a essência humana nunca se perca na automação.</p>
-                                        </div>
-                                    </div>
+                                            {field.type === 'text' && (
+                                                <input
+                                                    type="text"
+                                                    value={onboardingData[field.id]}
+                                                    onChange={(e) => updateOnboarding(field.id, e.target.value)}
+                                                    className="w-full bg-black/40 border border-white/10 rounded-lg px-4 py-3 text-sm text-slate-200 focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all"
+                                                />
+                                            )}
 
-                                    <button className="w-full text-xs font-bold uppercase tracking-wider text-slate-400 hover:text-white mt-4 py-3 rounded-xl border border-white/10 hover:bg-white/5 transition-colors flex items-center justify-center gap-2 md:hidden">
-                                        <span className="material-symbols-outlined text-[16px]">edit_square</span> Editar Essência
-                                    </button>
+                                            {field.type === 'textarea' && (
+                                                <textarea
+                                                    rows={field.id === 'concorrentes' ? 6 : 3}
+                                                    value={onboardingData[field.id]}
+                                                    onChange={(e) => updateOnboarding(field.id, e.target.value)}
+                                                    className="w-full bg-black/40 border border-white/10 rounded-lg px-4 py-3 text-sm text-slate-200 focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all custom-scrollbar resize-y"
+                                                />
+                                            )}
+
+                                            {field.type === 'select' && field.options && (
+                                                <select
+                                                    value={onboardingData[field.id]}
+                                                    onChange={(e) => updateOnboarding(field.id, e.target.value)}
+                                                    className="w-full bg-black/40 border border-white/10 rounded-lg px-4 py-3 text-sm text-slate-200 focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all appearance-none"
+                                                >
+                                                    {field.options.map(opt => (
+                                                        <option key={opt.value} value={opt.value}>{opt.label}</option>
+                                                    ))}
+                                                </select>
+                                            )}
+                                        </div>
+                                    ))}
                                 </div>
                             </div>
 
