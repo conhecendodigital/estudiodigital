@@ -3,13 +3,16 @@
 import React from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { LayoutDashboard, Users, Receipt, Settings, LogOut } from 'lucide-react';
+import { LayoutDashboard, Users, Receipt, Settings, LogOut, Plug, Bot, CreditCard } from 'lucide-react';
 
 export default function AdminSidebar() {
     const pathname = usePathname();
 
     const navLinks = [
         { href: '/admin', icon: <LayoutDashboard className="size-5" />, label: 'Visão Geral' },
+        { href: '/admin/agentes/novo', icon: <Bot className="size-5" />, label: 'Criar Agente' },
+        { href: '/admin/integracoes', icon: <Plug className="size-5" />, label: 'Integrações IA' },
+        { href: '/admin/pagamentos', icon: <CreditCard className="size-5" />, label: 'Pagamentos' },
         { href: '/admin/clientes', icon: <Users className="size-5" />, label: 'Assinantes' },
         { href: '/admin/faturamento', icon: <Receipt className="size-5" />, label: 'Faturamento' },
         { href: '/admin/config', icon: <Settings className="size-5" />, label: 'Configurações' },
