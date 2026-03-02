@@ -1,15 +1,77 @@
 'use client';
 
-import React from 'react';
-import Sidebar from '@/components/Sidebar';
+import React, { useState, useEffect } from 'react';
+import AdminSidebar from '@/components/AdminSidebar';
+import {
+    AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
+    BarChart, Bar
+} from 'recharts';
+
+/* ── Types ── */
+interface LogEntry {
+    id: string;
+    created_at: string;
+    provider: string;
+    model: string;
+    tokens_input: number;
+    tokens_output: number;
+    estimated_cost: number;
+    status_code: number;
+    latency_ms: number;
+    error_message?: string;
+    agents?: { name: string; icon?: string } | null;
+    profiles?: { full_name: string } | null;
+}
+
+function formatTime(dateStr: string) {
+    const d = new Date(dateStr);
+    return d.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit', second: '2-digit', fractionalSecondDigits: 3 });
+}
+
+function statusLabel(code: number) {
+    if (code === 200) return { text: '200 OK', cls: 'bg-green-500/10 text-green-400 border-green-500/30' };
+    if (code === 429) return { text: '429 RATE LIMIT', cls: 'bg-amber-500/10 text-amber-500 border-amber-500/30' };
+    return { text: `${code} ERROR`, cls: 'bg-red-500/10 text-red-400 border-red-500/30' };
+}
+
+function rowBg(code: number) {
+    if (code === 429) return 'bg-amber-500/5 border-l-2 border-l-amber-500';
+    if (code >= 400) return 'bg-red-500/10 border-l-2 border-l-red-500';
+    return '';
+}
 
 export default function RequisicoesAdminPage() {
+    const [currentTab, setCurrentTab] = useState('overview'); // 'overview', 'metrics', 'alerts'
+    const [logs, setLogs] = useState<LogEntry[]>([]);
+    const [alerts, setAlerts] = useState<LogEntry[]>([]);
+    const [chartData, setChartData] = useState<any[]>([]);
+    const [kpis, setKpis] = useState({ total_requests: 0, avg_latency_ms: 0, error_rate: 0 });
+    const [statusFilter, setStatusFilter] = useState('');
+    const [expandedError, setExpandedError] = useState<string | null>(null);
+
+    useEffect(() => {
+        const params = new URLSearchParams();
+        if (currentTab !== 'overview') params.set('tab', currentTab);
+        if (statusFilter && currentTab === 'overview') params.set('status', statusFilter);
+
+        fetch(`/api/admin/requisicoes?${params.toString()}`)
+            .then((r) => r.json())
+            .then((data) => {
+                if (data.logs) setLogs(data.logs);
+                if (data.kpis) setKpis(data.kpis);
+                if (data.chartData) setChartData(data.chartData);
+                if (data.alerts) setAlerts(data.alerts);
+            })
+            .catch(() => { });
+    }, [statusFilter, currentTab]);
+
+    const successRate = kpis.total_requests > 0 ? (100 - kpis.error_rate).toFixed(2) : '0.00';
+
     return (
         <div className="flex min-h-screen w-full flex-row bg-background-dark font-display text-slate-100">
-            <Sidebar />
+            <AdminSidebar />
 
-            {/* Main Content Area */}
-            <main className="flex-1 md:ml-[280px] p-6 md:p-8 relative z-10 w-full min-h-screen overflow-x-hidden mb-[80px] lg:mb-0 flex flex-col">
+            <main className="flex-1 ml-72 p-6 md:p-8 relative z-10 w-full min-h-screen overflow-x-hidden mb-[80px] lg:mb-0 flex flex-col">
 
                 {/* Header Navbar */}
                 <header className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 border-b border-white/5 pb-6 mb-6 shrink-0">
@@ -22,211 +84,298 @@ export default function RequisicoesAdminPage() {
                     </div>
                     <div className="flex items-center gap-4 w-full md:w-auto overflow-x-auto pb-2 md:pb-0">
                         <div className="flex items-center gap-6 text-sm font-medium text-slate-400 whitespace-nowrap">
-                            <a className="hover:text-primary transition-colors border-b-2 border-primary pb-2 text-white" href="#">Visão Geral</a>
-                            <a className="hover:text-primary transition-colors pb-2" href="#">Métricas</a>
-                            <a className="hover:text-primary transition-colors pb-2" href="#">Alertas</a>
+                            <button
+                                onClick={() => setCurrentTab('overview')}
+                                className={`transition-colors pb-2 ${currentTab === 'overview' ? 'text-white border-b-2 border-primary' : 'hover:text-primary'}`}
+                            >Visão Geral</button>
+                            <button
+                                onClick={() => setCurrentTab('metrics')}
+                                className={`transition-colors pb-2 ${currentTab === 'metrics' ? 'text-white border-b-2 border-primary' : 'hover:text-primary'}`}
+                            >Métricas</button>
+                            <button
+                                onClick={() => setCurrentTab('alerts')}
+                                className={`transition-colors pb-2 ${currentTab === 'alerts' ? 'text-white border-b-2 border-primary' : 'hover:text-primary'}`}
+                            >Alertas</button>
                         </div>
                         <div className="hidden md:block h-6 w-px bg-white/10 mx-2"></div>
-                        <button className="material-symbols-outlined text-slate-400 hover:text-white transition-colors">notifications</button>
+                        <button className="material-symbols-outlined text-slate-400 hover:text-white transition-colors cursor-not-allowed opacity-50" title="Sem novas notificações">notifications</button>
                     </div>
                 </header>
 
                 <div className="flex-1 overflow-y-auto space-y-6">
-                    {/* Filters Row */}
-                    <div className="flex flex-wrap gap-4 items-center">
-                        <div className="bg-white/5 backdrop-blur-md border border-white/10 rounded-lg flex items-center px-3 py-2 gap-3 min-w-[160px] flex-1 sm:flex-none hover:bg-white/10 transition-colors">
-                            <span className="material-symbols-outlined text-slate-400 text-lg">smart_toy</span>
-                            <div className="flex-1">
-                                <p className="text-[10px] text-slate-500 font-bold uppercase tracking-wider mb-0.5">Agente</p>
-                                <select className="bg-transparent border-none p-0 text-sm font-medium text-white focus:ring-0 w-full cursor-pointer outline-none appearance-none">
-                                    <option className="bg-background-dark text-white">Todos Agentes</option>
-                                    <option className="bg-background-dark text-white">Assistant_v2</option>
-                                    <option className="bg-background-dark text-white">Coder_Pro</option>
-                                </select>
+                    {/* Content Router */}
+                    {currentTab === 'overview' && (
+                        <>
+                            <div className="flex flex-wrap gap-4 items-center">
+                                <div className="bg-white/5 backdrop-blur-md border border-white/10 rounded-lg flex items-center px-3 py-2 gap-3 min-w-[160px] flex-1 sm:flex-none hover:bg-white/10 transition-colors">
+                                    <span className="material-symbols-outlined text-slate-400 text-lg">rule</span>
+                                    <div className="flex-1">
+                                        <p className="text-[10px] text-slate-500 font-bold uppercase tracking-wider mb-0.5">Status HTTP</p>
+                                        <select
+                                            value={statusFilter}
+                                            onChange={(e) => setStatusFilter(e.target.value)}
+                                            className="bg-transparent border-none p-0 text-sm font-medium text-white focus:ring-0 w-full cursor-pointer outline-none appearance-none"
+                                        >
+                                            <option className="bg-background-dark text-white" value="">Todos Status</option>
+                                            <option className="bg-background-dark text-white" value="ok">200 OK</option>
+                                            <option className="bg-background-dark text-white" value="rate_limit">429 Rate Limit</option>
+                                            <option className="bg-background-dark text-white" value="error">500 Error</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <button className="w-full lg:w-auto bg-primary text-white font-bold px-6 py-3 rounded-lg flex items-center justify-center gap-2 hover:bg-primary/90 transition-all shadow-lg shadow-primary/20">
+                                    <span className="material-symbols-outlined text-lg">download</span>
+                                    Exportar Relatório
+                                </button>
+                            </div>
+
+                            {/* Console Table Container */}
+                            <div className="bg-[#050505] rounded-2xl border border-white/10 overflow-hidden shadow-2xl">
+                                <div className="overflow-x-auto">
+                                    <table className="w-full text-left border-collapse font-mono text-xs min-w-[900px]">
+                                        <thead>
+                                            <tr className="bg-white/5 border-b border-white/10">
+                                                <th className="px-6 py-4 text-slate-500 font-bold uppercase tracking-widest">Timestamp</th>
+                                                <th className="px-6 py-4 text-slate-500 font-bold uppercase tracking-widest">Usuário</th>
+                                                <th className="px-6 py-4 text-slate-500 font-bold uppercase tracking-widest">Agente</th>
+                                                <th className="px-6 py-4 text-slate-500 font-bold uppercase tracking-widest">Modelo</th>
+                                                <th className="px-6 py-4 text-slate-500 font-bold uppercase tracking-widest text-right">Tokens</th>
+                                                <th className="px-6 py-4 text-slate-500 font-bold uppercase tracking-widest text-right">Custo ($)</th>
+                                                <th className="px-6 py-4 text-slate-500 font-bold uppercase tracking-widest">Status</th>
+                                                <th className="px-6 py-4 text-slate-500 font-bold uppercase tracking-widest text-right">Latência</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody className="divide-y divide-white/5">
+                                            {logs.length === 0 && (
+                                                <tr><td colSpan={8} className="px-6 py-12 text-center text-slate-500">Nenhuma requisição encontrada.</td></tr>
+                                            )}
+                                            {logs.map((log) => {
+                                                const st = statusLabel(log.status_code || 200);
+                                                const totalTokens = (log.tokens_input || 0) + (log.tokens_output || 0);
+                                                return (
+                                                    <React.Fragment key={log.id}>
+                                                        <tr
+                                                            className={`hover:bg-white/5 transition-colors cursor-pointer ${rowBg(log.status_code || 200)}`}
+                                                            onClick={() => log.error_message && setExpandedError(expandedError === log.id ? null : log.id)}
+                                                        >
+                                                            <td className="px-6 py-4 text-slate-400">{formatTime(log.created_at)}</td>
+                                                            <td className="px-6 py-4 text-primary font-bold">{log.profiles?.full_name || '—'}</td>
+                                                            <td className="px-6 py-4 text-slate-200">{log.agents?.name || '—'}</td>
+                                                            <td className="px-6 py-4">
+                                                                <span className="bg-white/10 border border-white/5 px-2 py-1 rounded text-white text-[10px]">{log.model}</span>
+                                                            </td>
+                                                            <td className="px-6 py-4 text-right text-slate-400">{totalTokens}</td>
+                                                            <td className="px-6 py-4 text-right text-slate-400">{(Number(log.estimated_cost) || 0).toFixed(4)}</td>
+                                                            <td className="px-6 py-4">
+                                                                <span className={`${st.cls} border px-2 py-1 rounded font-bold text-[10px] tracking-wider`}>{st.text}</span>
+                                                            </td>
+                                                            <td className="px-6 py-4 text-right text-slate-400">{log.latency_ms || 0}ms</td>
+                                                        </tr>
+                                                        {expandedError === log.id && log.error_message && (
+                                                            <tr className="bg-black/50">
+                                                                <td className="px-6 py-6" colSpan={8}>
+                                                                    <div className="bg-[#0A0A14] rounded-xl border border-red-500/20 p-6 overflow-hidden">
+                                                                        <div className="flex items-center gap-2 mb-4">
+                                                                            <span className="material-symbols-outlined text-red-500 text-lg">error</span>
+                                                                            <h4 className="text-slate-100 font-bold text-sm">Detalhes do Erro</h4>
+                                                                        </div>
+                                                                        <pre className="text-[12px] leading-relaxed overflow-x-auto p-4 bg-black rounded-lg border border-white/5 text-slate-300 font-mono whitespace-pre-wrap">
+                                                                            {log.error_message}
+                                                                        </pre>
+                                                                    </div>
+                                                                </td>
+                                                            </tr>
+                                                        )}
+                                                    </React.Fragment>
+                                                );
+                                            })}
+                                        </tbody>
+                                    </table>
+                                </div>
+                                <div className="p-4 bg-white/5 border-t border-white/10 flex flex-col sm:flex-row items-center justify-between gap-4 font-mono text-[10px] text-slate-500 uppercase tracking-widest">
+                                    <p>Exibindo últimos {logs.length} registros</p>
+                                </div>
+                            </div>
+                        </>
+                    )}
+
+                    {/* METRICS TAB */}
+                    {currentTab === 'metrics' && (
+                        <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
+                            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                                {/* Volume Chart */}
+                                <div className="bg-white/5 border border-white/10 rounded-2xl p-6">
+                                    <div className="flex items-center justify-between mb-6">
+                                        <div>
+                                            <h3 className="font-sora font-bold text-white mb-1">Volume de Requisições</h3>
+                                            <p className="text-sm text-slate-400">Tráfego diário dos últimos 14 dias</p>
+                                        </div>
+                                    </div>
+                                    <div className="h-[250px] w-full">
+                                        <ResponsiveContainer width="100%" height="100%">
+                                            <AreaChart data={chartData}>
+                                                <defs>
+                                                    <linearGradient id="colorVol" x1="0" y1="0" x2="0" y2="1">
+                                                        <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.8} />
+                                                        <stop offset="95%" stopColor="#3b82f6" stopOpacity={0} />
+                                                    </linearGradient>
+                                                </defs>
+                                                <CartesianGrid strokeDasharray="3 3" stroke="#ffffff10" vertical={false} />
+                                                <XAxis dataKey="date" stroke="#94a3b8" fontSize={10} tickLine={false} axisLine={false} />
+                                                <YAxis stroke="#94a3b8" fontSize={10} tickLine={false} axisLine={false} />
+                                                <Tooltip
+                                                    contentStyle={{ backgroundColor: '#0f172a', border: '1px solid #1e293b', borderRadius: '8px' }}
+                                                    itemStyle={{ color: '#fff' }}
+                                                />
+                                                <Area type="monotone" dataKey="volume" name="Chamadas" stroke="#3b82f6" strokeWidth={2} fillOpacity={1} fill="url(#colorVol)" />
+                                            </AreaChart>
+                                        </ResponsiveContainer>
+                                    </div>
+                                </div>
+
+                                {/* Latency Chart */}
+                                <div className="bg-white/5 border border-white/10 rounded-2xl p-6">
+                                    <div className="flex items-center justify-between mb-6">
+                                        <div>
+                                            <h3 className="font-sora font-bold text-white mb-1">Latência Média</h3>
+                                            <p className="text-sm text-slate-400">Tempo de resposta em milissegundos</p>
+                                        </div>
+                                    </div>
+                                    <div className="h-[250px] w-full">
+                                        <ResponsiveContainer width="100%" height="100%">
+                                            <AreaChart data={chartData}>
+                                                <defs>
+                                                    <linearGradient id="colorLat" x1="0" y1="0" x2="0" y2="1">
+                                                        <stop offset="5%" stopColor="#8b5cf6" stopOpacity={0.8} />
+                                                        <stop offset="95%" stopColor="#8b5cf6" stopOpacity={0} />
+                                                    </linearGradient>
+                                                </defs>
+                                                <CartesianGrid strokeDasharray="3 3" stroke="#ffffff10" vertical={false} />
+                                                <XAxis dataKey="date" stroke="#94a3b8" fontSize={10} tickLine={false} axisLine={false} />
+                                                <YAxis stroke="#94a3b8" fontSize={10} tickLine={false} axisLine={false} />
+                                                <Tooltip
+                                                    contentStyle={{ backgroundColor: '#0f172a', border: '1px solid #1e293b', borderRadius: '8px' }}
+                                                    itemStyle={{ color: '#fff' }}
+                                                />
+                                                <Area type="monotone" dataKey="avgLatency" name="Latência (ms)" stroke="#8b5cf6" strokeWidth={2} fillOpacity={1} fill="url(#colorLat)" />
+                                            </AreaChart>
+                                        </ResponsiveContainer>
+                                    </div>
+                                </div>
+
+                                {/* Errors Chart */}
+                                <div className="bg-white/5 border border-white/10 rounded-2xl p-6 lg:col-span-2">
+                                    <div className="flex items-center justify-between mb-6">
+                                        <div>
+                                            <h3 className="font-sora font-bold text-white mb-1">Falhas Críticas / Taxa de Retenção</h3>
+                                            <p className="text-sm text-slate-400">Contagem de erros diários (Status 4xx e 5xx)</p>
+                                        </div>
+                                    </div>
+                                    <div className="h-[250px] w-full">
+                                        <ResponsiveContainer width="100%" height="100%">
+                                            <BarChart data={chartData}>
+                                                <CartesianGrid strokeDasharray="3 3" stroke="#ffffff10" vertical={false} />
+                                                <XAxis dataKey="date" stroke="#94a3b8" fontSize={10} tickLine={false} axisLine={false} />
+                                                <YAxis stroke="#94a3b8" fontSize={10} tickLine={false} axisLine={false} />
+                                                <Tooltip
+                                                    contentStyle={{ backgroundColor: '#0f172a', border: '1px solid #1e293b', borderRadius: '8px' }}
+                                                    itemStyle={{ color: '#ef4444' }}
+                                                    cursor={{ fill: '#ffffff05' }}
+                                                />
+                                                <Bar dataKey="errors" name="Erros Diários" fill="#ef4444" radius={[4, 4, 0, 0]} />
+                                            </BarChart>
+                                        </ResponsiveContainer>
+                                    </div>
+                                </div>
                             </div>
                         </div>
-                        <div className="bg-white/5 backdrop-blur-md border border-white/10 rounded-lg flex items-center px-3 py-2 gap-3 min-w-[160px] flex-1 sm:flex-none hover:bg-white/10 transition-colors">
-                            <span className="material-symbols-outlined text-slate-400 text-lg">rule</span>
-                            <div className="flex-1">
-                                <p className="text-[10px] text-slate-500 font-bold uppercase tracking-wider mb-0.5">Status HTTP</p>
-                                <select className="bg-transparent border-none p-0 text-sm font-medium text-white focus:ring-0 w-full cursor-pointer outline-none appearance-none">
-                                    <option className="bg-background-dark text-white">Todos Status</option>
-                                    <option className="bg-background-dark text-white">200 OK</option>
-                                    <option className="bg-background-dark text-white">429 Rate Limit</option>
-                                    <option className="bg-background-dark text-white">500 Error</option>
-                                </select>
-                            </div>
-                        </div>
-                        <div className="bg-white/5 backdrop-blur-md border border-white/10 rounded-lg flex items-center px-3 py-2 gap-3 min-w-[200px] flex-1 hover:bg-white/10 transition-colors">
-                            <span className="material-symbols-outlined text-slate-400 text-lg">person_search</span>
-                            <div className="flex-1">
-                                <p className="text-[10px] text-slate-500 font-bold uppercase tracking-wider mb-0.5">Usuária (ID)</p>
-                                <input className="bg-transparent border-none p-0 text-sm font-medium text-white focus:ring-0 w-full outline-none placeholder:text-slate-600" placeholder="Buscar ID..." type="text" />
-                            </div>
-                        </div>
-                        <div className="bg-white/5 backdrop-blur-md border border-white/10 rounded-lg flex items-center px-3 py-2 gap-3 min-w-[160px] flex-1 sm:flex-none hover:bg-white/10 transition-colors">
-                            <span className="material-symbols-outlined text-slate-400 text-lg">calendar_today</span>
-                            <div className="flex-1">
-                                <p className="text-[10px] text-slate-500 font-bold uppercase tracking-wider mb-0.5">Período</p>
-                                <button className="text-sm font-medium text-white text-left w-full">Hoje, 27 Out</button>
-                            </div>
-                        </div>
-                        <button className="w-full lg:w-auto bg-primary text-white font-bold px-6 py-3 rounded-lg flex items-center justify-center gap-2 hover:bg-primary/90 transition-all shadow-lg shadow-primary/20">
-                            <span className="material-symbols-outlined text-lg">download</span>
-                            Exportar Relatório
-                        </button>
-                    </div>
+                    )}
 
-                    {/* Console Table Container */}
-                    <div className="bg-[#050505] rounded-2xl border border-white/10 overflow-hidden shadow-2xl">
-                        <div className="overflow-x-auto">
-                            <table className="w-full text-left border-collapse font-mono text-xs min-w-[900px]">
-                                <thead>
-                                    <tr className="bg-white/5 border-b border-white/10">
-                                        <th className="px-6 py-4 text-slate-500 font-bold uppercase tracking-widest">Timestamp</th>
-                                        <th className="px-6 py-4 text-slate-500 font-bold uppercase tracking-widest">Usuária (ID)</th>
-                                        <th className="px-6 py-4 text-slate-500 font-bold uppercase tracking-widest">Agente</th>
-                                        <th className="px-6 py-4 text-slate-500 font-bold uppercase tracking-widest">Modelo</th>
-                                        <th className="px-6 py-4 text-slate-500 font-bold uppercase tracking-widest text-right">Tokens</th>
-                                        <th className="px-6 py-4 text-slate-500 font-bold uppercase tracking-widest text-right">Custo ($)</th>
-                                        <th className="px-6 py-4 text-slate-500 font-bold uppercase tracking-widest">Status</th>
-                                        <th className="px-6 py-4 text-slate-500 font-bold uppercase tracking-widest text-right">Latência</th>
-                                    </tr>
-                                </thead>
-                                <tbody className="divide-y divide-white/5">
-                                    {/* Success Row 1 */}
-                                    <tr className="hover:bg-white/5 transition-colors">
-                                        <td className="px-6 py-4 text-slate-400">14:32:45.002</td>
-                                        <td className="px-6 py-4 text-primary font-bold">user_5521</td>
-                                        <td className="px-6 py-4 text-slate-200">General_AI</td>
-                                        <td className="px-6 py-4"><span className="bg-white/10 border border-white/5 px-2 py-1 rounded text-white text-[10px]">GPT-4o</span></td>
-                                        <td className="px-6 py-4 text-right text-slate-400">340</td>
-                                        <td className="px-6 py-4 text-right text-slate-400">0.0102</td>
-                                        <td className="px-6 py-4">
-                                            <span className="bg-green-500/10 text-green-400 border border-green-500/30 px-2 py-1 rounded font-bold text-[10px] tracking-wider">200 OK</span>
-                                        </td>
-                                        <td className="px-6 py-4 text-right text-slate-400">150ms</td>
-                                    </tr>
-
-                                    {/* Rate Limit Row */}
-                                    <tr className="hover:bg-white/5 transition-colors bg-amber-500/5 border-l-2 border-l-amber-500">
-                                        <td className="px-6 py-4 text-slate-400">14:31:58.910</td>
-                                        <td className="px-6 py-4 text-primary font-bold">user_4412</td>
-                                        <td className="px-6 py-4 text-slate-200">Support_Bot</td>
-                                        <td className="px-6 py-4"><span className="bg-white/10 border border-white/5 px-2 py-1 rounded text-white text-[10px]">Claude-3.5</span></td>
-                                        <td className="px-6 py-4 text-right text-slate-400">890</td>
-                                        <td className="px-6 py-4 text-right text-slate-400">0.0267</td>
-                                        <td className="px-6 py-4">
-                                            <span className="bg-amber-500/10 text-amber-500 border border-amber-500/30 px-2 py-1 rounded font-bold text-[10px] tracking-wider">429 RATE LIMIT</span>
-                                        </td>
-                                        <td className="px-6 py-4 text-right text-slate-400">45ms</td>
-                                    </tr>
-
-                                    {/* Error Row */}
-                                    <tr className="bg-red-500/10 border-l-2 border-l-red-500 hover:bg-red-500/20 transition-colors">
-                                        <td className="px-6 py-4 text-slate-400">14:31:12.445</td>
-                                        <td className="px-6 py-4 text-primary font-bold">user_1102</td>
-                                        <td className="px-6 py-4 text-slate-200">Writer_Agent</td>
-                                        <td className="px-6 py-4"><span className="bg-white/10 border border-white/5 px-2 py-1 rounded text-white text-[10px]">GPT-3.5</span></td>
-                                        <td className="px-6 py-4 text-right text-slate-400">120</td>
-                                        <td className="px-6 py-4 text-right text-slate-400">0.0002</td>
-                                        <td className="px-6 py-4">
-                                            <span className="bg-red-500/10 text-red-400 border border-red-500/30 px-2 py-1 rounded font-bold text-[10px] tracking-wider">500 ERROR</span>
-                                        </td>
-                                        <td className="px-6 py-4 text-right text-slate-400">2400ms</td>
-                                    </tr>
-
-                                    {/* Error Expansion JSON view */}
-                                    <tr className="bg-black/50">
-                                        <td className="px-6 py-6" colSpan={8}>
-                                            <div className="bg-[#0A0A14] rounded-xl border border-red-500/20 p-6 overflow-hidden relative group space-y-4">
-                                                <div className="absolute top-4 right-4 flex gap-4">
-                                                    <button className="text-[10px] text-slate-500 hover:text-white uppercase font-bold tracking-widest transition-colors">Copy JSON</button>
-                                                    <button className="text-[10px] text-slate-500 hover:text-white uppercase font-bold tracking-widest transition-colors">View Stack</button>
+                    {/* ALERTS TAB */}
+                    {currentTab === 'alerts' && (
+                        <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
+                            <div className="bg-[#100505] rounded-2xl border border-red-500/20 overflow-hidden shadow-[0_0_50px_rgba(239,68,68,0.05)]">
+                                <div className="p-6 border-b border-red-500/10 flex items-center justify-between">
+                                    <div className="flex items-center gap-3">
+                                        <div className="w-10 h-10 rounded-lg bg-red-500/10 flex items-center justify-center border border-red-500/20">
+                                            <span className="material-symbols-outlined text-red-500">warning</span>
+                                        </div>
+                                        <div>
+                                            <h3 className="font-sora font-bold text-red-400 mb-1">Incidentes Críticos</h3>
+                                            <p className="text-sm text-red-500/70">Acompanhamento das últimas requisições que retornaram erro (4xx/5xx).</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div className="divide-y divide-red-500/10">
+                                    {alerts.length === 0 ? (
+                                        <div className="p-12 text-center text-slate-500">
+                                            Nenhum alerta recente. A infraestrutura está saudável.
+                                        </div>
+                                    ) : alerts.map((alert) => {
+                                        const st = statusLabel(alert.status_code || 500);
+                                        return (
+                                            <div key={alert.id} className="p-6 hover:bg-black/20 transition-colors">
+                                                <div className="flex flex-col md:flex-row md:items-start justify-between gap-4">
+                                                    <div className="flex-1">
+                                                        <div className="flex items-center gap-3 mb-3">
+                                                            <span className={`${st.cls} border px-2 py-1 rounded font-bold text-[10px] tracking-wider`}>{st.text}</span>
+                                                            <span className="text-xs text-slate-400 font-mono">{formatTime(alert.created_at)}</span>
+                                                            <span className="bg-white/5 border border-white/10 px-2 py-0.5 rounded text-[10px] text-white">Modelo: {alert.model || 'Desconhecido'}</span>
+                                                        </div>
+                                                        <div className="bg-black/60 rounded-xl border border-red-500/20 p-4">
+                                                            <pre className="text-xs text-red-300/80 font-mono whitespace-pre-wrap break-all leading-relaxed">
+                                                                {alert.error_message || 'Erro não especificado no payload de resposta.'}
+                                                            </pre>
+                                                        </div>
+                                                    </div>
+                                                    <div className="md:w-[250px] shrink-0 bg-black/40 rounded-xl p-4 border border-white/5 space-y-3">
+                                                        <div>
+                                                            <p className="text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">Afetado</p>
+                                                            <p className="text-sm text-white font-medium">{alert.profiles?.full_name || 'Usuário Anônimo'}</p>
+                                                        </div>
+                                                        <div>
+                                                            <p className="text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">Agente</p>
+                                                            <p className="text-sm text-slate-300">{alert.agents?.name || 'Agente Genérico'}</p>
+                                                        </div>
+                                                    </div>
                                                 </div>
-                                                <div className="flex items-center gap-2 mb-4">
-                                                    <span className="material-symbols-outlined text-red-500 text-lg">error</span>
-                                                    <h4 className="text-slate-100 font-bold text-sm">Erro Interno da API - Detalhes da Execução</h4>
-                                                </div>
-                                                <pre className="text-[12px] leading-relaxed overflow-x-auto p-4 bg-black rounded-lg border border-white/5">
-                                                    <code className="font-mono">
-                                                        <span className="text-[#A78BFA]">{'{'}</span><br />
-                                                        &nbsp;&nbsp;<span className="text-[#22D3EE]">"error"</span>: <span className="text-[#A78BFA]">{'{'}</span><br />
-                                                        &nbsp;&nbsp;&nbsp;&nbsp;<span className="text-[#22D3EE]">"message"</span>: <span className="text-slate-300">"Internal Server Error"</span>,<br />
-                                                        &nbsp;&nbsp;&nbsp;&nbsp;<span className="text-[#22D3EE]">"type"</span>: <span className="text-slate-300">"api_error"</span>,<br />
-                                                        &nbsp;&nbsp;&nbsp;&nbsp;<span className="text-[#22D3EE]">"code"</span>: <span className="text-[#F472B6]">"500"</span>,<br />
-                                                        &nbsp;&nbsp;&nbsp;&nbsp;<span className="text-[#22D3EE]">"provider_response"</span>: <span className="text-[#A78BFA]">{'{'}</span><br />
-                                                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span className="text-[#22D3EE]">"upstream_status"</span>: <span className="text-[#F472B6]">502</span>,<br />
-                                                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span className="text-[#22D3EE]">"latency"</span>: <span className="text-[#F472B6]">2398</span><br />
-                                                        &nbsp;&nbsp;&nbsp;&nbsp;<span className="text-[#A78BFA]">{'}'}</span>,<br />
-                                                        &nbsp;&nbsp;&nbsp;&nbsp;<span className="text-[#22D3EE]">"stack_trace"</span>: <span className="text-slate-500">"at core/dispatch.js line 45:12 \n at providers/openai.js line 12:4"</span><br />
-                                                        &nbsp;&nbsp;<span className="text-[#A78BFA]">{'}'}</span><br />
-                                                        <span className="text-[#A78BFA]">{'}'}</span>
-                                                    </code>
-                                                </pre>
                                             </div>
-                                        </td>
-                                    </tr>
+                                        )
+                                    })}
+                                </div>
+                            </div>
+                        </div>
+                    )}
 
-                                    {/* Success Row 2 */}
-                                    <tr className="hover:bg-white/5 transition-colors">
-                                        <td className="px-6 py-4 text-slate-400">14:30:01.001</td>
-                                        <td className="px-6 py-4 text-primary font-bold">user_9928</td>
-                                        <td className="px-6 py-4 text-slate-200">Assistant_v2</td>
-                                        <td className="px-6 py-4"><span className="bg-white/10 border border-white/5 px-2 py-1 rounded text-white text-[10px]">GPT-4</span></td>
-                                        <td className="px-6 py-4 text-right text-slate-400">450</td>
-                                        <td className="px-6 py-4 text-right text-slate-400">0.0135</td>
-                                        <td className="px-6 py-4">
-                                            <span className="bg-green-500/10 text-green-400 border border-green-500/30 px-2 py-1 rounded font-bold text-[10px] tracking-wider">200 OK</span>
-                                        </td>
-                                        <td className="px-6 py-4 text-right text-slate-400">120ms</td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-
-                        {/* Pagination Footer */}
-                        <div className="p-4 bg-white/5 border-t border-white/10 flex flex-col sm:flex-row items-center justify-between gap-4 font-mono text-[10px] text-slate-500 uppercase tracking-widest">
-                            <p>Total de chamadas: 14,209 <span className="text-slate-600 ml-2">(últimos 60 min)</span></p>
-                            <div className="flex items-center gap-6">
-                                <button className="hover:text-white transition-colors">Anterior</button>
-                                <span className="text-white font-bold bg-white/10 px-3 py-1 rounded">Página 1 de 42</span>
-                                <button className="hover:text-white transition-colors">Próximo</button>
+                    {/* Quick Stats Grid - Only show in Overview */}
+                    {currentTab === 'overview' && (
+                        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 md:gap-6 mt-6 pb-6 animate-in fade-in slide-in-from-bottom-4">
+                            <div className="bg-white/5 backdrop-blur-md border border-white/10 rounded-xl p-5 hover:border-white/20 transition-all">
+                                <p className="text-[10px] text-slate-500 font-bold uppercase tracking-wider mb-2">Taxa de Sucesso</p>
+                                <div className="flex items-end gap-3">
+                                    <h3 className="text-2xl font-bold text-white">{successRate}%</h3>
+                                </div>
+                            </div>
+                            <div className="bg-white/5 backdrop-blur-md border border-white/10 rounded-xl p-5 hover:border-white/20 transition-all">
+                                <p className="text-[10px] text-slate-500 font-bold uppercase tracking-wider mb-2">Taxa de Erro</p>
+                                <div className="flex items-end gap-3">
+                                    <h3 className="text-2xl font-bold text-white">{kpis.error_rate}%</h3>
+                                </div>
+                            </div>
+                            <div className="bg-white/5 backdrop-blur-md border border-white/10 rounded-xl p-5 hover:border-white/20 transition-all">
+                                <p className="text-[10px] text-slate-500 font-bold uppercase tracking-wider mb-2">Latência Média</p>
+                                <div className="flex items-end gap-3">
+                                    <h3 className="text-2xl font-bold text-white">{kpis.avg_latency_ms}ms</h3>
+                                </div>
+                            </div>
+                            <div className="bg-white/5 backdrop-blur-md border border-white/10 rounded-xl p-5 hover:border-white/20 transition-all">
+                                <p className="text-[10px] text-slate-500 font-bold uppercase tracking-wider mb-2">Total Requisições</p>
+                                <div className="flex items-end gap-3">
+                                    <h3 className="text-2xl font-bold text-white">{kpis.total_requests.toLocaleString()}</h3>
+                                </div>
                             </div>
                         </div>
-                    </div>
-
-                    {/* Quick Stats Grid */}
-                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 md:gap-6 mt-6 pb-6">
-                        <div className="bg-white/5 backdrop-blur-md border border-white/10 rounded-xl p-5 hover:border-white/20 transition-all">
-                            <p className="text-[10px] text-slate-500 font-bold uppercase tracking-wider mb-2">Taxa de Sucesso</p>
-                            <div className="flex items-end gap-3">
-                                <h3 className="text-2xl font-bold text-white">99.82%</h3>
-                                <span className="text-green-500 text-[11px] font-bold mb-1">+0.04%</span>
-                            </div>
-                        </div>
-                        <div className="bg-white/5 backdrop-blur-md border border-white/10 rounded-xl p-5 hover:border-white/20 transition-all">
-                            <p className="text-[10px] text-slate-500 font-bold uppercase tracking-wider mb-2">Custo Projetado</p>
-                            <div className="flex items-end gap-3">
-                                <h3 className="text-2xl font-bold text-white">$242.10</h3>
-                                <span className="text-slate-500 text-[11px] font-bold mb-1">/mês</span>
-                            </div>
-                        </div>
-                        <div className="bg-white/5 backdrop-blur-md border border-white/10 rounded-xl p-5 hover:border-white/20 transition-all">
-                            <p className="text-[10px] text-slate-500 font-bold uppercase tracking-wider mb-2">Latência Média</p>
-                            <div className="flex items-end gap-3">
-                                <h3 className="text-2xl font-bold text-white">184ms</h3>
-                                <span className="text-red-500 text-[11px] font-bold mb-1">+12ms</span>
-                            </div>
-                        </div>
-                        <div className="bg-white/5 backdrop-blur-md border border-white/10 rounded-xl p-5 hover:border-white/20 transition-all">
-                            <p className="text-[10px] text-slate-500 font-bold uppercase tracking-wider mb-2">Tokens p/ Min. (TPM)</p>
-                            <div className="flex items-end gap-3">
-                                <h3 className="text-2xl font-bold text-white">4.2k</h3>
-                                <span className="text-green-500 text-[11px] font-bold mb-1 bg-green-500/10 px-2 rounded">Estável</span>
-                            </div>
-                        </div>
-                    </div>
+                    )}
 
                 </div>
             </main>

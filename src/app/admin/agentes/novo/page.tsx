@@ -89,13 +89,10 @@ interface UploadedFile {
     name: string;
     size: string;
     type: string;
+    file?: File;
 }
 
-const initialFiles: UploadedFile[] = [
-    { id: '1', name: 'manual-produto-v3.pdf', size: '2.4 MB', type: 'PDF' },
-    { id: '2', name: 'FAQ-clientes-2025.txt', size: '340 KB', type: 'TXT' },
-    { id: '3', name: 'politica-garantia.pdf', size: '1.1 MB', type: 'PDF' },
-];
+const initialFiles: UploadedFile[] = [];
 
 /* ── Chat Message Type ── */
 interface ChatMessage {
@@ -157,40 +154,85 @@ export default function CriarAgentePage() {
             const f = e.target.files[0];
             setFiles((prev) => [
                 ...prev,
-                { id: Date.now().toString(), name: f.name, size: `${(f.size / 1024).toFixed(0)} KB`, type: f.name.split('.').pop()?.toUpperCase() || 'FILE' },
+                { id: Date.now().toString(), name: f.name, size: `${(f.size / 1024).toFixed(0)} KB`, type: f.name.split('.').pop()?.toUpperCase() || 'FILE', file: f },
             ]);
         }
     };
 
-    const handleSave = () => {
+    const handleSave = async () => {
         setSaving(true);
-        setTimeout(() => {
-            setSaving(false);
-            setSaved(true);
-            setTimeout(() => setSaved(false), 3000);
-        }, 1500);
+        const provider = aiProviders.find((p) => p.models.some((m) => m.id === selectedModel));
+        try {
+            const res = await fetch('/api/admin/agentes', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    name: agentName,
+                    description,
+                    category,
+                    ai_provider: provider?.id || 'openai',
+                    ai_model: selectedModel,
+                    system_prompt: systemPrompt,
+                }),
+            });
+            if (res.ok) {
+                const data = await res.json();
+                const agentId = data.agent.id;
+
+                // Fazer upload dos arquivos (RAG)
+                if (files.length > 0) {
+                    const uploadPromises = files.map(async (fileObj) => {
+                        if (!fileObj.file) return; // ignora se não tiver o file real
+                        const formData = new FormData();
+                        formData.append('file', fileObj.file);
+
+                        await fetch(`/api/admin/agentes/${agentId}/files`, {
+                            method: 'POST',
+                            body: formData,
+                        });
+                    });
+                    await Promise.allSettled(uploadPromises);
+                }
+
+                setSaved(true);
+                setTimeout(() => setSaved(false), 3000);
+            }
+        } catch { /* silently fail */ }
+        setSaving(false);
     };
 
-    const handleSendMessage = () => {
+    const handleSendMessage = async () => {
         if (!chatInput.trim()) return;
         const userMsg = chatInput.trim();
-        setChatMessages((prev) => [...prev, { role: 'user', content: userMsg }]);
+        const newMessages = [...chatMessages, { role: 'user' as const, content: userMsg }];
+
+        setChatMessages(newMessages);
         setChatInput('');
         setIsTyping(true);
 
-        setTimeout(() => {
-            setChatMessages((prev) => [
-                ...prev,
-                {
-                    role: 'assistant',
-                    content: agentName
-                        ? `Eu sou ${agentName}! Recebi sua mensagem: "${userMsg}". O system prompt e a base de conhecimento ainda precisam ser conectados ao backend para respostas reais.`
-                        : `Recebi sua mensagem: "${userMsg}". Configure o nome do agente e o system prompt para personalizar minhas respostas.`,
-                },
-            ]);
+        try {
+            const res = await fetch('/api/admin/agentes/preview', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    messages: newMessages,
+                    system_prompt: systemPrompt || 'Você é um assistente útil e amigável.',
+                    model: selectedModel
+                })
+            });
+
+            if (res.ok) {
+                const data = await res.json();
+                setChatMessages(prev => [...prev, { role: 'assistant', content: data.response }]);
+            } else {
+                setChatMessages(prev => [...prev, { role: 'assistant', content: 'Desculpe, ocorreu um erro ao se conectar com a inteligência artificial para este preview.' }]);
+            }
+        } catch (error) {
+            setChatMessages(prev => [...prev, { role: 'assistant', content: 'Desculpe, ocorreu um erro de conexão.' }]);
+        } finally {
             setIsTyping(false);
             chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-        }, 1200);
+        }
     };
 
     const handleChatKeyDown = (e: React.KeyboardEvent) => {
@@ -640,8 +682,9 @@ export default function CriarAgentePage() {
                                         <span className="material-symbols-outlined text-xl">send</span>
                                     </button>
                                 </div>
-                                <p className="text-[10px] text-slate-600 mt-2 text-center">
-                                    Este é um preview simulado. Conecte ao backend para respostas reais.
+                                <p className="text-[10px] text-emerald-500/80 mt-2 text-center flex items-center justify-center gap-1">
+                                    <span className="material-symbols-outlined text-[14px]">bolt</span>
+                                    Preview conectado à API do Gemini
                                 </p>
                             </div>
 

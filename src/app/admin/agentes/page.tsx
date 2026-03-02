@@ -1,10 +1,10 @@
 'use client';
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import Link from 'next/link';
 import AdminSidebar from '@/components/AdminSidebar';
 
-/* ── Mock Agents Data ── */
+/* ── Agent Type ── */
 interface Agent {
     id: string;
     name: string;
@@ -21,71 +21,20 @@ interface Agent {
     initials: string;
 }
 
-const initialAgents: Agent[] = [
-    {
-        id: '1',
-        name: 'Copywriter de Reels',
-        description: 'Especialista em criar roteiros virais para Instagram Reels e TikTok. Usa gatilhos mentais de curiosidade e storytelling para maximizar engajamento e compartilhamento.',
-        category: 'Copywriting',
-        model: 'Claude 4.5 Sonnet',
-        modelProvider: 'Anthropic',
-        modelIcon: 'smart_toy',
-        modelColor: 'text-amber-400',
-        modelBg: 'bg-amber-500/15',
-        executions: '14.2k',
-        active: true,
-        gradient: 'from-violet-600 to-purple-500',
-        initials: 'CR',
-    },
-    {
-        id: '2',
-        name: 'Vendedor Inteligente',
-        description: 'Agente treinado para conduzir conversas de vendas consultivas via chat. Identifica objeções, aplica técnicas de fechamento e gera orçamentos automáticos.',
-        category: 'Vendas',
-        model: 'GPT-4o',
-        modelProvider: 'OpenAI',
-        modelIcon: 'psychology',
-        modelColor: 'text-emerald-400',
-        modelBg: 'bg-emerald-500/15',
-        executions: '8.7k',
-        active: true,
-        gradient: 'from-emerald-600 to-teal-500',
-        initials: 'VI',
-    },
-    {
-        id: '3',
-        name: 'Suporte Nível 1',
-        description: 'Atendimento automatizado de primeiro nível. Responde dúvidas frequentes, abre tickets e escala para humanos quando necessário, usando base de conhecimento interna.',
-        category: 'Suporte',
-        model: 'Gemini 2.5 Flash',
-        modelProvider: 'Google',
-        modelIcon: 'auto_awesome',
-        modelColor: 'text-blue-400',
-        modelBg: 'bg-blue-500/15',
-        executions: '23.1k',
-        active: false,
-        gradient: 'from-blue-600 to-cyan-500',
-        initials: 'S1',
-    },
-    {
-        id: '4',
-        name: 'Analista de Dados',
-        description: 'Interpreta relatórios, gera insights de métricas de marketing e vendas, cria resumos executivos semanais e identifica tendências de crescimento.',
-        category: 'Analytics',
-        model: 'DeepSeek R1',
-        modelProvider: 'OpenRouter',
-        modelIcon: 'route',
-        modelColor: 'text-rose-400',
-        modelBg: 'bg-rose-500/15',
-        executions: '5.4k',
-        active: true,
-        gradient: 'from-rose-600 to-pink-500',
-        initials: 'AD',
-    },
+const providerStyles: Record<string, { icon: string; color: string; bg: string }> = {
+    openai: { icon: 'psychology', color: 'text-emerald-400', bg: 'bg-emerald-500/15' },
+    anthropic: { icon: 'smart_toy', color: 'text-amber-400', bg: 'bg-amber-500/15' },
+    google: { icon: 'auto_awesome', color: 'text-blue-400', bg: 'bg-blue-500/15' },
+    openrouter: { icon: 'route', color: 'text-rose-400', bg: 'bg-rose-500/15' },
+};
+
+const gradientPool = [
+    'from-violet-600 to-purple-500', 'from-emerald-600 to-teal-500',
+    'from-blue-600 to-cyan-500', 'from-rose-600 to-pink-500',
+    'from-amber-600 to-orange-500', 'from-fuchsia-600 to-pink-500',
 ];
 
 const categoryFilters = ['Todas', 'Vendas', 'Copywriting', 'Suporte', 'Analytics', 'Educação'];
-const modelFilters = ['Todos', 'GPT-4o', 'Claude 4.5 Sonnet', 'Gemini 2.5 Flash', 'DeepSeek R1'];
 
 /* ── Category Badge ── */
 function CategoryTag({ category }: { category: string }) {
@@ -95,6 +44,11 @@ function CategoryTag({ category }: { category: string }) {
         Suporte: 'bg-blue-500/10 text-blue-400 border-blue-500/20',
         Analytics: 'bg-rose-500/10 text-rose-400 border-rose-500/20',
         Educação: 'bg-amber-500/10 text-amber-400 border-amber-500/20',
+        vendas: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20',
+        copywriting: 'bg-violet-500/10 text-violet-400 border-violet-500/20',
+        suporte: 'bg-blue-500/10 text-blue-400 border-blue-500/20',
+        analytics: 'bg-rose-500/10 text-rose-400 border-rose-500/20',
+        educacao: 'bg-amber-500/10 text-amber-400 border-amber-500/20',
     };
     return (
         <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider border ${colorMap[category] || 'bg-slate-500/10 text-slate-400 border-slate-500/20'}`}>
@@ -107,14 +61,52 @@ function CategoryTag({ category }: { category: string }) {
    GESTÃO DE AGENTES PAGE
    ═══════════════════════════════════════════ */
 export default function GestaoAgentesPage() {
-    const [agents, setAgents] = useState<Agent[]>(initialAgents);
+    const [agents, setAgents] = useState<Agent[]>([]);
     const [search, setSearch] = useState('');
     const [categoryFilter, setCategoryFilter] = useState('Todas');
-    const [modelFilter, setModelFilter] = useState('Todos');
+
+    /* ── Fetch Agents ── */
+    useEffect(() => {
+        fetch('/api/admin/agentes')
+            .then((r) => r.json())
+            .then((data) => {
+                if (data.agents) {
+                    const mapped: Agent[] = data.agents.map((a: Record<string, unknown>, i: number) => {
+                        const provider = providerStyles[(a.ai_provider as string) || 'openai'] || providerStyles.openai;
+                        const name = (a.name as string) || 'Agente';
+                        return {
+                            id: a.id as string,
+                            name,
+                            description: (a.description as string) || '',
+                            category: (a.category as string) || 'Outros',
+                            model: (a.ai_model as string) || 'GPT-4o',
+                            modelProvider: (a.ai_provider as string) || 'openai',
+                            modelIcon: provider.icon,
+                            modelColor: provider.color,
+                            modelBg: provider.bg,
+                            executions: '0',
+                            active: (a.status as string) === 'ativo',
+                            gradient: gradientPool[i % gradientPool.length],
+                            initials: name.split(' ').map((w: string) => w[0]).join('').slice(0, 2).toUpperCase(),
+                        };
+                    });
+                    setAgents(mapped);
+                }
+            })
+            .catch(() => { });
+    }, []);
 
     /* ── Toggle Agent ── */
-    const toggleAgent = (id: string) => {
+    const toggleAgent = async (id: string) => {
+        const agent = agents.find((a) => a.id === id);
+        if (!agent) return;
+        const newStatus = agent.active ? 'inativo' : 'ativo';
         setAgents((prev) => prev.map((a) => (a.id === id ? { ...a, active: !a.active } : a)));
+        await fetch(`/api/admin/agentes/${id}`, {
+            method: 'PATCH',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ status: newStatus }),
+        });
     };
 
     /* ── Filtered Agents ── */
@@ -122,10 +114,9 @@ export default function GestaoAgentesPage() {
         return agents.filter((a) => {
             const matchesSearch = !search || a.name.toLowerCase().includes(search.toLowerCase()) || a.description.toLowerCase().includes(search.toLowerCase());
             const matchesCat = categoryFilter === 'Todas' || a.category === categoryFilter;
-            const matchesModel = modelFilter === 'Todos' || a.model === modelFilter;
-            return matchesSearch && matchesCat && matchesModel;
+            return matchesSearch && matchesCat;
         });
-    }, [agents, search, categoryFilter, modelFilter]);
+    }, [agents, search, categoryFilter]);
 
     return (
         <div className="flex min-h-screen bg-background-dark font-display text-slate-100">
@@ -192,24 +183,7 @@ export default function GestaoAgentesPage() {
                         </div>
                     </div>
 
-                    {/* Model Filter */}
-                    <div className="relative">
-                        <div className="absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none">
-                            <span className="material-symbols-outlined text-slate-600 text-[16px]">memory</span>
-                        </div>
-                        <select
-                            value={modelFilter}
-                            onChange={(e) => setModelFilter(e.target.value)}
-                            className="bg-black/40 border border-white/10 rounded-xl pl-10 pr-8 py-2.5 text-sm text-slate-300 focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all duration-300 appearance-none cursor-pointer"
-                        >
-                            {modelFilters.map((m) => (
-                                <option key={m} value={m} className="bg-[#1a1a2e] text-slate-200">{m}</option>
-                            ))}
-                        </select>
-                        <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none">
-                            <span className="material-symbols-outlined text-slate-500 text-[16px]">expand_more</span>
-                        </div>
-                    </div>
+
                 </div>
 
                 {/* ─── AGENTS GRID ─── */}
@@ -282,11 +256,29 @@ export default function GestaoAgentesPage() {
                                         <span className="material-symbols-outlined text-[16px]">edit</span>
                                         Editar
                                     </Link>
-                                    <button className="flex items-center gap-1.5 text-slate-500 hover:text-slate-200 hover:bg-white/5 px-3 py-1.5 rounded-lg transition-all duration-300 text-xs font-semibold">
+                                    <button
+                                        onClick={() => {
+                                            // Optional: duplicate logic could go here later
+                                            alert("Recurso de duplicar em breve.");
+                                        }}
+                                        className="flex items-center gap-1.5 text-slate-500 hover:text-slate-200 hover:bg-white/5 px-3 py-1.5 rounded-lg transition-all duration-300 text-xs font-semibold"
+                                    >
                                         <span className="material-symbols-outlined text-[16px]">content_copy</span>
                                         Duplicar
                                     </button>
-                                    <button className="flex items-center gap-1.5 text-slate-500 hover:text-rose-400 hover:bg-rose-500/10 px-3 py-1.5 rounded-lg transition-all duration-300 text-xs font-semibold ml-auto">
+                                    <button
+                                        onClick={async () => {
+                                            if (confirm(`Tem certeza que deseja excluir o agente "${agent.name}"?`)) {
+                                                try {
+                                                    const res = await fetch(`/api/admin/agentes/${agent.id}`, { method: 'DELETE' });
+                                                    if (res.ok) setAgents((prev) => prev.filter((a) => a.id !== agent.id));
+                                                } catch (err) {
+                                                    console.error("Erro ao excluir", err);
+                                                }
+                                            }
+                                        }}
+                                        className="flex items-center gap-1.5 text-slate-500 hover:text-rose-400 hover:bg-rose-500/10 px-3 py-1.5 rounded-lg transition-all duration-300 text-xs font-semibold ml-auto"
+                                    >
                                         <span className="material-symbols-outlined text-[16px]">delete</span>
                                         Excluir
                                     </button>

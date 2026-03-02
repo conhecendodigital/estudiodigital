@@ -14,7 +14,7 @@ export default function Topbar() {
     }
 
     // Hide Topbar on authentication and onboarding routes
-    if (pathname && (pathname === '/login' || pathname.startsWith('/onboarding'))) {
+    if (pathname && (pathname === '/login' || pathname === '/cadastro' || pathname.startsWith('/onboarding'))) {
         return null;
     }
 

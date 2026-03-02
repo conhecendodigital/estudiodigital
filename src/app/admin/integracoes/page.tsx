@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import AdminSidebar from '@/components/AdminSidebar';
 
 /* ── Provider Config ── */
@@ -70,13 +70,37 @@ export default function IntegracoesPage() {
         Object.fromEntries(
             providers.map((p) => [
                 p.id,
-                { enabled: p.id === 'openai' || p.id === 'google', apiKey: '', visible: false, testing: false, connected: null },
+                { enabled: false, apiKey: '', visible: false, testing: false, connected: null },
             ])
         )
     );
 
     const [saving, setSaving] = useState(false);
     const [saved, setSaved] = useState(false);
+
+    /* ── Load existing settings ── */
+    useEffect(() => {
+        fetch('/api/admin/integracoes')
+            .then((r) => r.json())
+            .then((data) => {
+                if (data.settings) {
+                    const newStates = { ...states };
+                    for (const s of data.settings) {
+                        if (newStates[s.provider]) {
+                            newStates[s.provider] = {
+                                ...newStates[s.provider],
+                                enabled: s.is_enabled,
+                                apiKey: s.api_key || '',
+                                connected: s.last_test_result,
+                            };
+                        }
+                    }
+                    setStates(newStates);
+                }
+            })
+            .catch(() => { });
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
 
     const toggle = useCallback((id: string, field: 'enabled' | 'visible') => {
         setStates((prev) => ({ ...prev, [id]: { ...prev[id], [field]: !prev[id][field] } }));
@@ -86,21 +110,40 @@ export default function IntegracoesPage() {
         setStates((prev) => ({ ...prev, [id]: { ...prev[id], apiKey: value, connected: null } }));
     }, []);
 
-    const testConnection = useCallback((id: string) => {
+    const testConnection = useCallback(async (id: string) => {
         setStates((prev) => ({ ...prev, [id]: { ...prev[id], testing: true, connected: null } }));
-        setTimeout(() => {
-            setStates((prev) => ({ ...prev, [id]: { ...prev[id], testing: false, connected: true } }));
-        }, 1800);
+        try {
+            const res = await fetch('/api/admin/integracoes', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ provider: id }),
+            });
+            const data = await res.json();
+            setStates((prev) => ({ ...prev, [id]: { ...prev[id], testing: false, connected: data.success } }));
+        } catch {
+            setStates((prev) => ({ ...prev, [id]: { ...prev[id], testing: false, connected: false } }));
+        }
     }, []);
 
-    const handleSave = () => {
+    const handleSave = async () => {
         setSaving(true);
         setSaved(false);
-        setTimeout(() => {
-            setSaving(false);
+        try {
+            for (const [providerId, state] of Object.entries(states)) {
+                await fetch('/api/admin/integracoes', {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        provider: providerId,
+                        api_key: state.apiKey || undefined,
+                        is_enabled: state.enabled,
+                    }),
+                });
+            }
             setSaved(true);
             setTimeout(() => setSaved(false), 3000);
-        }, 1500);
+        } catch { /* silently fail */ }
+        setSaving(false);
     };
 
     return (
@@ -144,8 +187,8 @@ export default function IntegracoesPage() {
                             <div
                                 key={provider.id}
                                 className={`bg-white/5 backdrop-blur-md border rounded-2xl p-8 transition-all duration-500 group ${s.enabled
-                                        ? 'border-white/10 hover:shadow-[0_0_20px_rgba(123,97,255,0.12)] hover:border-primary/30'
-                                        : 'border-white/5 opacity-60 hover:opacity-80'
+                                    ? 'border-white/10 hover:shadow-[0_0_20px_rgba(123,97,255,0.12)] hover:border-primary/30'
+                                    : 'border-white/5 opacity-60 hover:opacity-80'
                                     }`}
                             >
                                 {/* Top Row: Icon + Name + Toggle */}
@@ -169,8 +212,8 @@ export default function IntegracoesPage() {
                                     <button
                                         onClick={() => toggle(provider.id, 'enabled')}
                                         className={`relative w-14 h-7 rounded-full transition-all duration-300 flex-shrink-0 ${s.enabled
-                                                ? 'bg-primary shadow-[0_0_15px_rgba(123,97,255,0.4)]'
-                                                : 'bg-white/10'
+                                            ? 'bg-primary shadow-[0_0_15px_rgba(123,97,255,0.4)]'
+                                            : 'bg-white/10'
                                             }`}
                                     >
                                         <div
@@ -216,10 +259,10 @@ export default function IntegracoesPage() {
                                                 onClick={() => testConnection(provider.id)}
                                                 disabled={s.testing || !s.apiKey}
                                                 className={`flex items-center gap-2 px-5 py-3 rounded-xl text-sm font-semibold transition-all duration-300 border ${s.testing
-                                                        ? 'bg-white/5 border-white/10 text-slate-400 cursor-wait'
-                                                        : !s.apiKey
-                                                            ? 'bg-white/5 border-white/5 text-slate-600 cursor-not-allowed'
-                                                            : 'bg-white/5 border-white/10 text-white hover:bg-primary/10 hover:border-primary/30 hover:text-primary hover:shadow-[0_0_15px_rgba(123,97,255,0.15)]'
+                                                    ? 'bg-white/5 border-white/10 text-slate-400 cursor-wait'
+                                                    : !s.apiKey
+                                                        ? 'bg-white/5 border-white/5 text-slate-600 cursor-not-allowed'
+                                                        : 'bg-white/5 border-white/10 text-white hover:bg-primary/10 hover:border-primary/30 hover:text-primary hover:shadow-[0_0_15px_rgba(123,97,255,0.15)]'
                                                     }`}
                                             >
                                                 {s.testing ? (
@@ -278,8 +321,8 @@ export default function IntegracoesPage() {
                                     onClick={handleSave}
                                     disabled={saving}
                                     className={`btn-magnetic flex items-center gap-2.5 px-8 py-3.5 rounded-xl font-sora font-semibold text-sm transition-all duration-300 border border-white/10 ${saving
-                                            ? 'bg-primary/50 text-white/60 cursor-wait'
-                                            : 'bg-primary hover:bg-primary-dark text-white shadow-[0_0_20px_rgba(123,97,255,0.3)] hover:shadow-[0_0_35px_rgba(123,97,255,0.5)]'
+                                        ? 'bg-primary/50 text-white/60 cursor-wait'
+                                        : 'bg-primary hover:bg-primary-dark text-white shadow-[0_0_20px_rgba(123,97,255,0.3)] hover:shadow-[0_0_35px_rgba(123,97,255,0.5)]'
                                         }`}
                                 >
                                     {saving ? (

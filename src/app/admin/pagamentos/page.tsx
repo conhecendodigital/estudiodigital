@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import AdminSidebar from '@/components/AdminSidebar';
 
 /* ── Types ── */
@@ -25,38 +25,6 @@ interface GatewayConfig {
     webhookUrl: string;
 }
 
-const gateways: GatewayConfig[] = [
-    {
-        id: 'mercadopago',
-        name: 'Mercado Pago',
-        description: 'Receba por Pix, boleto e cartão de crédito com a maior plataforma de pagamento da América Latina.',
-        icon: 'account_balance_wallet',
-        accentColor: 'text-sky-400',
-        accentBg: 'bg-sky-500/15',
-        accentGlow: 'shadow-[0_0_20px_rgba(56,189,248,0.15)]',
-        fields: [
-            { key: 'publicKey', label: 'Public Key', placeholder: 'APP_USR-xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx' },
-            { key: 'accessToken', label: 'Access Token', placeholder: 'APP_USR-0000000000000000-000000-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx-000000000' },
-        ],
-        webhookUrl: 'https://api.estudiodigital.com/webhooks/mercadopago',
-    },
-    {
-        id: 'stripe',
-        name: 'Stripe',
-        description: 'Pagamentos globais com cartão de crédito, Apple Pay e Google Pay. Ideal para planos internacionais.',
-        icon: 'credit_card',
-        accentColor: 'text-violet-400',
-        accentBg: 'bg-violet-500/15',
-        accentGlow: 'shadow-[0_0_20px_rgba(139,92,246,0.15)]',
-        fields: [
-            { key: 'publishableKey', label: 'Publishable Key', placeholder: 'pk_test_sua_chave_publica_aqui' },
-            { key: 'secretKey', label: 'Secret Key', placeholder: 'sk_test_sua_chave_secreta_aqui' },
-            { key: 'webhookSecret', label: 'Webhook Secret (Signing Secret)', placeholder: 'whsec_sua_assinatura_webhook_aqui' },
-        ],
-        webhookUrl: 'https://api.estudiodigital.com/webhooks/stripe',
-    },
-];
-
 /* ── Masked Input Component ── */
 function MaskedInput({
     label,
@@ -75,6 +43,21 @@ function MaskedInput({
     onChange: (v: string) => void;
     onToggleVisibility: () => void;
 }) {
+    const [showConfirm, setShowConfirm] = useState(false);
+
+    const handleToggleClick = () => {
+        if (!visible && value.trim().length > 0) {
+            setShowConfirm(true);
+        } else {
+            onToggleVisibility();
+        }
+    };
+
+    const confirmVisibility = () => {
+        setShowConfirm(false);
+        onToggleVisibility();
+    };
+
     return (
         <div>
             <label className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider mb-2 block">{label}</label>
@@ -91,11 +74,26 @@ function MaskedInput({
                     className={`w-full bg-black/40 border border-white/10 rounded-xl pl-12 pr-12 py-3 text-sm font-mono text-slate-200 placeholder-slate-600 focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all duration-300 ${readOnly ? 'cursor-default opacity-70' : ''}`}
                 />
                 <button
-                    onClick={onToggleVisibility}
+                    onClick={handleToggleClick}
                     className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-white p-1.5 rounded-lg hover:bg-white/10 transition-all"
+                    title={visible ? 'Ocultar' : 'Mostrar'}
                 >
                     <span className="material-symbols-outlined text-lg">{visible ? 'visibility_off' : 'visibility'}</span>
                 </button>
+
+                {/* Confirmation Overlay */}
+                {showConfirm && (
+                    <div className="absolute inset-0 bg-background-dark/95 backdrop-blur-sm border border-rose-500/30 rounded-xl flex items-center justify-between px-4 z-10 animate-fade-in shadow-lg">
+                        <div className="flex items-center gap-2">
+                            <span className="material-symbols-outlined text-rose-400 text-lg">warning</span>
+                            <span className="text-xs font-semibold text-slate-200">Deseja mesmo reexibir essa credencial?</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                            <button onClick={() => setShowConfirm(false)} className="text-[10px] font-bold uppercase tracking-wider text-slate-400 hover:text-white px-2 py-1 rounded-md hover:bg-white/10 transition-colors">Cancelar</button>
+                            <button onClick={confirmVisibility} className="text-[10px] font-bold uppercase tracking-wider bg-rose-500/20 text-rose-400 hover:bg-rose-500/30 hover:text-rose-300 px-3 py-1.5 rounded-md transition-colors border border-rose-500/20">Mostrar</button>
+                        </div>
+                    </div>
+                )}
             </div>
         </div>
     );
@@ -148,24 +146,62 @@ function WebhookUrlField({ url }: { url: string }) {
    PAYMENT GATEWAYS PAGE
    ═══════════════════════════════════════════ */
 export default function PagamentosPage() {
-    const [states, setStates] = useState<Record<string, GatewayState>>(
-        Object.fromEntries(
-            gateways.map((g) => [
-                g.id,
-                {
-                    enabled: g.id === 'mercadopago',
-                    fields: Object.fromEntries(g.fields.map((f) => [f.key, { value: '', visible: false }])),
-                    testing: false,
-                    testResult: null,
-                    saving: false,
-                    saved: false,
-                },
-            ])
-        )
-    );
+    const [gatewaysConfig, setGatewaysConfig] = useState<GatewayConfig[]>([]);
+    const [states, setStates] = useState<Record<string, GatewayState>>({});
+
+    useEffect(() => {
+        fetch('/api/admin/pagamentos')
+            .then((r) => r.json())
+            .then((data) => {
+                if (data.gateways) {
+                    const gwData = data.gateways as any[];
+                    setGatewaysConfig(gwData);
+
+                    // Build initial states mapping
+                    const nextStates: Record<string, GatewayState> = {};
+                    gwData.forEach((gw) => {
+                        const id = gw.id;
+                        const isEnabled = gw.is_enabled;
+                        const credentials = gw.credentials || {};
+
+                        // Map fields from dictionary setting their initial value if any
+                        const mappedFields = Object.fromEntries(
+                            (gw.fields || []).map((f: any) => [
+                                f.key,
+                                { value: credentials[f.key] || '', visible: false }
+                            ])
+                        );
+
+                        nextStates[id] = {
+                            enabled: isEnabled,
+                            fields: mappedFields,
+                            testing: false,
+                            testResult: null,
+                            saving: false,
+                            saved: false,
+                        };
+                    });
+
+                    setStates(nextStates);
+                }
+            })
+            .catch(() => { });
+    }, []);
 
     const toggleEnabled = useCallback((id: string) => {
-        setStates((prev) => ({ ...prev, [id]: { ...prev[id], enabled: !prev[id].enabled } }));
+        setStates((prev) => {
+            const currentState = prev[id];
+            const newState = !currentState.enabled;
+
+            // Auto-save the toggle state to the backend
+            fetch('/api/admin/pagamentos', {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ provider: id, is_active: newState }),
+            }).catch(() => console.error("Falha ao salvar o novo estado do toggle."));
+
+            return { ...prev, [id]: { ...currentState, enabled: newState } };
+        });
     }, []);
 
     const setFieldValue = useCallback((gatewayId: string, fieldKey: string, value: string) => {
@@ -193,23 +229,42 @@ export default function PagamentosPage() {
 
     const testWebhook = useCallback((id: string) => {
         setStates((prev) => ({ ...prev, [id]: { ...prev[id], testing: true, testResult: null } }));
-        setTimeout(() => {
-            setStates((prev) => ({ ...prev, [id]: { ...prev[id], testing: false, testResult: 'success' } }));
-            setTimeout(() => {
-                setStates((prev) => ({ ...prev, [id]: { ...prev[id], testResult: null } }));
-            }, 4000);
-        }, 2000);
+        fetch('/api/admin/pagamentos', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ provider: id }),
+        })
+            .then((r) => r.json())
+            .then((data) => {
+                const result = data.success ? 'success' : 'error';
+                setStates((prev) => ({ ...prev, [id]: { ...prev[id], testing: false, testResult: result as 'success' | 'error' } }));
+                setTimeout(() => setStates((prev) => ({ ...prev, [id]: { ...prev[id], testResult: null } })), 4000);
+            })
+            .catch(() => {
+                setStates((prev) => ({ ...prev, [id]: { ...prev[id], testing: false, testResult: 'error' } }));
+                setTimeout(() => setStates((prev) => ({ ...prev, [id]: { ...prev[id], testResult: null } })), 4000);
+            });
     }, []);
 
     const saveCredentials = useCallback((id: string) => {
         setStates((prev) => ({ ...prev, [id]: { ...prev[id], saving: true, saved: false } }));
-        setTimeout(() => {
-            setStates((prev) => ({ ...prev, [id]: { ...prev[id], saving: false, saved: true } }));
-            setTimeout(() => {
-                setStates((prev) => ({ ...prev, [id]: { ...prev[id], saved: false } }));
-            }, 3000);
-        }, 1500);
-    }, []);
+        const s = states[id];
+        const credentials: Record<string, string> = {};
+        Object.entries(s.fields).forEach(([key, f]) => { credentials[key] = f.value; });
+        fetch('/api/admin/pagamentos', {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ provider: id, is_active: s.enabled, credentials }),
+        })
+            .then((r) => r.json())
+            .then(() => {
+                setStates((prev) => ({ ...prev, [id]: { ...prev[id], saving: false, saved: true } }));
+                setTimeout(() => setStates((prev) => ({ ...prev, [id]: { ...prev[id], saved: false } })), 3000);
+            })
+            .catch(() => {
+                setStates((prev) => ({ ...prev, [id]: { ...prev[id], saving: false } }));
+            });
+    }, [states]);
 
     return (
         <div className="flex min-h-screen bg-background-dark font-display text-slate-100">
@@ -246,8 +301,10 @@ export default function PagamentosPage() {
 
                 {/* ─── GATEWAY PANELS ─── */}
                 <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
-                    {gateways.map((gateway) => {
+                    {gatewaysConfig.map((gateway) => {
                         const s = states[gateway.id];
+                        if (!s) return null; // Wait until loaded
+
                         return (
                             <div
                                 key={gateway.id}

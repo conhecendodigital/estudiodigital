@@ -1,6 +1,7 @@
 'use client';
 
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import AdminSidebar from '@/components/AdminSidebar';
 
 /* ── Tab Definitions ── */
@@ -104,13 +105,40 @@ function GeralContent() {
     const [saved, setSaved] = useState(false);
     const fileRef = useRef<HTMLInputElement>(null);
 
-    const handleSave = () => {
+    useEffect(() => {
+        fetch('/api/admin/config')
+            .then((r) => r.json())
+            .then((data) => {
+                if (data.config) {
+                    const cfgMap = data.config as Record<string, string>;
+                    if (cfgMap.platform_name) setPlatformName(cfgMap.platform_name);
+                    if (cfgMap.support_email) setSupportEmail(cfgMap.support_email);
+                    if (cfgMap.timezone) setTimezone(cfgMap.timezone);
+                    if (cfgMap.language) setLanguage(cfgMap.language);
+                }
+            })
+            .catch(() => { });
+    }, []);
+
+    const handleSave = async () => {
         setSaving(true);
-        setTimeout(() => {
-            setSaving(false);
+        try {
+            await fetch('/api/admin/config', {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    configs: [
+                        { key: 'platform_name', value: platformName, category: 'geral' },
+                        { key: 'support_email', value: supportEmail, category: 'geral' },
+                        { key: 'timezone', value: timezone, category: 'geral' },
+                        { key: 'language', value: language, category: 'geral' },
+                    ],
+                }),
+            });
             setSaved(true);
             setTimeout(() => setSaved(false), 3000);
-        }, 1500);
+        } catch { /* ignore */ }
+        setSaving(false);
     };
 
     const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -243,8 +271,8 @@ function GeralContent() {
                     onClick={handleSave}
                     disabled={saving}
                     className={`btn-magnetic flex items-center gap-2 px-8 py-3 rounded-xl font-sora font-semibold text-sm transition-all duration-300 border border-white/10 ${saving
-                            ? 'bg-primary/50 text-white/60 cursor-wait'
-                            : 'bg-primary hover:bg-primary-dark text-white shadow-[0_0_15px_rgba(123,97,255,0.3)] hover:shadow-[0_0_25px_rgba(123,97,255,0.5)]'
+                        ? 'bg-primary/50 text-white/60 cursor-wait'
+                        : 'bg-primary hover:bg-primary-dark text-white shadow-[0_0_15px_rgba(123,97,255,0.3)] hover:shadow-[0_0_25px_rgba(123,97,255,0.5)]'
                         }`}
                 >
                     {saving ? (
@@ -266,36 +294,51 @@ function GeralContent() {
 
 /* ── Pagamentos Tab Content ── */
 function PagamentosContent() {
-    const gateways = [
-        { name: 'Mercado Pago', icon: 'account_balance_wallet', color: 'text-sky-400', bg: 'bg-sky-500/15', desc: 'Receba por Pix, boleto e cartão de crédito.', status: true },
-        { name: 'Stripe', icon: 'credit_card', color: 'text-violet-400', bg: 'bg-violet-500/15', desc: 'Pagamentos globais com Apple Pay e Google Pay.', status: false },
-    ];
+    const [gateways, setGateways] = useState<any[]>([]);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        fetch('/api/admin/pagamentos')
+            .then(res => res.json())
+            .then(data => {
+                if (data.gateways) setGateways(data.gateways);
+                setLoading(false);
+            })
+            .catch(() => setLoading(false));
+    }, []);
+
+    const router = useRouter();
+
+    if (loading) return <div className="text-slate-500 text-sm animate-pulse">Carregando painéis...</div>;
+
     return (
         <div className="space-y-4">
             {gateways.map((gw) => (
                 <div key={gw.name} className="bg-white/5 backdrop-blur-md border border-white/10 rounded-2xl p-6 flex items-center justify-between hover:border-primary/20 transition-all duration-300">
                     <div className="flex items-center gap-4">
-                        <div className={`${gw.bg} p-3 rounded-xl`}>
-                            <span className={`material-symbols-outlined ${gw.color} text-2xl`}>{gw.icon}</span>
+                        <div className={`${gw.accentBg || 'bg-white/10'} p-3 rounded-xl`}>
+                            <span className={`material-symbols-outlined ${gw.accentColor || 'text-white'} text-2xl`}>{gw.icon || 'payments'}</span>
                         </div>
                         <div>
                             <div className="flex items-center gap-2">
                                 <h4 className="font-bold font-sora text-white">{gw.name}</h4>
-                                {gw.status && (
+                                {gw.is_enabled && (
                                     <span className="inline-flex items-center gap-1 bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider">
                                         <span className="size-1.5 bg-emerald-500 rounded-full animate-pulse" />
                                         Conectado
                                     </span>
                                 )}
                             </div>
-                            <p className="text-xs text-slate-500 mt-0.5">{gw.desc}</p>
+                            <p className="text-xs text-slate-500 mt-0.5">{gw.description}</p>
                         </div>
                     </div>
-                    <button className={`px-5 py-2.5 rounded-xl text-sm font-semibold transition-all duration-300 border ${gw.status
+                    <button
+                        onClick={() => router.push('/admin/pagamentos')}
+                        className={`px-5 py-2.5 rounded-xl text-sm font-semibold transition-all duration-300 border ${gw.is_enabled
                             ? 'bg-white/5 border-white/10 text-slate-300 hover:bg-white/10 hover:text-white'
                             : 'bg-primary/10 border-primary/30 text-primary hover:bg-primary/20'
-                        }`}>
-                        {gw.status ? 'Configurar' : 'Conectar'}
+                            }`}>
+                        {gw.is_enabled ? 'Configurar' : 'Conectar'}
                     </button>
                 </div>
             ))}
@@ -305,50 +348,50 @@ function PagamentosContent() {
 
 /* ── AI Integrations Tab Content ── */
 function IAContent() {
-    const integrations = [
-        { name: 'OpenAI', icon: 'psychology', color: 'text-emerald-400', bg: 'bg-emerald-500/15', desc: 'GPT-4o, GPT-4o mini — Geração de texto e análise.', status: true, model: 'gpt-4o' },
-        { name: 'Anthropic (Claude)', icon: 'smart_toy', color: 'text-amber-400', bg: 'bg-amber-500/15', desc: 'Claude 3.5 Sonnet — Raciocínio avançado e análise.', status: true, model: 'claude-sonnet-4-5' },
-    ];
     return (
         <div className="space-y-4">
-            {integrations.map((ai) => (
-                <div key={ai.name} className="bg-white/5 backdrop-blur-md border border-white/10 rounded-2xl p-6 hover:border-primary/20 transition-all duration-300">
-                    <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-4">
-                            <div className={`${ai.bg} p-3 rounded-xl`}>
-                                <span className={`material-symbols-outlined ${ai.color} text-2xl`}>{ai.icon}</span>
-                            </div>
-                            <div>
-                                <div className="flex items-center gap-2">
-                                    <h4 className="font-bold font-sora text-white">{ai.name}</h4>
-                                    {ai.status && (
-                                        <span className="inline-flex items-center gap-1 bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider">
-                                            <span className="size-1.5 bg-emerald-500 rounded-full animate-pulse" />
-                                            Ativo
-                                        </span>
-                                    )}
-                                </div>
-                                <p className="text-xs text-slate-500 mt-0.5">{ai.desc}</p>
-                            </div>
-                        </div>
-                        <button className="px-5 py-2.5 rounded-xl text-sm font-semibold bg-white/5 border border-white/10 text-slate-300 hover:bg-white/10 hover:text-white transition-all duration-300">
-                            Configurar
-                        </button>
-                    </div>
-                    {ai.status && (
-                        <div className="mt-4 pt-4 border-t border-white/5 flex items-center gap-6">
-                            <div className="flex items-center gap-2 text-xs text-slate-500">
-                                <span className="material-symbols-outlined text-[14px]">memory</span>
-                                Modelo: <span className="text-slate-300 font-mono font-semibold">{ai.model}</span>
-                            </div>
-                            <div className="flex items-center gap-2 text-xs text-slate-500">
-                                <span className="material-symbols-outlined text-[14px]">speed</span>
-                                Status: <span className="text-emerald-400 font-semibold">Operacional</span>
-                            </div>
-                        </div>
-                    )}
+            <div className="bg-emerald-500/5 border border-emerald-500/15 rounded-2xl p-5 mb-8 flex items-start gap-4">
+                <div className="bg-emerald-500/15 p-2 rounded-lg flex-shrink-0 mt-0.5">
+                    <span className="material-symbols-outlined text-emerald-400 text-xl">info</span>
                 </div>
-            ))}
+                <div>
+                    <p className="text-sm font-semibold text-emerald-300">Inteligências Artificiais</p>
+                    <p className="text-xs text-slate-400 mt-1 leading-relaxed">
+                        No Escritório Digital, as integrações de modelos de Inteligência Artificial como (OpenAI, Anthropic e Google Gemini) são ativadas em nível global da Aplicação e parametrizadas na guia de Criação de Agentes, já que as chaves de API já estão presentes nas variáveis de ambiente seguras do seu host.
+                    </p>
+                </div>
+            </div>
+
+            <div className="bg-white/5 backdrop-blur-md border border-white/10 rounded-2xl p-6 hover:border-primary/20 transition-all duration-300">
+                <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-4">
+                        <div className="bg-emerald-500/15 p-3 rounded-xl border border-emerald-500/20">
+                            <span className="material-symbols-outlined text-emerald-400 text-2xl">psychology</span>
+                        </div>
+                        <div>
+                            <div className="flex items-center gap-2">
+                                <h4 className="font-bold font-sora text-white">Google Gemini</h4>
+                                <span className="inline-flex items-center gap-1 bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider">
+                                    <span className="size-1.5 bg-emerald-500 rounded-full animate-pulse" />
+                                    Conectado
+                                </span>
+                            </div>
+                            <p className="text-xs text-slate-500 mt-0.5">Modelo robusto nativo do Estud.io utilizando Gemini Pro Flash.</p>
+                        </div>
+                    </div>
+                </div>
+                <div className="mt-4 pt-4 border-t border-white/5 flex items-center gap-6">
+                    <div className="flex items-center gap-2 text-xs text-slate-500">
+                        <span className="material-symbols-outlined text-[14px]">memory</span>
+                        Modelo Atual: <span className="text-slate-300 font-mono font-semibold">gemini-2.5-flash</span>
+                    </div>
+                    <div className="flex items-center gap-2 text-xs text-slate-500">
+                        <span className="material-symbols-outlined text-[14px]">vpn_key</span>
+                        Origem: <span className="text-emerald-400 font-semibold">Variáveis de Ambiente (.env)</span>
+                    </div>
+                </div>
+            </div>
+
         </div>
     );
 }
@@ -358,18 +401,54 @@ function NotificacoesContent() {
     const [emailEnabled, setEmailEnabled] = useState(true);
     const [pushEnabled, setPushEnabled] = useState(false);
     const [webhookEnabled, setWebhookEnabled] = useState(true);
+    const [isSaving, setIsSaving] = useState(false);
+
+    useEffect(() => {
+        fetch('/api/admin/config')
+            .then((r) => r.json())
+            .then((data) => {
+                if (data.config) {
+                    const cfg = data.config as Record<string, string | boolean>;
+                    if (cfg.notify_email !== undefined) setEmailEnabled(cfg.notify_email === 'true' || cfg.notify_email === true);
+                    if (cfg.notify_push !== undefined) setPushEnabled(cfg.notify_push === 'true' || cfg.notify_push === true);
+                    if (cfg.notify_webhook !== undefined) setWebhookEnabled(cfg.notify_webhook === 'true' || cfg.notify_webhook === true);
+                }
+            })
+            .catch(() => { });
+    }, []);
+
+    const handleToggle = async (key: string, currentValue: boolean, setter: (val: boolean) => void) => {
+        const newValue = !currentValue;
+        setter(newValue); // Optimistic UI update
+        setIsSaving(true);
+
+        try {
+            await fetch('/api/admin/config', {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    configs: [{ key, value: String(newValue), category: 'notificacoes' }],
+                }),
+            });
+        } catch (error) {
+            console.error('Falha ao salvar config', error);
+            setter(currentValue); // Rollback on error
+        } finally {
+            setIsSaving(false);
+        }
+    };
 
     const toggles = [
-        { label: 'Notificações por E-mail', desc: 'Novos assinantes, pagamentos e cancelamentos', icon: 'mail', enabled: emailEnabled, toggle: () => setEmailEnabled(!emailEnabled) },
-        { label: 'Push Notifications', desc: 'Alertas em tempo real no navegador', icon: 'notifications_active', enabled: pushEnabled, toggle: () => setPushEnabled(!pushEnabled) },
-        { label: 'Webhooks', desc: 'Enviar eventos para URLs externas em tempo real', icon: 'webhook', enabled: webhookEnabled, toggle: () => setWebhookEnabled(!webhookEnabled) },
+        { label: 'Notificações por E-mail', desc: 'Novos assinantes, pagamentos e cancelamentos', icon: 'mail', enabled: emailEnabled, toggle: () => handleToggle('notify_email', emailEnabled, setEmailEnabled) },
+        { label: 'Push Notifications', desc: 'Alertas em tempo real no navegador', icon: 'notifications_active', enabled: pushEnabled, toggle: () => handleToggle('notify_push', pushEnabled, setPushEnabled) },
+        { label: 'Webhooks', desc: 'Enviar eventos para URLs externas em tempo real', icon: 'webhook', enabled: webhookEnabled, toggle: () => handleToggle('notify_webhook', webhookEnabled, setWebhookEnabled) },
     ];
 
     return (
         <div className="space-y-4">
             {toggles.map((item) => (
-                <div key={item.label} className="bg-white/5 backdrop-blur-md border border-white/10 rounded-2xl p-6 flex items-center justify-between hover:border-primary/20 transition-all duration-300">
-                    <div className="flex items-center gap-4">
+                <div key={item.label} className="bg-white/5 backdrop-blur-md border border-white/10 rounded-2xl p-6 flex items-center justify-between hover:border-primary/20 transition-all duration-300 relative overflow-hidden">
+                    <div className="flex items-center gap-4 relative z-10">
                         <div className="bg-primary/10 p-3 rounded-xl">
                             <span className="material-symbols-outlined text-primary text-2xl">{item.icon}</span>
                         </div>
@@ -380,14 +459,17 @@ function NotificacoesContent() {
                     </div>
                     <button
                         onClick={item.toggle}
-                        className={`relative w-14 h-7 rounded-full transition-all duration-300 flex-shrink-0 ${item.enabled
-                                ? 'bg-primary shadow-[0_0_15px_rgba(123,97,255,0.4)]'
-                                : 'bg-white/10'
-                            }`}
+                        disabled={isSaving}
+                        className={`relative w-14 h-7 rounded-full transition-all duration-300 flex-shrink-0 z-10 ${item.enabled
+                            ? 'bg-primary shadow-[0_0_15px_rgba(123,97,255,0.4)]'
+                            : 'bg-white/10'
+                            } ${isSaving ? 'opacity-50 cursor-wait' : ''}`}
                     >
                         <div className={`absolute top-0.5 w-6 h-6 rounded-full bg-white shadow-lg transition-all duration-300 ${item.enabled ? 'left-[calc(100%-1.625rem)]' : 'left-0.5'
                             }`} />
                     </button>
+                    {/* Subtle highlight if enabled */}
+                    {item.enabled && <div className="absolute inset-0 bg-primary/5 -z-0 pointer-events-none" />}
                 </div>
             ))}
         </div>
@@ -446,8 +528,8 @@ export default function ConfiguracoesPage() {
                                             key={tab.id}
                                             onClick={() => setActiveTab(tab.id)}
                                             className={`w-full text-left flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-300 group relative ${isActive
-                                                    ? 'bg-primary/10 text-primary border-l-2 border-primary'
-                                                    : 'text-slate-400 hover:bg-white/5 hover:text-white border-l-2 border-transparent'
+                                                ? 'bg-primary/10 text-primary border-l-2 border-primary'
+                                                : 'text-slate-400 hover:bg-white/5 hover:text-white border-l-2 border-transparent'
                                                 }`}
                                         >
                                             <span className={`material-symbols-outlined text-xl transition-transform duration-300 ${isActive ? 'scale-110' : 'group-hover:scale-105'}`}>

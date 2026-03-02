@@ -5,32 +5,60 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase';
 
-export default function LoginPage() {
+export default function CadastroPage() {
     const router = useRouter();
     const supabase = createClient();
 
+    const [name, setName] = useState('');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState<string | null>(null);
     const [isLoading, setIsLoading] = useState(false);
     const [showPassword, setShowPassword] = useState(false);
+    const [successMsg, setSuccessMsg] = useState<string | null>(null);
 
-    const handleLogin = async (e: React.FormEvent) => {
+    const handleSignup = async (e: React.FormEvent) => {
         e.preventDefault();
         setError(null);
+        setSuccessMsg(null);
         setIsLoading(true);
 
-        const { error: authError } = await supabase.auth.signInWithPassword({
+        // 1. Criar o usuário no Supabase Auth
+        const { data: authData, error: authError } = await supabase.auth.signUp({
             email,
             password,
+            options: {
+                data: {
+                    full_name: name
+                }
+            }
         });
 
         if (authError) {
-            setError('Credenciais inválidas. Verifique seu e-mail e senha.');
+            // Handle rate limit specific error
+            if (authError.message.includes('rate limit')) {
+                setError('Limite de tentativas excedido no Supabase. Como você já tentou várias vezes, sua conta já deve ter sido criada. Tente fazer o login com esta mesma senha.');
+            } else {
+                setError(authError.message || 'Erro ao criar conta. Tente novamente.');
+            }
+            setIsLoading(false);
+            return;
+        }
+
+        // Verifica se a confirmação de e-mail é necessária
+        if (authData.user && authData.user.identities && authData.user.identities.length === 0) {
+            setError('Este e-mail já está em uso ou é inválido.');
+            setIsLoading(false);
+            return;
+        }
+
+        if (authData.session === null) {
+            // Conta criada, mas precisa confirmar email
+            setSuccessMsg('Conta criada! Por favor, verifique a caixa de entrada do seu e-mail para confirmar seu cadastro antes de continuar.');
             setIsLoading(false);
         } else {
-            // Força recarregamento pelo router para atualizar o middleware adequadamente
-            window.location.href = '/';
+            // Conta criada e sessão iniciada, redireciona para onboarding
+            router.push('/onboarding');
         }
     };
 
@@ -62,11 +90,11 @@ export default function LoginPage() {
                 {/* Central Card */}
                 <main className="w-full max-w-[480px]">
                     <div className="bg-[#120f23]/60 backdrop-blur-md rounded-[2rem] p-10 shadow-2xl border border-primary/20">
-                        <h1 className="text-white font-serif italic text-[40px] leading-tight text-center mb-10">
-                            Bem-vindo ao sistema.
+                        <h1 className="text-white font-serif italic text-[36px] leading-tight text-center mb-10">
+                            Crie sua conta.
                         </h1>
 
-                        <form className="space-y-6" onSubmit={handleLogin}>
+                        <form className="space-y-6" onSubmit={handleSignup}>
                             {error && (
                                 <div className="bg-rose-500/10 border border-rose-500/30 rounded-xl p-4 flex items-start gap-3">
                                     <span className="material-symbols-outlined text-rose-400 shrink-0 mt-0.5" style={{ fontSize: '20px' }}>error</span>
@@ -75,6 +103,33 @@ export default function LoginPage() {
                                     </p>
                                 </div>
                             )}
+
+                            {successMsg && (
+                                <div className="bg-emerald-500/10 border border-emerald-500/30 rounded-xl p-4 flex items-start gap-3">
+                                    <span className="material-symbols-outlined text-emerald-400 shrink-0 mt-0.5" style={{ fontSize: '20px' }}>check_circle</span>
+                                    <p className="text-xs text-emerald-300 font-medium leading-relaxed">
+                                        {successMsg}
+                                    </p>
+                                </div>
+                            )}
+
+                            {/* Name Field */}
+                            <div className="relative group">
+                                <label className="block font-sora text-sm font-medium text-slate-400 mb-2 transition-colors group-focus-within:text-primary" htmlFor="name">
+                                    Nome Completo
+                                </label>
+                                <input
+                                    className="w-full bg-slate-900/50 border border-slate-700/50 focus:border-primary focus:ring-1 focus:ring-primary/20 rounded-xl px-5 py-4 text-white font-sora placeholder:text-slate-600 transition-all outline-none"
+                                    id="name"
+                                    name="name"
+                                    placeholder="João da Silva"
+                                    type="text"
+                                    value={name}
+                                    onChange={(e) => setName(e.target.value)}
+                                    required
+                                    disabled={isLoading}
+                                />
+                            </div>
 
                             {/* Email Field */}
                             <div className="relative group">
@@ -96,14 +151,9 @@ export default function LoginPage() {
 
                             {/* Password Field */}
                             <div className="relative group">
-                                <div className="flex justify-between items-center mb-2">
-                                    <label className="block font-sora text-sm font-medium text-slate-400 transition-colors group-focus-within:text-primary" htmlFor="password">
-                                        Senha
-                                    </label>
-                                    <a className="text-xs font-sora text-slate-500 hover:text-slate-200 transition-colors hover:underline underline-offset-4" href="#">
-                                        Esqueci minha senha
-                                    </a>
-                                </div>
+                                <label className="block font-sora text-sm font-medium text-slate-400 mb-2 transition-colors group-focus-within:text-primary" htmlFor="password">
+                                    Senha
+                                </label>
                                 <div className="relative flex items-center">
                                     <input
                                         className="w-full bg-slate-900/50 border border-slate-700/50 focus:border-primary focus:ring-1 focus:ring-primary/20 rounded-xl px-5 py-4 text-white font-mono placeholder:text-slate-600 transition-all outline-none"
@@ -114,6 +164,7 @@ export default function LoginPage() {
                                         value={password}
                                         onChange={(e) => setPassword(e.target.value)}
                                         required
+                                        minLength={6}
                                         disabled={isLoading}
                                     />
                                     <button
@@ -128,7 +179,7 @@ export default function LoginPage() {
                                 </div>
                             </div>
 
-                            {/* Login Button */}
+                            {/* Signup Button */}
                             <div className="pt-4">
                                 <button
                                     type="submit"
@@ -136,7 +187,7 @@ export default function LoginPage() {
                                     className={`w-full font-sora font-bold text-lg py-5 rounded-full shadow-[0_0_20px_rgba(123,97,255,0.3)] transition-all flex items-center justify-center ${isLoading ? 'bg-primary/50 text-white/50 cursor-not-allowed' : 'bg-primary hover:bg-primary/90 text-white hover:scale-[1.02] active:scale-[0.98]'
                                         }`}
                                 >
-                                    {isLoading ? 'Autenticando...' : 'Entrar'}
+                                    {isLoading ? 'Cadastrando...' : 'Criar Conta'}
                                 </button>
                             </div>
                         </form>
@@ -144,9 +195,9 @@ export default function LoginPage() {
                         {/* Footer Links */}
                         <div className="mt-10 text-center">
                             <p className="font-sora text-slate-400 text-sm">
-                                Novo por aqui?
-                                <Link className="text-slate-200 font-semibold hover:underline underline-offset-4 transition-all ml-1" href="/cadastro">
-                                    Criar conta
+                                Já tem uma conta?
+                                <Link className="text-slate-200 font-semibold hover:underline underline-offset-4 transition-all ml-1" href="/login">
+                                    Fazer login
                                 </Link>
                             </p>
                         </div>

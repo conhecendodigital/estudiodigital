@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import AdminSidebar from '@/components/AdminSidebar';
 
 /* ── Types ── */
@@ -21,81 +21,10 @@ interface Subscriber {
     startDate: string;
 }
 
-/* ── Mock Data ── */
-const subscribers: Subscriber[] = [
-    {
-        id: 'SUB-001',
-        name: 'João Pereira',
-        email: 'joao.pereira@email.com',
-        initials: 'JP',
-        gradient: 'from-primary to-purple-600',
-        avatar: null,
-        plan: 'Anual Premium',
-        planType: 'Anual',
-        monthlyValue: 'R$ 83,08',
-        status: 'Ativo',
-        startDate: '12 Jan 2025',
-    },
-    {
-        id: 'SUB-002',
-        name: 'Carla Mendes',
-        email: 'carla.mendes@email.com',
-        initials: 'CM',
-        gradient: 'from-rose-500 to-pink-600',
-        avatar: 'https://i.pravatar.cc/150?img=47',
-        plan: 'Mensal Básico',
-        planType: 'Mensal',
-        monthlyValue: 'R$ 97,00',
-        status: 'Cancelado',
-        startDate: '03 Mar 2025',
-    },
-    {
-        id: 'SUB-003',
-        name: 'Roberto Silva',
-        email: 'roberto.silva@email.com',
-        initials: 'RS',
-        gradient: 'from-amber-500 to-orange-600',
-        avatar: null,
-        plan: 'Mensal Pro',
-        planType: 'Mensal',
-        monthlyValue: 'R$ 197,00',
-        status: 'Inadimplente',
-        startDate: '18 Nov 2024',
-    },
-    {
-        id: 'SUB-004',
-        name: 'Ana Lúcia Ferreira',
-        email: 'ana.lucia@email.com',
-        initials: 'AL',
-        gradient: 'from-emerald-500 to-teal-600',
-        avatar: 'https://i.pravatar.cc/150?img=32',
-        plan: 'Anual VIP',
-        planType: 'Anual',
-        monthlyValue: 'R$ 166,42',
-        status: 'Ativo',
-        startDate: '27 Jun 2024',
-    },
-    {
-        id: 'SUB-005',
-        name: 'Fernando Costa',
-        email: 'fernando.costa@email.com',
-        initials: 'FC',
-        gradient: 'from-blue-500 to-cyan-600',
-        avatar: null,
-        plan: 'Mensal Pro',
-        planType: 'Mensal',
-        monthlyValue: 'R$ 197,00',
-        status: 'Ativo',
-        startDate: '05 Fev 2026',
-    },
-];
-
-/* ── KPI summary data ── */
-const kpis = [
-    { label: 'Total Assinantes', value: '1.204', icon: 'group', iconBg: 'bg-primary/20', iconColor: 'text-primary' },
-    { label: 'Ativos', value: '1.089', icon: 'check_circle', iconBg: 'bg-emerald-500/20', iconColor: 'text-emerald-400' },
-    { label: 'Inadimplentes', value: '74', icon: 'warning', iconBg: 'bg-yellow-500/20', iconColor: 'text-yellow-400' },
-    { label: 'Cancelados', value: '41', icon: 'cancel', iconBg: 'bg-rose-500/20', iconColor: 'text-rose-400' },
+const clientGradients = [
+    'from-primary to-purple-600', 'from-rose-500 to-pink-600',
+    'from-amber-500 to-orange-600', 'from-emerald-500 to-teal-600',
+    'from-blue-500 to-cyan-600', 'from-violet-500 to-fuchsia-600',
 ];
 
 /* ── Status Badge ── */
@@ -118,11 +47,10 @@ function StatusBadge({ status }: { status: SubscriberStatus }) {
 function PlanBadge({ plan }: { plan: string }) {
     const isAnual = plan.toLowerCase().includes('anual');
     return (
-        <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-semibold border ${
-            isAnual
-                ? 'bg-primary/10 text-primary border-primary/20'
-                : 'bg-white/5 text-slate-300 border-white/10'
-        }`}>
+        <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-semibold border ${isAnual
+            ? 'bg-primary/10 text-primary border-primary/20'
+            : 'bg-white/5 text-slate-300 border-white/10'
+            }`}>
             <span className="material-symbols-outlined text-[14px]">
                 {isAnual ? 'workspace_premium' : 'calendar_today'}
             </span>
@@ -151,11 +79,10 @@ function FilterDropdown({
         <div className="relative">
             <button
                 onClick={() => setOpen(!open)}
-                className={`flex items-center gap-2 px-4 py-3 rounded-xl text-sm font-semibold transition-all duration-300 border ${
-                    value
-                        ? 'bg-primary/10 border-primary/30 text-primary'
-                        : 'bg-white/5 border-white/10 text-slate-300 hover:bg-white/10 hover:text-white'
-                }`}
+                className={`flex items-center gap-2 px-4 py-3 rounded-xl text-sm font-semibold transition-all duration-300 border ${value
+                    ? 'bg-primary/10 border-primary/30 text-primary'
+                    : 'bg-white/5 border-white/10 text-slate-300 hover:bg-white/10 hover:text-white'
+                    }`}
             >
                 <span className="material-symbols-outlined text-lg">{icon}</span>
                 {value || label}
@@ -170,9 +97,8 @@ function FilterDropdown({
                     <div className="absolute top-full left-0 mt-2 w-48 bg-[#1a1a2e]/95 backdrop-blur-xl border border-white/10 rounded-xl shadow-2xl z-40 overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200">
                         <button
                             onClick={() => { onChange(''); setOpen(false); }}
-                            className={`w-full text-left px-4 py-3 text-sm transition-colors ${
-                                !value ? 'text-primary bg-primary/10 font-semibold' : 'text-slate-300 hover:bg-white/5 hover:text-white'
-                            }`}
+                            className={`w-full text-left px-4 py-3 text-sm transition-colors ${!value ? 'text-primary bg-primary/10 font-semibold' : 'text-slate-300 hover:bg-white/5 hover:text-white'
+                                }`}
                         >
                             Todos
                         </button>
@@ -180,9 +106,8 @@ function FilterDropdown({
                             <button
                                 key={opt.value}
                                 onClick={() => { onChange(opt.value); setOpen(false); }}
-                                className={`w-full text-left px-4 py-3 text-sm transition-colors border-t border-white/5 ${
-                                    value === opt.value ? 'text-primary bg-primary/10 font-semibold' : 'text-slate-300 hover:bg-white/5 hover:text-white'
-                                }`}
+                                className={`w-full text-left px-4 py-3 text-sm transition-colors border-t border-white/5 ${value === opt.value ? 'text-primary bg-primary/10 font-semibold' : 'text-slate-300 hover:bg-white/5 hover:text-white'
+                                    }`}
                             >
                                 {opt.label}
                             </button>
@@ -198,11 +123,61 @@ function FilterDropdown({
    ASSINANTES PAGE
    ═══════════════════════════════════════════ */
 export default function AssinantesPage() {
+    const [subscribers, setSubscribers] = useState<Subscriber[]>([]);
+    const [kpis, setKpis] = useState([
+        { label: 'Total Assinantes', value: '...', icon: 'group', iconBg: 'bg-primary/20', iconColor: 'text-primary' },
+        { label: 'Ativos', value: '...', icon: 'check_circle', iconBg: 'bg-emerald-500/20', iconColor: 'text-emerald-400' },
+        { label: 'Inadimplentes', value: '...', icon: 'warning', iconBg: 'bg-yellow-500/20', iconColor: 'text-yellow-400' },
+        { label: 'Cancelados', value: '...', icon: 'cancel', iconBg: 'bg-rose-500/20', iconColor: 'text-rose-400' },
+    ]);
     const [search, setSearch] = useState('');
     const [statusFilter, setStatusFilter] = useState('');
     const [planFilter, setPlanFilter] = useState('');
     const [currentPage, setCurrentPage] = useState(1);
+    const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+    const [editingSub, setEditingSub] = useState<Subscriber | null>(null);
     const perPage = 5;
+
+    useEffect(() => {
+        fetch('/api/admin/clientes')
+            .then((r) => r.json())
+            .then((data) => {
+                if (data.clients) {
+                    const mapped: Subscriber[] = data.clients.map((c: Record<string, unknown>, i: number) => {
+                        const subs = (c.subscriptions as Array<Record<string, unknown>>) || [];
+                        const activeSub = subs[0] || {} as Record<string, unknown>;
+                        const plan = activeSub.plans as Record<string, string> | null;
+                        const name = (c.full_name as string) || 'Usu\u00e1rio';
+                        const statusRaw = (activeSub.status as string) || 'ativo';
+                        const statusMap: Record<string, SubscriberStatus> = { ativo: 'Ativo', cancelado: 'Cancelado', inadimplente: 'Inadimplente' };
+                        return {
+                            id: (c.id as string)?.slice(0, 8) || `SUB-${i}`,
+                            name,
+                            email: (c.email as string) || '',
+                            initials: name.split(' ').map((w: string) => w[0]).join('').slice(0, 2).toUpperCase(),
+                            gradient: clientGradients[i % clientGradients.length],
+                            avatar: (c.avatar_url as string) || null,
+                            plan: plan?.name || (activeSub.plan_type as string) || 'Plano',
+                            planType: ((activeSub.plan_type as string) || '').includes('anual') ? 'Anual' as PlanType : 'Mensal' as PlanType,
+                            monthlyValue: `R$ ${Number(activeSub.monthly_value || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`,
+                            status: statusMap[statusRaw] || 'Ativo',
+                            startDate: activeSub.start_date ? new Date(activeSub.start_date as string).toLocaleDateString('pt-BR') : '\u2014',
+                        };
+                    });
+                    setSubscribers(mapped);
+                }
+                if (data.kpis) {
+                    const k = data.kpis;
+                    setKpis([
+                        { label: 'Total Assinantes', value: String(k.total), icon: 'group', iconBg: 'bg-primary/20', iconColor: 'text-primary' },
+                        { label: 'Ativos', value: String(k.ativos), icon: 'check_circle', iconBg: 'bg-emerald-500/20', iconColor: 'text-emerald-400' },
+                        { label: 'Inadimplentes', value: String(k.inadimplentes), icon: 'warning', iconBg: 'bg-yellow-500/20', iconColor: 'text-yellow-400' },
+                        { label: 'Cancelados', value: String(k.cancelados), icon: 'cancel', iconBg: 'bg-rose-500/20', iconColor: 'text-rose-400' },
+                    ]);
+                }
+            })
+            .catch(() => { });
+    }, []);
 
     /* ── Filtered Data ── */
     const filtered = useMemo(() => {
@@ -224,6 +199,42 @@ export default function AssinantesPage() {
     const paginated = filtered.slice((currentPage - 1) * perPage, currentPage * perPage);
 
     const activeFilters = [statusFilter, planFilter].filter(Boolean).length;
+
+    /* ── Actions ── */
+    const handleToggleStatus = async (sub: Subscriber) => {
+        const newStatus = sub.status === 'Ativo' ? 'cancelado' : 'ativo';
+        if (!confirm(`Deseja alterar o status de ${sub.name} para ${newStatus}?`)) return;
+
+        try {
+            const res = await fetch('/api/admin/clientes', {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ id: sub.id, action: 'update_status', status: newStatus })
+            });
+            if (res.ok) {
+                setSubscribers(prev => prev.map(s => s.id === sub.id ? { ...s, status: newStatus === 'ativo' ? 'Ativo' : 'Cancelado' } : s));
+            } else {
+                alert("Erro ao atualizar status do cliente.");
+            }
+        } catch (error) {
+            console.error(error);
+        }
+    };
+
+    const handleDelete = async (sub: Subscriber) => {
+        if (!confirm(`TEM CERTEZA ABSOLUTA que deseja excluir a conta de ${sub.name} permanentemente? Isso não pode ser desfeito.`)) return;
+
+        try {
+            const res = await fetch(`/api/admin/clientes?id=${sub.id}`, { method: 'DELETE' });
+            if (res.ok) {
+                setSubscribers(prev => prev.filter(s => s.id !== sub.id));
+            } else {
+                alert("Erro ao excluir cliente.");
+            }
+        } catch (error) {
+            console.error(error);
+        }
+    };
 
     return (
         <div className="flex min-h-screen bg-background-dark font-display text-slate-100">
@@ -405,12 +416,23 @@ export default function AssinantesPage() {
                                             <td className="px-6 py-4 text-right">
                                                 <div className="flex items-center justify-end gap-1">
                                                     <button
+                                                        onClick={() => { setEditingSub(sub); setIsEditModalOpen(true); }}
                                                         className="text-slate-500 hover:text-primary hover:bg-primary/10 p-2 rounded-lg transition-all duration-300"
-                                                        title="Editar assinante"
+                                                        title="Ver / Editar assinante"
                                                     >
                                                         <span className="material-symbols-outlined text-[18px]">edit</span>
                                                     </button>
                                                     <button
+                                                        onClick={() => handleToggleStatus(sub)}
+                                                        className="text-slate-500 hover:text-amber-400 hover:bg-amber-500/10 p-2 rounded-lg transition-all duration-300"
+                                                        title={sub.status === 'Ativo' ? "Pausar Assinatura" : "Reativar Assinatura"}
+                                                    >
+                                                        <span className="material-symbols-outlined text-[18px]">
+                                                            {sub.status === 'Ativo' ? 'pause_circle' : 'play_circle'}
+                                                        </span>
+                                                    </button>
+                                                    <button
+                                                        onClick={() => handleDelete(sub)}
                                                         className="text-slate-500 hover:text-rose-400 hover:bg-rose-500/10 p-2 rounded-lg transition-all duration-300"
                                                         title="Excluir assinante"
                                                     >
@@ -449,11 +471,10 @@ export default function AssinantesPage() {
                                 <button
                                     onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
                                     disabled={currentPage === 1}
-                                    className={`flex items-center gap-1.5 px-4 py-2 rounded-xl text-sm font-semibold transition-all duration-300 border ${
-                                        currentPage === 1
-                                            ? 'bg-white/[0.02] border-white/5 text-slate-600 cursor-not-allowed'
-                                            : 'bg-white/5 border-white/10 text-slate-300 hover:bg-white/10 hover:text-white'
-                                    }`}
+                                    className={`flex items-center gap-1.5 px-4 py-2 rounded-xl text-sm font-semibold transition-all duration-300 border ${currentPage === 1
+                                        ? 'bg-white/[0.02] border-white/5 text-slate-600 cursor-not-allowed'
+                                        : 'bg-white/5 border-white/10 text-slate-300 hover:bg-white/10 hover:text-white'
+                                        }`}
                                 >
                                     <span className="material-symbols-outlined text-[18px]">chevron_left</span>
                                     Anterior
@@ -465,11 +486,10 @@ export default function AssinantesPage() {
                                         <button
                                             key={page}
                                             onClick={() => setCurrentPage(page)}
-                                            className={`size-9 rounded-lg text-sm font-semibold transition-all duration-300 ${
-                                                page === currentPage
-                                                    ? 'bg-primary text-white shadow-[0_0_12px_rgba(123,97,255,0.4)]'
-                                                    : 'text-slate-400 hover:bg-white/10 hover:text-white'
-                                            }`}
+                                            className={`size-9 rounded-lg text-sm font-semibold transition-all duration-300 ${page === currentPage
+                                                ? 'bg-primary text-white shadow-[0_0_12px_rgba(123,97,255,0.4)]'
+                                                : 'text-slate-400 hover:bg-white/10 hover:text-white'
+                                                }`}
                                         >
                                             {page}
                                         </button>
@@ -479,11 +499,10 @@ export default function AssinantesPage() {
                                 <button
                                     onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
                                     disabled={currentPage === totalPages}
-                                    className={`flex items-center gap-1.5 px-4 py-2 rounded-xl text-sm font-semibold transition-all duration-300 border ${
-                                        currentPage === totalPages
-                                            ? 'bg-white/[0.02] border-white/5 text-slate-600 cursor-not-allowed'
-                                            : 'bg-white/5 border-white/10 text-slate-300 hover:bg-white/10 hover:text-white'
-                                    }`}
+                                    className={`flex items-center gap-1.5 px-4 py-2 rounded-xl text-sm font-semibold transition-all duration-300 border ${currentPage === totalPages
+                                        ? 'bg-white/[0.02] border-white/5 text-slate-600 cursor-not-allowed'
+                                        : 'bg-white/5 border-white/10 text-slate-300 hover:bg-white/10 hover:text-white'
+                                        }`}
                                 >
                                     Próxima
                                     <span className="material-symbols-outlined text-[18px]">chevron_right</span>
@@ -492,6 +511,70 @@ export default function AssinantesPage() {
                         </div>
                     )}
                 </div>
+
+                {/* MODAL VER / EDITAR */}
+                {isEditModalOpen && editingSub && (
+                    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+                        <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setIsEditModalOpen(false)}></div>
+                        <div className="bg-background-dark border border-white/10 rounded-2xl w-full max-w-md relative z-10 p-6 md:p-8 shadow-2xl">
+                            <div className="flex justify-between items-start mb-6">
+                                <div className="flex items-center gap-4">
+                                    {editingSub.avatar ? (
+                                        <img src={editingSub.avatar} alt="Avatar" className="size-14 rounded-full border border-white/10 object-cover" />
+                                    ) : (
+                                        <div className={`size-14 rounded-full bg-gradient-to-tr ${editingSub.gradient} flex items-center justify-center font-bold text-white text-lg border border-white/10 shadow-lg`}>
+                                            {editingSub.initials}
+                                        </div>
+                                    )}
+                                    <div>
+                                        <h3 className="text-xl font-sora font-bold text-white leading-tight">{editingSub.name}</h3>
+                                        <p className="text-sm text-slate-400">{editingSub.email}</p>
+                                    </div>
+                                </div>
+                                <button onClick={() => setIsEditModalOpen(false)} className="text-slate-500 hover:text-white transition-colors">
+                                    <span className="material-symbols-outlined">close</span>
+                                </button>
+                            </div>
+
+                            <div className="space-y-4">
+                                <div>
+                                    <label className="block text-xs font-bold text-slate-500 uppercase tracking-widest mb-1">ID Único</label>
+                                    <p className="font-mono text-slate-300 text-sm">{editingSub.id}</p>
+                                </div>
+
+                                <div className="grid grid-cols-2 gap-4 bg-white/5 border border-white/5 rounded-xl p-4">
+                                    <div>
+                                        <label className="block text-xs font-bold text-slate-500 uppercase tracking-widest mb-1">Status Atual</label>
+                                        <StatusBadge status={editingSub.status} />
+                                    </div>
+                                    <div>
+                                        <label className="block text-xs font-bold text-slate-500 uppercase tracking-widest mb-1">Data de Início</label>
+                                        <p className="text-white font-medium text-sm">{editingSub.startDate}</p>
+                                    </div>
+                                    <div>
+                                        <label className="block text-xs font-bold text-slate-500 uppercase tracking-widest mb-1">Plano Base</label>
+                                        <PlanBadge plan={editingSub.plan} />
+                                    </div>
+                                    <div>
+                                        <label className="block text-xs font-bold text-slate-500 uppercase tracking-widest mb-1">Cobrança</label>
+                                        <p className="text-white font-mono font-bold text-sm">{editingSub.monthlyValue}</p>
+                                    </div>
+                                </div>
+
+                                <p className="text-xs text-rose-400 mt-4 leading-relaxed bg-rose-500/10 p-3 rounded-lg border border-rose-500/20">
+                                    <span className="font-bold uppercase block mb-1">Nota Administrativa</span>
+                                    Edições de valores de cobrança, email ou migrações de plano complexas devem ser realizadas diretamente no dashboard do provedor de pagamento (Stripe/MercadoPago).
+                                </p>
+                            </div>
+
+                            <div className="mt-8 pt-6 border-t border-white/10 flex justify-end">
+                                <button onClick={() => setIsEditModalOpen(false)} className="bg-white/10 hover:bg-white/20 text-white px-6 py-2.5 rounded-xl text-sm font-bold transition-all">
+                                    Fechar Aba
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                )}
 
             </main>
         </div>

@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useRef, useEffect } from 'react';
+import { useParams } from 'next/navigation';
 import AdminSidebar from '@/components/AdminSidebar';
 
 /* ── AI Provider & Model Definitions ── */
@@ -90,6 +91,7 @@ interface UploadedFile {
     name: string;
     size: string;
     type: string;
+    file?: File;
 }
 
 /* ── Chat Message Type ── */
@@ -132,6 +134,35 @@ export default function EditarAgentePage() {
     const fileUploadRef = useRef<HTMLInputElement>(null);
     const chatEndRef = useRef<HTMLDivElement>(null);
     const modelDropdownRef = useRef<HTMLDivElement>(null);
+    const params = useParams();
+    const agentId = params?.id as string;
+
+    /* ── Load agent data from API ── */
+    useEffect(() => {
+        if (!agentId) return;
+        fetch(`/api/admin/agentes/${agentId}`)
+            .then((r) => r.json())
+            .then((data) => {
+                if (data.agent) {
+                    const a = data.agent;
+                    if (a.name) setAgentName(a.name);
+                    if (a.description) setDescription(a.description);
+                    if (a.category) setCategory(a.category);
+                    if (a.ai_model) setSelectedModel(a.ai_model);
+                    if (a.system_prompt) setSystemPrompt(a.system_prompt);
+                    if (a.avatar_url) setAvatarName(a.avatar_url);
+                    if (a.files && Array.isArray(a.files)) {
+                        setFiles(a.files.map((f: Record<string, string>) => ({
+                            id: f.id || Date.now().toString(),
+                            name: f.file_name || f.name,
+                            size: f.file_size ? `${(Number(f.file_size) / 1024).toFixed(0)} KB` : '—',
+                            type: (f.file_name || f.name || '').split('.').pop()?.toUpperCase() || 'FILE',
+                        })));
+                    }
+                }
+            })
+            .catch(() => { });
+    }, [agentId]);
 
     /* ── Click outside to close dropdown ── */
     useEffect(() => {
@@ -149,8 +180,19 @@ export default function EditarAgentePage() {
         if (e.target.files?.[0]) setAvatarName(e.target.files[0].name);
     };
 
-    const handleRemoveFile = (id: string) => {
+    const handleRemoveFile = async (id: string) => {
+        const fileToRemove = files.find(f => f.id === id);
         setFiles((prev) => prev.filter((f) => f.id !== id));
+
+        if (fileToRemove && !fileToRemove.file) {
+            try {
+                await fetch(`/api/admin/agentes/${agentId}/files?fileId=${id}`, {
+                    method: 'DELETE'
+                });
+            } catch (err) {
+                console.error("Erro ao deletar arquivo", err);
+            }
+        }
     };
 
     const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -158,38 +200,82 @@ export default function EditarAgentePage() {
             const f = e.target.files[0];
             setFiles((prev) => [
                 ...prev,
-                { id: Date.now().toString(), name: f.name, size: `${(f.size / 1024).toFixed(0)} KB`, type: f.name.split('.').pop()?.toUpperCase() || 'FILE' },
+                { id: Date.now().toString(), name: f.name, size: `${(f.size / 1024).toFixed(0)} KB`, type: f.name.split('.').pop()?.toUpperCase() || 'FILE', file: f },
             ]);
         }
     };
 
-    const handleSave = () => {
+    const handleSave = async () => {
         setSaving(true);
-        setTimeout(() => {
-            setSaving(false);
-            setSaved(true);
-            setTimeout(() => setSaved(false), 3000);
-        }, 1500);
+        const provider = aiProviders.find((p) => p.models.some((m) => m.id === selectedModel));
+        try {
+            const res = await fetch(`/api/admin/agentes/${agentId}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    name: agentName,
+                    description,
+                    category,
+                    ai_provider: provider?.id || 'openai',
+                    ai_model: selectedModel,
+                    system_prompt: systemPrompt,
+                }),
+            });
+            if (res.ok) {
+                const newFiles = files.filter(f => f.file);
+                if (newFiles.length > 0) {
+                    const uploadPromises = newFiles.map(async (fileObj) => {
+                        if (!fileObj.file) return;
+                        const formData = new FormData();
+                        formData.append('file', fileObj.file);
+
+                        await fetch(`/api/admin/agentes/${agentId}/files`, {
+                            method: 'POST',
+                            body: formData,
+                        });
+                    });
+                    await Promise.allSettled(uploadPromises);
+                }
+
+                setSaved(true);
+                setTimeout(() => setSaved(false), 3000);
+            }
+        } catch { /* ignore */ }
+        setSaving(false);
     };
 
-    const handleSendMessage = () => {
+    const handleSendMessage = async () => {
         if (!chatInput.trim()) return;
         const userMsg = chatInput.trim();
-        setChatMessages((prev) => [...prev, { role: 'user', content: userMsg }]);
+        const newMessages = [...chatMessages, { role: 'user' as const, content: userMsg }];
+
+        setChatMessages(newMessages);
         setChatInput('');
         setIsTyping(true);
 
-        setTimeout(() => {
-            setChatMessages((prev) => [
-                ...prev,
-                {
-                    role: 'assistant',
-                    content: `Recebi sua mensagem: "${userMsg}". Como ${agentName}, posso ajudar com roteiros, ganchos e copies para Reels. O system prompt e a base de conhecimento ainda precisam ser conectados ao backend para respostas reais.`,
-                },
-            ]);
+        try {
+            const res = await fetch('/api/admin/agentes/preview', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    messages: newMessages,
+                    system_prompt: systemPrompt || 'Você é um assistente útil e amigável.',
+                    model: selectedModel
+                })
+            });
+
+            if (res.ok) {
+                const data = await res.json();
+                setChatMessages(prev => [...prev, { role: 'assistant', content: data.response }]);
+            } else {
+                setChatMessages(prev => [...prev, { role: 'assistant', content: 'Desculpe, ocorreu um erro ao se conectar com a inteligência artificial para este preview.' }]);
+            }
+        } catch (error) {
+            setChatMessages(prev => [...prev, { role: 'assistant', content: 'Desculpe, ocorreu um erro de conexão.' }]);
+        } finally {
             setIsTyping(false);
             chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-        }, 1200);
+        }
     };
 
     const handleChatKeyDown = (e: React.KeyboardEvent) => {
@@ -334,8 +420,8 @@ export default function EditarAgentePage() {
                                 <button
                                     onClick={() => setModelDropdownOpen(!modelDropdownOpen)}
                                     className={`w-full bg-black/40 border rounded-xl px-4 py-3 flex items-center gap-3 transition-all duration-300 text-left group ${modelDropdownOpen
-                                            ? 'border-primary ring-1 ring-primary'
-                                            : 'border-white/10 hover:border-white/20'
+                                        ? 'border-primary ring-1 ring-primary'
+                                        : 'border-white/10 hover:border-white/20'
                                         }`}
                                 >
                                     {selectedModelInfo ? (
@@ -379,8 +465,8 @@ export default function EditarAgentePage() {
                                                                 key={model.id}
                                                                 onClick={() => { setSelectedModel(model.id); setModelDropdownOpen(false); }}
                                                                 className={`w-full text-left px-4 py-2.5 pl-11 flex items-center justify-between transition-all duration-200 ${isSelected
-                                                                        ? 'bg-primary/10 text-primary'
-                                                                        : 'text-slate-300 hover:bg-white/5 hover:text-white'
+                                                                    ? 'bg-primary/10 text-primary'
+                                                                    : 'text-slate-300 hover:bg-white/5 hover:text-white'
                                                                     }`}
                                                             >
                                                                 <span className={`text-sm ${isSelected ? 'font-bold' : 'font-medium'}`}>{model.name}</span>
@@ -647,8 +733,9 @@ export default function EditarAgentePage() {
                                         <span className="material-symbols-outlined text-xl">send</span>
                                     </button>
                                 </div>
-                                <p className="text-[10px] text-slate-600 mt-2 text-center">
-                                    Este é um preview simulado. Conecte ao backend para respostas reais.
+                                <p className="text-[10px] text-emerald-500/80 mt-2 text-center flex items-center justify-center gap-1">
+                                    <span className="material-symbols-outlined text-[14px]">bolt</span>
+                                    Preview conectado à API do Gemini
                                 </p>
                             </div>
 

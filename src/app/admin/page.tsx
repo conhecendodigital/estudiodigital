@@ -1,73 +1,47 @@
 'use client';
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+import Link from 'next/link';
 import AdminSidebar from '@/components/AdminSidebar';
 
-/* ── Mock Data ── */
-const kpiData = [
-    {
-        label: 'Faturamento Mensal',
-        value: 'R$ 45.280',
-        change: '+12.5%',
-        trend: 'up' as const,
-        icon: 'payments',
-        iconBg: 'bg-emerald-500/20',
-        iconColor: 'text-emerald-400',
-        sparkline: [30, 42, 38, 55, 48, 70, 65, 80],
-        sparkColor: '#34d399',
-    },
-    {
-        label: 'Alunos Ativos',
-        value: '1.204',
-        change: '+48',
-        trend: 'up' as const,
-        icon: 'group',
-        iconBg: 'bg-primary/20',
-        iconColor: 'text-primary',
-        sparkline: [40, 44, 50, 52, 55, 60, 58, 64],
-        sparkColor: '#7b61ff',
-    },
-    {
-        label: 'Taxa de Churn',
-        value: '3.4%',
-        subtitle: '41 clientes',
-        change: '-2.1%',
-        trend: 'down' as const,
-        icon: 'person_off',
-        iconBg: 'bg-rose-500/20',
-        iconColor: 'text-rose-400',
-        sparkline: [60, 55, 50, 48, 52, 45, 42, 38],
-        sparkColor: '#f43f5e',
-    },
-    {
-        label: 'MRR Atual',
-        value: 'R$ 38.150',
-        change: '+5.2%',
-        trend: 'up' as const,
-        icon: 'attach_money',
-        iconBg: 'bg-blue-500/20',
-        iconColor: 'text-blue-400',
-        sparkline: [35, 40, 38, 45, 50, 48, 55, 60],
-        sparkColor: '#60a5fa',
-    },
-];
+/* ── Types ── */
+interface KPIItem {
+    label: string;
+    value: string;
+    change: string;
+    trend: 'up' | 'down';
+    icon: string;
+    iconBg: string;
+    iconColor: string;
+    sparkline: number[];
+    sparkColor: string;
+    subtitle?: string;
+}
 
-const barChartData = [
-    { month: 'Jan', revenue: 28000, students: 35 },
-    { month: 'Fev', revenue: 32000, students: 42 },
-    { month: 'Mar', revenue: 30000, students: 38 },
-    { month: 'Abr', revenue: 38000, students: 55 },
-    { month: 'Mai', revenue: 35000, students: 48 },
-    { month: 'Jun', revenue: 45280, students: 64 },
-];
+interface ActivityItem {
+    name: string;
+    email: string;
+    initials: string;
+    gradient: string;
+    status: string;
+    plan: string;
+    value: string;
+    time: string;
+    avatar: string | null;
+}
 
-const tableData = [
-    { name: 'João Pereira', email: 'joao.pereira@email.com', initials: 'JP', gradient: 'from-primary to-purple-600', status: 'Ativo', plan: 'Anual Premium', value: 'R$ 997,00', time: 'Há 2 min', avatar: null },
-    { name: 'Carla Mendes', email: 'carla.mendes@email.com', initials: 'CM', gradient: 'from-rose-500 to-pink-600', status: 'Cancelado', plan: 'Mensal Básico', value: 'R$ 97,00', time: 'Há 45 min', avatar: 'https://i.pravatar.cc/150?img=47' },
-    { name: 'Roberto Silva', email: 'roberto.silva@email.com', initials: 'RS', gradient: 'from-amber-500 to-orange-600', status: 'Inadimplente', plan: 'Mensal Pro', value: 'R$ 197,00', time: 'Há 2 horas', avatar: null },
-    { name: 'Ana Lúcia', email: 'ana.lucia@email.com', initials: 'AL', gradient: 'from-emerald-500 to-teal-600', status: 'Ativo', plan: 'Anual VIP', value: 'R$ 1.997,00', time: 'Há 5 horas', avatar: 'https://i.pravatar.cc/150?img=32' },
-    { name: 'Fernando Costa', email: 'fernando.costa@email.com', initials: 'FC', gradient: 'from-blue-500 to-cyan-600', status: 'Ativo', plan: 'Mensal Pro', value: 'R$ 197,00', time: 'Há 8 horas', avatar: null },
-    { name: 'Mariana Rocha', email: 'mariana.rocha@email.com', initials: 'MR', gradient: 'from-violet-500 to-fuchsia-600', status: 'Cancelado', plan: 'Anual Premium', value: 'R$ 997,00', time: 'Há 1 dia', avatar: 'https://i.pravatar.cc/150?img=5' },
+/* ── Defaults (visual fallback enquanto carrega) ── */
+const defaultSparklines = {
+    faturamento: [0, 0, 0, 0, 0, 0, 0, 0],
+    alunos: [0, 0, 0, 0, 0, 0, 0, 0],
+    churn: [0, 0, 0, 0, 0, 0, 0, 0],
+    mrr: [0, 0, 0, 0, 0, 0, 0, 0],
+};
+
+const gradients = [
+    'from-primary to-purple-600', 'from-rose-500 to-pink-600',
+    'from-amber-500 to-orange-600', 'from-emerald-500 to-teal-600',
+    'from-blue-500 to-cyan-600', 'from-violet-500 to-fuchsia-600',
 ];
 
 /* ── Helper: Sparkline SVG ── */
@@ -123,9 +97,63 @@ function StatusBadge({ status }: { status: string }) {
    ADMIN DASHBOARD PAGE
    ═══════════════════════════════════════════ */
 export default function AdminDashboard() {
-    const maxRevenue = Math.max(...barChartData.map(d => d.revenue));
-    const maxStudents = Math.max(...barChartData.map(d => d.students));
-    const retentionRate = 96.6;
+    const [kpiData, setKpiData] = useState<KPIItem[]>([
+        { label: 'Faturamento Mensal', value: '...', change: '—', trend: 'up', icon: 'payments', iconBg: 'bg-emerald-500/20', iconColor: 'text-emerald-400', sparkline: defaultSparklines.faturamento, sparkColor: '#34d399' },
+        { label: 'Alunos Ativos', value: '...', change: '—', trend: 'up', icon: 'group', iconBg: 'bg-primary/20', iconColor: 'text-primary', sparkline: defaultSparklines.alunos, sparkColor: '#7b61ff' },
+        { label: 'Taxa de Churn', value: '...', change: '—', trend: 'down', icon: 'person_off', iconBg: 'bg-rose-500/20', iconColor: 'text-rose-400', sparkline: defaultSparklines.churn, sparkColor: '#f43f5e' },
+        { label: 'MRR Atual', value: '...', change: '—', trend: 'up', icon: 'attach_money', iconBg: 'bg-blue-500/20', iconColor: 'text-blue-400', sparkline: defaultSparklines.mrr, sparkColor: '#60a5fa' },
+    ]);
+    const [tableData, setTableData] = useState<ActivityItem[]>([]);
+    const [chartData, setChartData] = useState<{ month: string, revenue: number, students: number }[]>([]);
+
+    const [originalKpis, setOriginalKpis] = useState<any>(null);
+
+    useEffect(() => {
+        fetch('/api/admin/dashboard')
+            .then((r) => r.json())
+            .then((data) => {
+                if (data.kpis) {
+                    const k = data.kpis;
+                    setOriginalKpis(k);
+                    const apiSparks = k.sparklines || defaultSparklines;
+                    setKpiData([
+                        { label: 'Faturamento Mensal', value: `R$ ${Number(k.faturamento_mensal).toLocaleString('pt-BR')}`, change: '+12.5%', trend: 'up', icon: 'payments', iconBg: 'bg-emerald-500/20', iconColor: 'text-emerald-400', sparkline: apiSparks.faturamento, sparkColor: '#34d399' },
+                        { label: 'Alunos Ativos', value: String(k.alunos_ativos).replace(/\B(?=(\d{3})+(?!\d))/g, '.'), change: `+${k.mensagens_hoje}`, trend: 'up', icon: 'group', iconBg: 'bg-primary/20', iconColor: 'text-primary', sparkline: apiSparks.alunos, sparkColor: '#7b61ff' },
+                        { label: 'Taxa de Churn', value: `${k.taxa_churn}%`, change: `-${k.taxa_churn}%`, trend: 'down', icon: 'person_off', iconBg: 'bg-rose-500/20', iconColor: 'text-rose-400', sparkline: apiSparks.churn, sparkColor: '#f43f5e' },
+                        { label: 'MRR Atual', value: `R$ ${Number(k.mrr).toLocaleString('pt-BR')}`, change: '+5.2%', trend: 'up', icon: 'attach_money', iconBg: 'bg-blue-500/20', iconColor: 'text-blue-400', sparkline: apiSparks.mrr, sparkColor: '#60a5fa' },
+                    ]);
+                    if (k.barChartData) {
+                        setChartData(k.barChartData);
+                    }
+                }
+                if (data.recent_activity) {
+                    const activity = data.recent_activity.map((item: Record<string, unknown>, i: number) => {
+                        const profile = item.profiles as Record<string, string> | null;
+                        const plan = item.plans as Record<string, string> | null;
+                        const name = profile?.full_name || 'Usuário';
+                        const initials = name.split(' ').map((w: string) => w[0]).join('').slice(0, 2).toUpperCase();
+                        return {
+                            name,
+                            email: profile?.email || '',
+                            initials,
+                            gradient: gradients[i % gradients.length],
+                            status: (item.status as string) === 'ativo' ? 'Ativo' : (item.status as string) === 'cancelado' ? 'Cancelado' : 'Inadimplente',
+                            plan: plan?.name || (item.plan_type as string) || 'Plano',
+                            value: `R$ ${Number(item.monthly_value || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`,
+                            time: new Date(item.created_at as string).toLocaleDateString('pt-BR'),
+                            avatar: profile?.avatar_url || null,
+                        };
+                    });
+                    setTableData(activity);
+                }
+            })
+            .catch(() => { });
+    }, []);
+
+    const maxRevenue = Math.max(...chartData.map(d => d.revenue), 1000); // minimum scale
+    const maxStudents = Math.max(...chartData.map(d => d.students), 10); // minimum scale
+    const retentionRate = originalKpis ? Math.max(0, 100 - (Number(originalKpis.taxa_churn) || 0)) : 100;
+
     const circumference = 2 * Math.PI * 40;
 
     return (
@@ -135,15 +163,25 @@ export default function AdminDashboard() {
             <main className="flex-1 ml-72 p-10 overflow-y-auto w-full relative">
 
                 {/* ─── 1. HEADER ─── */}
-                <header className="flex items-center justify-between mb-10 z-10 relative">
+                <header className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-10 z-10 relative">
                     <div>
                         <h1 className="text-4xl font-bold font-sora text-white tracking-tight">Visão Geral</h1>
                         <p className="text-slate-400 mt-2 text-sm">Acompanhe as métricas e o desempenho da sua plataforma em tempo real.</p>
                     </div>
-                    <button className="btn-magnetic bg-primary hover:bg-primary-dark text-white font-sora font-semibold px-6 py-3 rounded-xl flex items-center gap-2.5 transition-all shadow-[0_0_15px_rgba(123,97,255,0.3)] hover:shadow-[0_0_30px_rgba(123,97,255,0.5)] border border-white/10">
-                        <span className="material-symbols-outlined text-[20px]">download</span>
-                        Baixar Relatório Mensal
-                    </button>
+                    <div className="flex flex-wrap items-center gap-3">
+                        <Link href="/admin/custos" className="bg-white/5 hover:bg-white/10 text-white px-5 py-3 rounded-xl flex items-center gap-2.5 transition-all border border-white/10 text-sm font-semibold">
+                            <span className="material-symbols-outlined text-[18px]">trending_up</span>
+                            Custos de IA
+                        </Link>
+                        <Link href="/admin/faturamento" className="bg-white/5 hover:bg-white/10 text-white px-5 py-3 rounded-xl flex items-center gap-2.5 transition-all border border-white/10 text-sm font-semibold">
+                            <span className="material-symbols-outlined text-[18px]">receipt_long</span>
+                            Faturamento
+                        </Link>
+                        <button className="btn-magnetic bg-primary hover:bg-primary-dark text-white font-sora font-semibold px-6 py-3 rounded-xl flex items-center gap-2.5 transition-all shadow-[0_0_15px_rgba(123,97,255,0.3)] hover:shadow-[0_0_30px_rgba(123,97,255,0.5)] border border-white/10">
+                            <span className="material-symbols-outlined text-[20px]">download</span>
+                            Baixar Relatório Mensal
+                        </button>
+                    </div>
                 </header>
 
                 {/* ─── 2. KPI CARDS ─── */}
@@ -209,9 +247,11 @@ export default function AdminDashboard() {
                         <div className="relative w-full h-72">
                             {/* Y-Axis labels */}
                             <div className="absolute left-0 top-0 bottom-8 w-14 flex flex-col justify-between text-right pr-3 pointer-events-none">
-                                {['45k', '35k', '25k', '15k', '0'].map((label) => (
-                                    <span key={label} className="text-[10px] text-slate-500 font-mono">{label}</span>
-                                ))}
+                                <span className="text-[10px] text-slate-500 font-mono">{(maxRevenue / 1000).toFixed(0)}k</span>
+                                <span className="text-[10px] text-slate-500 font-mono">{((maxRevenue * 0.75) / 1000).toFixed(0)}k</span>
+                                <span className="text-[10px] text-slate-500 font-mono">{((maxRevenue * 0.5) / 1000).toFixed(0)}k</span>
+                                <span className="text-[10px] text-slate-500 font-mono">{((maxRevenue * 0.25) / 1000).toFixed(0)}k</span>
+                                <span className="text-[10px] text-slate-500 font-mono">0</span>
                             </div>
 
                             {/* Grid + Bars */}
@@ -226,26 +266,26 @@ export default function AdminDashboard() {
 
                                     {/* Bars */}
                                     <div className="w-full h-full flex items-end justify-around gap-2 relative z-10 pb-1">
-                                        {barChartData.map((d) => {
+                                        {chartData.map((d) => {
                                             const revH = (d.revenue / maxRevenue) * 100;
                                             const stuH = (d.students / maxStudents) * 100;
                                             return (
                                                 <div key={d.month} className="flex-1 flex items-end justify-center gap-1.5 h-full group/bar relative">
                                                     {/* Tooltip */}
                                                     <div className="absolute -top-16 left-1/2 -translate-x-1/2 opacity-0 group-hover/bar:opacity-100 transition-all duration-300 bg-background-dark/95 border border-white/10 px-3 py-2 rounded-lg text-[11px] whitespace-nowrap shadow-xl backdrop-blur-sm z-20 pointer-events-none">
-                                                        <p className="text-primary font-bold">R$ {(d.revenue / 1000).toFixed(0)}k</p>
+                                                        <p className="text-primary font-bold">R$ {(d.revenue / 1000).toFixed(1)}k</p>
                                                         <p className="text-emerald-400 font-bold">+{d.students} alunos</p>
                                                     </div>
 
                                                     {/* Revenue bar */}
                                                     <div
                                                         className="w-5 bg-gradient-to-t from-primary/60 to-primary rounded-t-md transition-all duration-500 cursor-pointer hover:from-primary/80 hover:to-primary-light hover:shadow-[0_0_12px_rgba(123,97,255,0.4)]"
-                                                        style={{ height: `${revH}%` }}
+                                                        style={{ height: `${Math.max(revH, 2)}%` }} /* min 2% visible height */
                                                     ></div>
                                                     {/* Students bar */}
                                                     <div
                                                         className="w-5 bg-gradient-to-t from-emerald-500/60 to-emerald-400 rounded-t-md transition-all duration-500 cursor-pointer hover:from-emerald-500/80 hover:to-emerald-300 hover:shadow-[0_0_12px_rgba(52,211,153,0.4)]"
-                                                        style={{ height: `${stuH}%` }}
+                                                        style={{ height: `${Math.max(stuH, 2)}%` }} /* min 2% visible height */
                                                     ></div>
                                                 </div>
                                             );
@@ -255,7 +295,7 @@ export default function AdminDashboard() {
 
                                 {/* X-Axis */}
                                 <div className="flex justify-around h-8 items-center">
-                                    {barChartData.map((d) => (
+                                    {chartData.map((d) => (
                                         <span key={d.month} className="text-[11px] text-slate-500 font-mono">{d.month}</span>
                                     ))}
                                 </div>
@@ -333,10 +373,10 @@ export default function AdminDashboard() {
                             </div>
                             <h3 className="text-lg font-bold font-sora text-white">Últimas Movimentações</h3>
                         </div>
-                        <button className="text-sm font-semibold text-primary hover:text-white transition-colors flex items-center gap-1.5 hover-lift">
+                        <Link href="/admin/faturamento" className="text-sm font-semibold text-primary hover:text-white transition-colors flex items-center gap-1.5 hover-lift">
                             Ver todas
                             <span className="material-symbols-outlined text-[16px]">arrow_forward</span>
-                        </button>
+                        </Link>
                     </div>
 
                     <div className="overflow-x-auto">

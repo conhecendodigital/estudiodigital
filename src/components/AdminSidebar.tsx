@@ -3,7 +3,7 @@
 import React from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { LayoutDashboard, Users, Receipt, Settings, LogOut, Plug, Bot, CreditCard } from 'lucide-react';
+import { LayoutDashboard, Users, Receipt, Settings, LogOut, Plug, Bot, CreditCard, Activity, TrendingUp } from 'lucide-react';
 
 export default function AdminSidebar() {
     const pathname = usePathname();
@@ -13,6 +13,8 @@ export default function AdminSidebar() {
         { href: '/admin/agentes/novo', icon: <Bot className="size-5" />, label: 'Criar Agente' },
         { href: '/admin/agentes', icon: <Users className="size-5" />, label: 'Gestão de Agentes' },
         { href: '/admin/integracoes', icon: <Plug className="size-5" />, label: 'Integrações IA' },
+        { href: '/admin/requisicoes', icon: <Activity className="size-5" />, label: 'Requisições API' },
+        { href: '/admin/custos', icon: <TrendingUp className="size-5" />, label: 'Monitor de Custos' },
         { href: '/admin/pagamentos', icon: <CreditCard className="size-5" />, label: 'Pagamentos' },
         { href: '/admin/clientes', icon: <Users className="size-5" />, label: 'Assinantes' },
         { href: '/admin/faturamento', icon: <Receipt className="size-5" />, label: 'Faturamento' },

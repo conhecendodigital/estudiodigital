@@ -1,15 +1,109 @@
 'use client';
 
-import React from 'react';
-import Sidebar from '@/components/Sidebar';
+import React, { useState, useEffect } from 'react';
+import AdminSidebar from '@/components/AdminSidebar';
+
+/* ── Types ── */
+interface UserRow {
+    id: string;
+    full_name: string;
+    email: string;
+    avatar_url?: string;
+    plan_name?: string;
+    plan_tier?: string;
+    credits_remaining?: number;
+    total_requests?: number;
+    status: string;
+    created_at: string;
+}
+
+const planBadge: Record<string, string> = {
+    pro: 'bg-primary text-white',
+    enterprise: 'bg-slate-100 text-background-dark',
+    starter: 'bg-white/10 text-slate-300',
+    free: 'bg-white/10 text-slate-300',
+};
 
 export default function GestaoUsuariosAdminPage() {
+    const [users, setUsers] = useState<UserRow[]>([]);
+    const [search, setSearch] = useState('');
+    const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+    const [editingUser, setEditingUser] = useState<UserRow | null>(null);
+
+    useEffect(() => {
+        const params = new URLSearchParams();
+        if (search) params.set('search', search);
+        fetch(`/api/admin/clientes?${params.toString()}`)
+            .then((r) => r.json())
+            .then((data) => {
+                if (data.clients) {
+                    setUsers(
+                        (data.clients as Array<Record<string, unknown>>).map((s) => {
+                            const subs = (s.subscriptions as Array<Record<string, unknown>>) || [];
+                            const activeSub = subs.find((sub) => sub.status === 'ativo') || subs[0];
+                            const planObj = activeSub?.plans as Record<string, string> | null;
+                            return {
+                                id: (s.id as string) || '',
+                                full_name: (s.full_name as string) || 'Usuário',
+                                email: (s.email as string) || '',
+                                avatar_url: (s.avatar_url as string) || undefined,
+                                plan_name: planObj?.name || 'Free',
+                                plan_tier: (planObj?.slug || 'free').toLowerCase(),
+                                credits_remaining: 0,
+                                total_requests: 0,
+                                status: activeSub ? String(activeSub.status || 'inactive') : 'inactive',
+                                created_at: (s.created_at as string) || new Date().toISOString(),
+                            };
+                        })
+                    );
+                }
+            })
+            .catch(() => { });
+    }, [search]);
+
+    const formatDate = (d: string) => new Date(d).toLocaleDateString('pt-BR');
+
+    /* ── Actions ── */
+    const handleToggleStatus = async (user: UserRow) => {
+        const newStatus = user.status === 'ativo' ? 'cancelado' : 'ativo';
+        if (!confirm(`Deseja alterar o status de ${user.full_name} para ${newStatus}?`)) return;
+
+        try {
+            const res = await fetch('/api/admin/clientes', {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ id: user.id, action: 'update_status', status: newStatus })
+            });
+            if (res.ok) {
+                setUsers(prev => prev.map(u => u.id === user.id ? { ...u, status: newStatus } : u));
+            } else {
+                alert("Erro ao atualizar status do usuário.");
+            }
+        } catch (error) {
+            console.error(error);
+        }
+    };
+
+    const handleDelete = async (user: UserRow) => {
+        if (!confirm(`TEM CERTEZA ABSOLUTA que deseja excluir a conta de ${user.full_name} permanentemente? Isso não pode ser desfeito.`)) return;
+
+        try {
+            const res = await fetch(`/api/admin/clientes?id=${user.id}`, { method: 'DELETE' });
+            if (res.ok) {
+                setUsers(prev => prev.filter(u => u.id !== user.id));
+            } else {
+                alert("Erro ao excluir usuário.");
+            }
+        } catch (error) {
+            console.error(error);
+        }
+    };
+
     return (
         <div className="flex min-h-screen w-full flex-row bg-background-dark font-sans text-slate-100">
-            <Sidebar />
+            <AdminSidebar />
 
-            {/* Main Content Area */}
-            <main className="flex-1 md:ml-[280px] p-6 md:p-10 relative z-10 w-full min-h-screen mb-[80px] lg:mb-0">
+            <main className="flex-1 ml-72 p-6 md:p-10 relative z-10 w-full min-h-screen mb-[80px] lg:mb-0">
                 {/* Header Section */}
                 <header className="flex justify-between items-end mb-10">
                     <div>
@@ -20,7 +114,6 @@ export default function GestaoUsuariosAdminPage() {
                         <span className="material-symbols-outlined text-[20px]">download</span>
                         Exportar CSV
                     </button>
-                    {/* Botão Mobile Simplificado */}
                     <button className="md:hidden flex items-center justify-center p-3 border border-white/10 rounded-full hover:bg-white/5 text-slate-300 font-medium transition-all">
                         <span className="material-symbols-outlined text-[20px]">download</span>
                     </button>
@@ -32,27 +125,13 @@ export default function GestaoUsuariosAdminPage() {
                         <div className="relative group">
                             <span className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 group-focus-within:text-primary transition-colors">search</span>
                             <input
+                                value={search}
+                                onChange={(e) => setSearch(e.target.value)}
                                 className="w-full bg-white/5 border border-white/10 rounded-full py-3 pl-12 pr-6 text-slate-100 placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary/40 transition-all text-sm"
                                 placeholder="Pesquisar por nome, email ou ID..."
                                 type="text"
                             />
                         </div>
-                    </div>
-                    <div className="flex flex-wrap items-center gap-2 md:gap-3 w-full md:w-auto">
-                        <button className="bg-white/5 backdrop-blur-xl border border-white/10 flex-1 md:flex-none justify-center flex items-center gap-2 px-4 md:px-5 py-2.5 rounded-full text-xs md:text-sm font-sora text-slate-300 hover:border-white/20 transition-all">
-                            Plano <span className="material-symbols-outlined text-[18px]">expand_more</span>
-                        </button>
-                        <button className="bg-white/5 backdrop-blur-xl border border-white/10 flex-1 md:flex-none justify-center flex items-center gap-2 px-4 md:px-5 py-2.5 rounded-full text-xs md:text-sm font-sora text-slate-300 hover:border-white/20 transition-all">
-                            Status <span className="material-symbols-outlined text-[18px]">expand_more</span>
-                        </button>
-                        <button className="bg-white/5 backdrop-blur-xl border border-white/10 flex-1 md:flex-none justify-center flex items-center gap-2 px-4 md:px-5 py-2.5 rounded-full text-xs md:text-sm font-sora text-slate-300 hover:border-white/20 transition-all">
-                            Data <span className="material-symbols-outlined text-[18px]">calendar_today</span>
-                        </button>
-                        <div className="hidden md:block h-8 w-px bg-white/10 mx-2"></div>
-                        <button className="w-full md:w-auto mt-2 md:mt-0 bg-primary hover:bg-primary/90 text-white flex items-center justify-center gap-2 px-6 py-2.5 rounded-full font-bold text-sm transition-all shadow-lg shadow-primary/20">
-                            <span className="material-symbols-outlined text-[20px]">add</span>
-                            Novo Usuário
-                        </button>
                     </div>
                 </section>
 
@@ -72,165 +151,138 @@ export default function GestaoUsuariosAdminPage() {
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-white/5">
-                                {/* Row 1 */}
-                                <tr className="hover:bg-white/[0.02] transition-colors">
-                                    <td className="px-6 py-5">
-                                        <div className="flex items-center gap-3">
-                                            <div
-                                                className="w-10 h-10 rounded-full border border-white/10 bg-slate-800 bg-cover bg-center"
-                                                title="Avatar do usuário Alex Silva"
-                                                style={{ backgroundImage: "url('https://lh3.googleusercontent.com/aida-public/AB6AXuAYrMAW9HjjBo8xBMFcKinoPtAlVN453LO1T19qJscyZ-TanNS0Is06Y_9aEDcVZKcG2x_RjD80ulsJ3DCcdDhYd0V7qAy8ezSFYAw0-hGJFsYpKbgzu6R1K50C7NxWew7_0NqeTdGiomnfJGPXKePSfJF3LttejhTrfucjLuVE3x9caikWoTYz3M8pbSqST3yvlcMUp5nULUdRTrXX36mZVFsC2R0qYIx0RGLoKhVfu-33o2__Z4zqdJy0A09s22Q8NW3qKH_S_kA')" }}
-                                            ></div>
-                                            <div>
-                                                <p className="text-sm font-semibold text-slate-100">Alex Silva</p>
-                                                <p className="text-xs text-slate-500">alex@chave.ai</p>
-                                            </div>
-                                        </div>
-                                    </td>
-                                    <td className="px-6 py-5">
-                                        <span className="inline-flex px-3 py-1 rounded-full text-[10px] font-bold uppercase bg-primary text-white tracking-wider">PRO</span>
-                                    </td>
-                                    <td className="px-6 py-5">
-                                        <code className="font-mono text-sm text-primary">5.250</code>
-                                    </td>
-                                    <td className="px-6 py-5">
-                                        <code className="font-mono text-sm text-slate-300">12.8k</code>
-                                    </td>
-                                    <td className="px-6 py-5">
-                                        <div className="flex items-center gap-2">
-                                            <div className="w-2 h-2 rounded-full bg-emerald-500 shadow-[0_0_8px_#10b981]"></div>
-                                            <span className="text-xs font-medium text-slate-300">Ativo</span>
-                                        </div>
-                                    </td>
-                                    <td className="px-6 py-5 text-sm text-slate-500 font-sora">12/10/2023</td>
-                                    <td className="px-6 py-5 text-right">
-                                        <div className="flex items-center justify-end gap-2">
-                                            <button className="p-2 text-slate-500 hover:text-white hover:bg-white/10 rounded-full transition-all">
-                                                <span className="material-symbols-outlined text-[18px]">visibility</span>
-                                            </button>
-                                            <button className="p-2 text-slate-500 hover:text-white hover:bg-white/10 rounded-full transition-all">
-                                                <span className="material-symbols-outlined text-[18px]">edit</span>
-                                            </button>
-                                            <button className="p-2 text-slate-500 hover:text-white hover:bg-white/10 rounded-full transition-all">
-                                                <span className="material-symbols-outlined text-[18px]">pause</span>
-                                            </button>
-                                            <button className="p-2 text-red-500 hover:bg-red-500/10 rounded-full transition-all">
-                                                <span className="material-symbols-outlined text-[18px]">delete</span>
-                                            </button>
-                                        </div>
-                                    </td>
-                                </tr>
-                                {/* Row 2 */}
-                                <tr className="hover:bg-white/[0.02] transition-colors">
-                                    <td className="px-6 py-5">
-                                        <div className="flex items-center gap-3">
-                                            <div
-                                                className="w-10 h-10 rounded-full border border-white/10 bg-slate-800 bg-cover bg-center"
-                                                title="Avatar do usuário Beatriz Rocha"
-                                                style={{ backgroundImage: "url('https://lh3.googleusercontent.com/aida-public/AB6AXuAPDDSDgXVFHPejvNd8JGE1u7qBtQejN4yucmeNBV9FceVL0AYikmpBUDpfmlYtxZ_YlyOeWl-VY4u_MQyNJbZelLX0x29nJsWiPRDeffjLnh6Xv6qiJxuGDEjMY-S-wvONdzpeWfMHJah3UO-ULxKf6RavqQ7Qnu-edh0oHwKbmMJZ7bjZX1kvlBiJGvNOC6myS6tDhKndhLSXb6kWmyp5InsXAnxazgpoPKIYm5gH3lpuHJg41G_N_IizER4LBLc717HyJWYl8Hk')" }}
-                                            ></div>
-                                            <div>
-                                                <p className="text-sm font-semibold text-slate-100">Beatriz Rocha</p>
-                                                <p className="text-xs text-slate-500">bea@chave.ai</p>
-                                            </div>
-                                        </div>
-                                    </td>
-                                    <td className="px-6 py-5">
-                                        <span className="inline-flex px-3 py-1 rounded-full text-[10px] font-bold uppercase bg-white/10 text-slate-300 tracking-wider">FREE</span>
-                                    </td>
-                                    <td className="px-6 py-5">
-                                        <code className="font-mono text-sm text-primary">0</code>
-                                    </td>
-                                    <td className="px-6 py-5">
-                                        <code className="font-mono text-sm text-slate-300">450</code>
-                                    </td>
-                                    <td className="px-6 py-5">
-                                        <div className="flex items-center gap-2">
-                                            <div className="w-2 h-2 rounded-full bg-slate-600"></div>
-                                            <span className="text-xs font-medium text-slate-500">Inativo</span>
-                                        </div>
-                                    </td>
-                                    <td className="px-6 py-5 text-sm text-slate-500 font-sora">05/11/2023</td>
-                                    <td className="px-6 py-5 text-right">
-                                        <div className="flex items-center justify-end gap-2">
-                                            <button className="p-2 text-slate-500 hover:text-white hover:bg-white/10 rounded-full transition-all">
-                                                <span className="material-symbols-outlined text-[18px]">visibility</span>
-                                            </button>
-                                            <button className="p-2 text-slate-500 hover:text-white hover:bg-white/10 rounded-full transition-all">
-                                                <span className="material-symbols-outlined text-[18px]">edit</span>
-                                            </button>
-                                            <button className="p-2 text-slate-500 hover:text-white hover:bg-white/10 rounded-full transition-all">
-                                                <span className="material-symbols-outlined text-[18px]">pause</span>
-                                            </button>
-                                            <button className="p-2 text-red-500 hover:bg-red-500/10 rounded-full transition-all">
-                                                <span className="material-symbols-outlined text-[18px]">delete</span>
-                                            </button>
-                                        </div>
-                                    </td>
-                                </tr>
-                                {/* Row 3 */}
-                                <tr className="hover:bg-white/[0.02] transition-colors">
-                                    <td className="px-6 py-5">
-                                        <div className="flex items-center gap-3">
-                                            <div
-                                                className="w-10 h-10 rounded-full border border-white/10 bg-slate-800 bg-cover bg-center"
-                                                title="Avatar do usuário Carlos Lima"
-                                                style={{ backgroundImage: "url('https://lh3.googleusercontent.com/aida-public/AB6AXuAPWV84cGJfDZ5zo4LtM4s577WK11C6S7qM-x-F0jBB5pZwTlmkyJlhecjULHFLgcuoXq7dsYQELx0Kx7mAygQ0bJ26lH6AmglLm8SvYayH_Tsv1MKhove3VmrTTvo_bie6dJGweg327rLQwq08D33e9alX9QRdIMGRmKHE8eguNtuLSsoHbZecvahZWqfLdjq5LTAPZH_R76J2yOZkHmpcCrG6RL4x4vEKviQ1RCEvB5ic78xPE67a4GnQ-UsarojB5FClt5oyALE')" }}
-                                            ></div>
-                                            <div>
-                                                <p className="text-sm font-semibold text-slate-100">Carlos Lima</p>
-                                                <p className="text-xs text-slate-500">carlos@chave.ai</p>
-                                            </div>
-                                        </div>
-                                    </td>
-                                    <td className="px-6 py-5">
-                                        <span className="inline-flex px-3 py-1 rounded-full text-[10px] font-bold uppercase bg-slate-100 text-background-dark tracking-wider">ENTERPRISE</span>
-                                    </td>
-                                    <td className="px-6 py-5">
-                                        <code className="font-mono text-sm text-primary">∞</code>
-                                    </td>
-                                    <td className="px-6 py-5">
-                                        <code className="font-mono text-sm text-slate-300">156.2k</code>
-                                    </td>
-                                    <td className="px-6 py-5">
-                                        <div className="flex items-center gap-2">
-                                            <div className="w-2 h-2 rounded-full bg-emerald-500 shadow-[0_0_8px_#10b981]"></div>
-                                            <span className="text-xs font-medium text-slate-300">Ativo</span>
-                                        </div>
-                                    </td>
-                                    <td className="px-6 py-5 text-sm text-slate-500 font-sora">20/09/2023</td>
-                                    <td className="px-6 py-5 text-right">
-                                        <div className="flex items-center justify-end gap-2">
-                                            <button className="p-2 text-slate-500 hover:text-white hover:bg-white/10 rounded-full transition-all">
-                                                <span className="material-symbols-outlined text-[18px]">visibility</span>
-                                            </button>
-                                            <button className="p-2 text-slate-500 hover:text-white hover:bg-white/10 rounded-full transition-all">
-                                                <span className="material-symbols-outlined text-[18px]">edit</span>
-                                            </button>
-                                            <button className="p-2 text-slate-500 hover:text-white hover:bg-white/10 rounded-full transition-all">
-                                                <span className="material-symbols-outlined text-[18px]">pause</span>
-                                            </button>
-                                            <button className="p-2 text-red-500 hover:bg-red-500/10 rounded-full transition-all">
-                                                <span className="material-symbols-outlined text-[18px]">delete</span>
-                                            </button>
-                                        </div>
-                                    </td>
-                                </tr>
+                                {users.length === 0 && (
+                                    <tr><td colSpan={7} className="px-6 py-12 text-center text-slate-500">Nenhum usuário encontrado.</td></tr>
+                                )}
+                                {users.map((user) => {
+                                    const badge = planBadge[user.plan_tier || 'free'] || planBadge.free;
+                                    const isActive = user.status === 'active';
+                                    return (
+                                        <tr key={user.id} className="hover:bg-white/[0.02] transition-colors">
+                                            <td className="px-6 py-5">
+                                                <div className="flex items-center gap-3">
+                                                    <div className="w-10 h-10 rounded-full border border-white/10 bg-gradient-to-tr from-primary/30 to-purple-500/30 flex items-center justify-center text-sm font-bold text-white">
+                                                        {user.full_name.split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase()}
+                                                    </div>
+                                                    <div>
+                                                        <p className="text-sm font-semibold text-slate-100">{user.full_name}</p>
+                                                        <p className="text-xs text-slate-500">{user.email}</p>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td className="px-6 py-5">
+                                                <span className={`inline-flex px-3 py-1 rounded-full text-[10px] font-bold uppercase ${badge} tracking-wider`}>
+                                                    {(user.plan_name || 'FREE').toUpperCase()}
+                                                </span>
+                                            </td>
+                                            <td className="px-6 py-5">
+                                                <code className="font-mono text-sm text-primary">
+                                                    {(user.credits_remaining ?? 0) < 0 ? '∞' : (user.credits_remaining ?? 0).toLocaleString('pt-BR')}
+                                                </code>
+                                            </td>
+                                            <td className="px-6 py-5">
+                                                <code className="font-mono text-sm text-slate-300">{(user.total_requests ?? 0).toLocaleString('pt-BR')}</code>
+                                            </td>
+                                            <td className="px-6 py-5">
+                                                <div className="flex items-center gap-2">
+                                                    <div className={`w-2 h-2 rounded-full ${isActive ? 'bg-emerald-500 shadow-[0_0_8px_#10b981]' : 'bg-slate-600'}`}></div>
+                                                    <span className={`text-xs font-medium ${isActive ? 'text-slate-300' : 'text-slate-500'}`}>{isActive ? 'Ativo' : 'Inativo'}</span>
+                                                </div>
+                                            </td>
+                                            <td className="px-6 py-5 text-sm text-slate-500 font-sora">{formatDate(user.created_at)}</td>
+                                            <td className="px-6 py-5 text-right">
+                                                <div className="flex items-center justify-end gap-2">
+                                                    <button
+                                                        onClick={() => { setEditingUser(user); setIsEditModalOpen(true); }}
+                                                        className="p-2 text-slate-500 hover:text-white hover:bg-white/10 rounded-full transition-all"
+                                                        title="Ver Detalhes">
+                                                        <span className="material-symbols-outlined text-[18px]">visibility</span>
+                                                    </button>
+                                                    <button
+                                                        onClick={() => handleToggleStatus(user)}
+                                                        className="p-2 text-slate-500 hover:text-amber-400 hover:bg-amber-400/10 rounded-full transition-all"
+                                                        title={isActive ? "Pausar Usuário" : "Reativar"}>
+                                                        <span className="material-symbols-outlined text-[18px]">{isActive ? 'pause' : 'play_arrow'}</span>
+                                                    </button>
+                                                    <button
+                                                        onClick={() => handleDelete(user)}
+                                                        className="p-2 text-red-500 hover:bg-red-500/10 rounded-full transition-all"
+                                                        title="Excluir Definitivamente">
+                                                        <span className="material-symbols-outlined text-[18px]">delete</span>
+                                                    </button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    );
+                                })}
                             </tbody>
                         </table>
                     </div>
                 </div>
 
-                {/* Pagination Footer */}
-                <footer className="flex flex-wrap items-center justify-center gap-2 py-4">
-                    <button className="hidden sm:block px-4 py-2 text-sm text-slate-500 hover:text-white hover:bg-white/5 rounded-full transition-all">Anterior</button>
-                    <button className="w-10 h-10 flex items-center justify-center rounded-full bg-primary text-white font-bold text-sm shadow-[0_0_15px_rgba(104,81,251,0.4)]">1</button>
-                    <button className="w-10 h-10 flex items-center justify-center rounded-full hover:bg-white/5 text-slate-400 font-medium text-sm transition-all">2</button>
-                    <button className="w-10 h-10 flex items-center justify-center rounded-full hover:bg-white/5 text-slate-400 font-medium text-sm transition-all">3</button>
-                    <div className="text-slate-600 px-2">...</div>
-                    <button className="w-10 h-10 flex items-center justify-center rounded-full hover:bg-white/5 text-slate-400 font-medium text-sm transition-all">12</button>
-                    <button className="hidden sm:block px-4 py-2 text-sm text-slate-500 hover:text-white hover:bg-white/5 rounded-full transition-all">Próxima</button>
-                </footer>
+                {/* MODAL VER / EDITAR */}
+                {isEditModalOpen && editingUser && (
+                    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+                        <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setIsEditModalOpen(false)}></div>
+                        <div className="bg-background-dark border border-white/10 rounded-2xl w-full max-w-md relative z-10 p-6 md:p-8 shadow-2xl">
+                            <div className="flex justify-between items-start mb-6">
+                                <div className="flex items-center gap-4">
+                                    {editingUser.avatar_url ? (
+                                        <img src={editingUser.avatar_url} alt="Avatar" className="size-14 rounded-full border border-white/10 object-cover" />
+                                    ) : (
+                                        <div className="size-14 rounded-full bg-gradient-to-tr from-primary/30 to-purple-500/30 flex items-center justify-center text-lg font-bold text-white border border-white/10 shadow-lg">
+                                            {editingUser.full_name.split(' ').map((w: string) => w[0]).join('').slice(0, 2).toUpperCase()}
+                                        </div>
+                                    )}
+                                    <div>
+                                        <h3 className="text-xl font-sora font-bold text-white leading-tight">{editingUser.full_name}</h3>
+                                        <p className="text-sm text-slate-400">{editingUser.email}</p>
+                                    </div>
+                                </div>
+                                <button onClick={() => setIsEditModalOpen(false)} className="text-slate-500 hover:text-white transition-colors">
+                                    <span className="material-symbols-outlined">close</span>
+                                </button>
+                            </div>
+
+                            <div className="space-y-4">
+                                <div>
+                                    <label className="block text-xs font-bold text-slate-500 uppercase tracking-widest mb-1">ID Único</label>
+                                    <p className="font-mono text-slate-300 text-sm break-all">{editingUser.id}</p>
+                                </div>
+
+                                <div className="grid grid-cols-2 gap-4 bg-white/5 border border-white/5 rounded-xl p-4">
+                                    <div>
+                                        <label className="block text-xs font-bold text-slate-500 uppercase tracking-widest mb-1">Status Atual</label>
+                                        <div className="flex items-center gap-2 mt-1">
+                                            <div className={`w-2 h-2 rounded-full ${editingUser.status === 'ativo' ? 'bg-emerald-500 shadow-[0_0_8px_#10b981]' : 'bg-slate-600'}`}></div>
+                                            <span className={`text-sm font-medium ${editingUser.status === 'ativo' ? 'text-slate-300' : 'text-slate-500'}`}>{editingUser.status === 'ativo' ? 'Ativo' : 'Inativo'}</span>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <label className="block text-xs font-bold text-slate-500 uppercase tracking-widest mb-1">Data de Cadastro</label>
+                                        <p className="text-white font-medium text-sm mt-1">{formatDate(editingUser.created_at)}</p>
+                                    </div>
+                                    <div>
+                                        <label className="block text-xs font-bold text-slate-500 uppercase tracking-widest mb-1">Plano Base</label>
+                                        <p className="inline-flex px-2 py-0.5 rounded text-[10px] font-bold uppercase mt-1 tracking-wider bg-white/10 text-slate-300">
+                                            {editingUser.plan_name}
+                                        </p>
+                                    </div>
+                                    <div>
+                                        <label className="block text-xs font-bold text-slate-500 uppercase tracking-widest mb-1">Requisições</label>
+                                        <p className="text-white font-mono font-bold text-sm mt-1">{editingUser.total_requests}</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div className="mt-8 pt-6 border-t border-white/10 flex justify-end">
+                                <button onClick={() => setIsEditModalOpen(false)} className="bg-white/10 hover:bg-white/20 text-white px-6 py-2.5 rounded-xl text-sm font-bold transition-all">
+                                    Fechar Aba
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                )}
 
                 {/* Plasma Accents */}
                 <div className="absolute top-0 right-0 w-[500px] h-[500px] rounded-full -z-10 blur-[100px] opacity-20 pointer-events-none" style={{ background: 'radial-gradient(circle, rgba(104, 81, 251, 0.4) 0%, transparent 70%)' }}></div>

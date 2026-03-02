@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import AdminSidebar from '@/components/AdminSidebar';
 
 /* ── Types ── */
@@ -29,151 +29,6 @@ const periodOptions = [
     { value: '12m', label: 'Últimos 12 meses' },
 ];
 
-/* ── Mock KPI Data ── */
-const kpiData = [
-    {
-        label: 'MRR',
-        subtitle: 'Receita Recorrente Mensal',
-        value: 'R$ 38.150',
-        change: '+5.2%',
-        trend: 'up' as const,
-        icon: 'trending_up',
-        iconBg: 'bg-primary/20',
-        iconColor: 'text-primary',
-        highlight: true,
-    },
-    {
-        label: 'Receita Bruta',
-        subtitle: 'Total acumulado no período',
-        value: 'R$ 127.840',
-        change: '+18.3%',
-        trend: 'up' as const,
-        icon: 'account_balance',
-        iconBg: 'bg-emerald-500/20',
-        iconColor: 'text-emerald-400',
-        highlight: false,
-    },
-    {
-        label: 'Ticket Médio',
-        subtitle: 'ARPU por assinante',
-        value: 'R$ 168,42',
-        change: '+3.7%',
-        trend: 'up' as const,
-        icon: 'confirmation_number',
-        iconBg: 'bg-blue-500/20',
-        iconColor: 'text-blue-400',
-        highlight: false,
-    },
-    {
-        label: 'Taxa de Churn',
-        subtitle: 'Cancelamentos no período',
-        value: '3.4%',
-        change: '-0.8%',
-        trend: 'down' as const,
-        icon: 'person_off',
-        iconBg: 'bg-rose-500/20',
-        iconColor: 'text-rose-400',
-        highlight: false,
-    },
-];
-
-/* ── Mock Chart Data (weekly revenue) ── */
-const chartData = [
-    { label: 'Sem 1', value: 8200, secondary: 6800 },
-    { label: 'Sem 2', value: 9450, secondary: 7200 },
-    { label: 'Sem 3', value: 7800, secondary: 6500 },
-    { label: 'Sem 4', value: 11200, secondary: 8900 },
-    { label: 'Sem 5', value: 10500, secondary: 8100 },
-    { label: 'Sem 6', value: 9800, secondary: 7600 },
-    { label: 'Sem 7', value: 12400, secondary: 9200 },
-    { label: 'Sem 8', value: 11800, secondary: 8800 },
-    { label: 'Sem 9', value: 13200, secondary: 10100 },
-    { label: 'Sem 10', value: 12600, secondary: 9500 },
-    { label: 'Sem 11', value: 14100, secondary: 10800 },
-    { label: 'Sem 12', value: 15300, secondary: 11400 },
-];
-
-/* ── Mock Transactions ── */
-const transactions: Transaction[] = [
-    {
-        id: 'TXN-4821',
-        date: '27 Fev 2026',
-        clientName: 'João Pereira',
-        clientEmail: 'joao.pereira@email.com',
-        clientInitials: 'JP',
-        clientGradient: 'from-primary to-purple-600',
-        clientAvatar: null,
-        plan: 'Anual Premium',
-        method: 'Cartão',
-        value: 'R$ 997,00',
-        status: 'Aprovado',
-    },
-    {
-        id: 'TXN-4820',
-        date: '27 Fev 2026',
-        clientName: 'Carla Mendes',
-        clientEmail: 'carla.mendes@email.com',
-        clientInitials: 'CM',
-        clientGradient: 'from-rose-500 to-pink-600',
-        clientAvatar: 'https://i.pravatar.cc/150?img=47',
-        plan: 'Mensal Básico',
-        method: 'Pix',
-        value: 'R$ 97,00',
-        status: 'Aprovado',
-    },
-    {
-        id: 'TXN-4819',
-        date: '26 Fev 2026',
-        clientName: 'Roberto Silva',
-        clientEmail: 'roberto.silva@email.com',
-        clientInitials: 'RS',
-        clientGradient: 'from-amber-500 to-orange-600',
-        clientAvatar: null,
-        plan: 'Mensal Pro',
-        method: 'Cartão',
-        value: 'R$ 197,00',
-        status: 'Recusado',
-    },
-    {
-        id: 'TXN-4818',
-        date: '25 Fev 2026',
-        clientName: 'Ana Lúcia Ferreira',
-        clientEmail: 'ana.lucia@email.com',
-        clientInitials: 'AL',
-        clientGradient: 'from-emerald-500 to-teal-600',
-        clientAvatar: 'https://i.pravatar.cc/150?img=32',
-        plan: 'Anual VIP',
-        method: 'Pix',
-        value: 'R$ 1.997,00',
-        status: 'Aprovado',
-    },
-    {
-        id: 'TXN-4817',
-        date: '24 Fev 2026',
-        clientName: 'Fernando Costa',
-        clientEmail: 'fernando.costa@email.com',
-        clientInitials: 'FC',
-        clientGradient: 'from-blue-500 to-cyan-600',
-        clientAvatar: null,
-        plan: 'Mensal Pro',
-        method: 'Cartão',
-        value: 'R$ 197,00',
-        status: 'Estornado',
-    },
-    {
-        id: 'TXN-4816',
-        date: '23 Fev 2026',
-        clientName: 'Mariana Rocha',
-        clientEmail: 'mariana.rocha@email.com',
-        clientInitials: 'MR',
-        clientGradient: 'from-violet-500 to-fuchsia-600',
-        clientAvatar: 'https://i.pravatar.cc/150?img=5',
-        plan: 'Anual Premium',
-        method: 'Pix',
-        value: 'R$ 997,00',
-        status: 'Aprovado',
-    },
-];
 
 /* ── Transaction Status Badge ── */
 function TransactionBadge({ status }: { status: TransactionStatus }) {
@@ -196,8 +51,8 @@ function MethodBadge({ method }: { method: PaymentMethod }) {
     const isPix = method === 'Pix';
     return (
         <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-semibold border ${isPix
-                ? 'bg-teal-500/10 text-teal-400 border-teal-500/20'
-                : 'bg-white/5 text-slate-300 border-white/10'
+            ? 'bg-teal-500/10 text-teal-400 border-teal-500/20'
+            : 'bg-white/5 text-slate-300 border-white/10'
             }`}>
             <span className="material-symbols-outlined text-[14px]">
                 {isPix ? 'qr_code_2' : 'credit_card'}
@@ -208,8 +63,8 @@ function MethodBadge({ method }: { method: PaymentMethod }) {
 }
 
 /* ── Area Chart SVG ── */
-function RevenueChart({ data }: { data: typeof chartData }) {
-    const maxVal = Math.max(...data.map(d => d.value));
+function RevenueChart({ data }: { data: Array<{ label: string; value: number; secondary: number }> }) {
+    const maxVal = Math.max(...data.map(d => d.value), 1000);
     const width = 900;
     const height = 220;
     const padding = { top: 10, bottom: 5, left: 0, right: 0 };
@@ -279,8 +134,63 @@ function RevenueChart({ data }: { data: typeof chartData }) {
 export default function FaturamentoPage() {
     const [period, setPeriod] = useState('30d');
     const [periodOpen, setPeriodOpen] = useState(false);
+    const [kpiData, setKpiData] = useState([
+        { label: 'MRR', subtitle: 'Receita Recorrente Mensal', value: '...', change: '—', trend: 'up' as const, icon: 'trending_up', iconBg: 'bg-primary/20', iconColor: 'text-primary', highlight: true },
+        { label: 'Receita Bruta', subtitle: 'Total acumulado no período', value: '...', change: '—', trend: 'up' as const, icon: 'account_balance', iconBg: 'bg-emerald-500/20', iconColor: 'text-emerald-400', highlight: false },
+        { label: 'Ticket Médio', subtitle: 'ARPU por assinante', value: '...', change: '—', trend: 'up' as const, icon: 'confirmation_number', iconBg: 'bg-blue-500/20', iconColor: 'text-blue-400', highlight: false },
+        { label: 'Taxa de Churn', subtitle: 'Cancelamentos no período', value: '...', change: '—', trend: 'down' as const, icon: 'person_off', iconBg: 'bg-rose-500/20', iconColor: 'text-rose-400', highlight: false },
+    ]);
+    const [transactions, setTransactions] = useState<Transaction[]>([]);
+    const [chartData, setChartData] = useState<Array<{ label: string; value: number; secondary: number }>>([]);
+    const [loading, setLoading] = useState(true);
 
-    const selectedPeriod = periodOptions.find(p => p.value === period);
+    useEffect(() => {
+        setLoading(true);
+        fetch(`/api/admin/faturamento?period=${period}`)
+            .then((r) => r.json())
+            .then((data) => {
+                if (data.kpis) {
+                    const k = data.kpis;
+                    setKpiData([
+                        { label: 'MRR', subtitle: 'Receita Recorrente Mensal', value: `R$ ${Number(k.mrr).toLocaleString('pt-BR')}`, change: '+5.2%', trend: 'up', icon: 'trending_up', iconBg: 'bg-primary/20', iconColor: 'text-primary', highlight: true },
+                        { label: 'Receita Bruta', subtitle: 'Total acumulado no período', value: `R$ ${Number(k.receita_bruta || 0).toLocaleString('pt-BR')}`, change: '+18.3%', trend: 'up', icon: 'account_balance', iconBg: 'bg-emerald-500/20', iconColor: 'text-emerald-400', highlight: false },
+                        { label: 'Ticket Médio', subtitle: 'ARPU por assinante', value: `R$ ${Number(k.ticket_medio).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`, change: '+3.7%', trend: 'up', icon: 'confirmation_number', iconBg: 'bg-blue-500/20', iconColor: 'text-blue-400', highlight: false },
+                        { label: 'Taxa de Churn', subtitle: 'Cancelamentos no período', value: `${k.taxa_churn}%`, change: `-${k.taxa_churn}%`, trend: 'down', icon: 'person_off', iconBg: 'bg-rose-500/20', iconColor: 'text-rose-400', highlight: false },
+                    ]);
+                }
+                if (data.transactions) {
+                    const txGradients = ['from-primary to-purple-600', 'from-rose-500 to-pink-600', 'from-amber-500 to-orange-600', 'from-emerald-500 to-teal-600', 'from-blue-500 to-cyan-600', 'from-violet-500 to-fuchsia-600'];
+                    const mapped: Transaction[] = data.transactions.map((t: Record<string, unknown>, i: number) => {
+                        const profile = t.profiles as Record<string, string> | null;
+                        const name = profile?.full_name || 'Usuário';
+                        return {
+                            id: (t.id as string)?.slice(0, 8) || `TXN-${i}`,
+                            date: new Date(t.created_at as string).toLocaleDateString('pt-BR'),
+                            clientName: name,
+                            clientEmail: profile?.email || '',
+                            clientInitials: name.split(' ').map((w: string) => w[0]).join('').slice(0, 2).toUpperCase(),
+                            clientGradient: txGradients[i % txGradients.length],
+                            clientAvatar: profile?.avatar_url || null,
+                            plan: (t.plan_type as string) || 'Plano',
+                            method: (t.payment_method as string) === 'pix' ? 'Pix' as PaymentMethod : 'Cartão' as PaymentMethod,
+                            value: `R$ ${Number(t.monthly_value || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`,
+                            status: ((t.status as string) === 'ativo' ? 'Aprovado' : (t.status as string) === 'cancelado' ? 'Estornado' : 'Recusado') as TransactionStatus,
+                        };
+                    });
+                    setTransactions(mapped);
+                }
+                if (data.chartData) {
+                    const mappedChart = data.chartData.map((d: any) => ({
+                        label: d.date,
+                        value: d.gross,
+                        secondary: d.net
+                    }));
+                    setChartData(mappedChart);
+                }
+            })
+            .catch(() => { })
+            .finally(() => setLoading(false));
+    }, [period]);
 
     return (
         <div className="flex min-h-screen bg-background-dark font-display text-slate-100">
@@ -307,7 +217,7 @@ export default function FaturamentoPage() {
                             className="flex items-center gap-2 bg-white/5 backdrop-blur-md border border-white/10 px-5 py-3 rounded-xl text-sm font-semibold text-slate-200 hover:bg-white/10 hover:text-white transition-all duration-300"
                         >
                             <span className="material-symbols-outlined text-primary text-lg">calendar_month</span>
-                            {selectedPeriod?.label}
+                            {periodOptions.find(p => p.value === period)?.label}
                             <span className={`material-symbols-outlined text-lg transition-transform duration-200 ${periodOpen ? 'rotate-180' : ''}`}>
                                 expand_more
                             </span>
@@ -322,8 +232,8 @@ export default function FaturamentoPage() {
                                             key={opt.value}
                                             onClick={() => { setPeriod(opt.value); setPeriodOpen(false); }}
                                             className={`w-full text-left px-5 py-3 text-sm transition-colors border-b last:border-b-0 border-white/5 ${period === opt.value
-                                                    ? 'text-primary bg-primary/10 font-semibold'
-                                                    : 'text-slate-300 hover:bg-white/5 hover:text-white'
+                                                ? 'text-primary bg-primary/10 font-semibold'
+                                                : 'text-slate-300 hover:bg-white/5 hover:text-white'
                                                 }`}
                                         >
                                             {opt.label}
@@ -341,8 +251,8 @@ export default function FaturamentoPage() {
                         <div
                             key={kpi.label}
                             className={`bg-white/5 backdrop-blur-md border rounded-2xl p-6 transition-all duration-500 group hover:-translate-y-1 ${kpi.highlight
-                                    ? 'border-primary/30 shadow-[0_0_25px_rgba(123,97,255,0.15)] hover:shadow-[0_0_35px_rgba(123,97,255,0.25)]'
-                                    : 'border-white/10 hover:shadow-[0_0_20px_rgba(123,97,255,0.1)] hover:border-primary/30'
+                                ? 'border-primary/30 shadow-[0_0_25px_rgba(123,97,255,0.15)] hover:shadow-[0_0_35px_rgba(123,97,255,0.25)]'
+                                : 'border-white/10 hover:shadow-[0_0_20px_rgba(123,97,255,0.1)] hover:border-primary/30'
                                 }`}
                         >
                             <div className="flex items-center justify-between mb-4">
@@ -350,8 +260,8 @@ export default function FaturamentoPage() {
                                     <span className="material-symbols-outlined">{kpi.icon}</span>
                                 </div>
                                 <div className={`flex items-center gap-1 text-xs font-bold px-2.5 py-1 rounded-full ${kpi.label === 'Taxa de Churn'
-                                        ? (kpi.trend === 'down' ? 'text-emerald-400 bg-emerald-500/10' : 'text-rose-400 bg-rose-500/10')
-                                        : (kpi.trend === 'up' ? 'text-emerald-400 bg-emerald-500/10' : 'text-rose-400 bg-rose-500/10')
+                                    ? (kpi.trend === 'down' ? 'text-emerald-400 bg-emerald-500/10' : 'text-rose-400 bg-rose-500/10')
+                                    : (kpi.trend === 'up' ? 'text-emerald-400 bg-emerald-500/10' : 'text-rose-400 bg-rose-500/10')
                                     }`}>
                                     <span className="material-symbols-outlined text-[14px]">
                                         {kpi.label === 'Taxa de Churn'
@@ -429,18 +339,22 @@ export default function FaturamentoPage() {
                     <div className="grid grid-cols-3 gap-4 mt-4 pt-4 border-t border-white/5">
                         <div className="text-center">
                             <p className="text-[11px] text-slate-500 uppercase tracking-wider mb-1">Maior Receita</p>
-                            <p className="text-lg font-bold font-sora text-primary">R$ 15.300</p>
-                            <p className="text-[10px] text-slate-600">Semana 12</p>
+                            <p className="text-lg font-bold font-sora text-primary">R$ {Math.max(...chartData.map(d => d.value)).toLocaleString('pt-BR')}</p>
+                            <p className="text-[10px] text-slate-600">No período selecionado</p>
                         </div>
                         <div className="text-center border-x border-white/5">
-                            <p className="text-[11px] text-slate-500 uppercase tracking-wider mb-1">Média Semanal</p>
-                            <p className="text-lg font-bold font-sora text-white">R$ 11.375</p>
-                            <p className="text-[10px] text-slate-600">Últimas 12 semanas</p>
+                            <p className="text-[11px] text-slate-500 uppercase tracking-wider mb-1">Média do Período</p>
+                            <p className="text-lg font-bold font-sora text-white">R$ {Math.round(chartData.reduce((acc, d) => acc + d.value, 0) / chartData.length).toLocaleString('pt-BR')}</p>
+                            <p className="text-[10px] text-slate-600">Por ponto de dados</p>
                         </div>
                         <div className="text-center">
                             <p className="text-[11px] text-slate-500 uppercase tracking-wider mb-1">Crescimento</p>
-                            <p className="text-lg font-bold font-sora text-emerald-400">+86.6%</p>
-                            <p className="text-[10px] text-slate-600">vs primeiro período</p>
+                            <p className="text-lg font-bold font-sora text-emerald-400">
+                                {chartData.length > 1 ?
+                                    (chartData[chartData.length - 1].value >= chartData[0].value ? '+' : '-') + Math.abs(((chartData[chartData.length - 1].value / Math.max(chartData[0].value, 1)) - 1) * 100).toFixed(1) + '%'
+                                    : '---'}
+                            </p>
+                            <p className="text-[10px] text-slate-600">Fim vs Início do gráfico</p>
                         </div>
                     </div>
                 </div>
@@ -520,8 +434,8 @@ export default function FaturamentoPage() {
                                         {/* Value */}
                                         <td className="px-6 py-4">
                                             <span className={`font-mono font-bold ${txn.status === 'Estornado' ? 'text-amber-400 line-through decoration-amber-400/40' :
-                                                    txn.status === 'Recusado' ? 'text-slate-500' :
-                                                        'text-white'
+                                                txn.status === 'Recusado' ? 'text-slate-500' :
+                                                    'text-white'
                                                 }`}>
                                                 {txn.value}
                                             </span>
