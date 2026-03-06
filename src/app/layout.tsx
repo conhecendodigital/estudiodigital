@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import Topbar from "@/components/Topbar";
+import { AuthProvider } from "@/contexts/AuthContext";
 
 export const metadata: Metadata = {
     title: "Escritório Digital — O Coração da IA",
@@ -29,9 +30,11 @@ export default function RootLayout({
                 />
             </head>
             <body className="font-sans antialiased min-h-screen flex flex-col overflow-x-hidden">
-                <div className="noise-overlay"></div>
-                <Topbar />
-                {children}
+                <AuthProvider>
+                    <div className="noise-overlay"></div>
+                    <Topbar />
+                    {children}
+                </AuthProvider>
             </body>
         </html>
     );

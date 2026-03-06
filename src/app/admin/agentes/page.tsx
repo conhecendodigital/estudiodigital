@@ -34,21 +34,23 @@ const gradientPool = [
     'from-amber-600 to-orange-500', 'from-fuchsia-600 to-pink-500',
 ];
 
-const categoryFilters = ['Todas', 'Vendas', 'Copywriting', 'Suporte', 'Analytics', 'Educação'];
+const categoryFilters = [
+    { value: 'Todas', label: 'Todas' },
+    { value: 'vendas', label: 'Vendas' },
+    { value: 'conteudo', label: 'Conteúdo' },
+    { value: 'suporte', label: 'Suporte' },
+    { value: 'estrategico', label: 'Estratégico' },
+    { value: 'produtividade', label: 'Produtividade' },
+];
 
 /* ── Category Badge ── */
 function CategoryTag({ category }: { category: string }) {
     const colorMap: Record<string, string> = {
-        Vendas: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20',
-        Copywriting: 'bg-violet-500/10 text-violet-400 border-violet-500/20',
-        Suporte: 'bg-blue-500/10 text-blue-400 border-blue-500/20',
-        Analytics: 'bg-rose-500/10 text-rose-400 border-rose-500/20',
-        Educação: 'bg-amber-500/10 text-amber-400 border-amber-500/20',
         vendas: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20',
-        copywriting: 'bg-violet-500/10 text-violet-400 border-violet-500/20',
+        conteudo: 'bg-indigo-500/10 text-indigo-400 border-indigo-500/20',
         suporte: 'bg-blue-500/10 text-blue-400 border-blue-500/20',
-        analytics: 'bg-rose-500/10 text-rose-400 border-rose-500/20',
-        educacao: 'bg-amber-500/10 text-amber-400 border-amber-500/20',
+        estrategico: 'bg-rose-500/10 text-rose-400 border-rose-500/20',
+        produtividade: 'bg-amber-500/10 text-amber-400 border-amber-500/20',
     };
     return (
         <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider border ${colorMap[category] || 'bg-slate-500/10 text-slate-400 border-slate-500/20'}`}>
@@ -175,7 +177,7 @@ export default function GestaoAgentesPage() {
                             className="bg-black/40 border border-white/10 rounded-xl pl-10 pr-8 py-2.5 text-sm text-slate-300 focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all duration-300 appearance-none cursor-pointer"
                         >
                             {categoryFilters.map((c) => (
-                                <option key={c} value={c} className="bg-[#1a1a2e] text-slate-200">{c}</option>
+                                <option key={c.value} value={c.value} className="bg-[#1a1a2e] text-slate-200">{c.label}</option>
                             ))}
                         </select>
                         <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none">

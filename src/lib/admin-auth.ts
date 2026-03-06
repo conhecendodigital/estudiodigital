@@ -7,7 +7,7 @@ type AdminAuthResult =
 
 /**
  * Verifica se o usuário atual é admin.
- * TODO: re-enable auth after testing
+ * Retorna erro 401 se não autenticado, 403 se não admin.
  */
 export async function requireAdmin(): Promise<AdminAuthResult> {
     const supabase = await createClient();

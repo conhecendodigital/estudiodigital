@@ -76,11 +76,10 @@ function findModelInfo(modelId: string) {
 const categoryOptions = [
     { value: '', label: 'Selecionar categoria...' },
     { value: 'vendas', label: '💰 Vendas' },
-    { value: 'copywriting', label: '✍️ Copywriting' },
+    { value: 'conteudo', label: '✍️ Conteúdo' },
     { value: 'suporte', label: '🎧 Suporte ao Cliente' },
-    { value: 'onboarding', label: '🚀 Onboarding' },
-    { value: 'analytics', label: '📊 Análise de Dados' },
-    { value: 'educacao', label: '📚 Educação' },
+    { value: 'estrategico', label: '🚀 Estratégico' },
+    { value: 'produtividade', label: '📊 Produtividade' },
 ];
 
 /* ── Mock uploaded files ── */
@@ -684,7 +683,7 @@ export default function CriarAgentePage() {
                                 </div>
                                 <p className="text-[10px] text-emerald-500/80 mt-2 text-center flex items-center justify-center gap-1">
                                     <span className="material-symbols-outlined text-[14px]">bolt</span>
-                                    Preview conectado à API do Gemini
+                                    Preview conectado à {findModelInfo(selectedModel)?.model?.name || selectedModel}
                                 </p>
                             </div>
 

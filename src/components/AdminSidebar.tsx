@@ -2,11 +2,19 @@
 
 import React from 'react';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { LayoutDashboard, Users, Receipt, Settings, LogOut, Plug, Bot, CreditCard, Activity, TrendingUp } from 'lucide-react';
+import { createClient } from '@/lib/supabase';
 
 export default function AdminSidebar() {
     const pathname = usePathname();
+    const router = useRouter();
+
+    const handleLogout = async () => {
+        const supabase = createClient();
+        await supabase.auth.signOut();
+        router.replace('/admin/login');
+    };
 
     const navLinks = [
         { href: '/admin', icon: <LayoutDashboard className="size-5" />, label: 'Visão Geral' },
@@ -56,10 +64,10 @@ export default function AdminSidebar() {
             </nav>
 
             <div className="p-6 border-t border-white/5 bg-black/20">
-                <Link href="/admin/login" className="flex items-center gap-4 p-3 rounded-xl hover:bg-rose-500/10 hover:text-rose-400 text-slate-400 transition-all cursor-pointer group border border-transparent hover:border-rose-500/20">
+                <button onClick={handleLogout} className="w-full flex items-center gap-4 p-3 rounded-xl hover:bg-rose-500/10 hover:text-rose-400 text-slate-400 transition-all cursor-pointer group border border-transparent hover:border-rose-500/20">
                     <LogOut className="size-5 group-hover:-translate-x-1 transition-transform" />
                     <span className="text-sm font-semibold">Sair do Painel</span>
-                </Link>
+                </button>
             </div>
         </aside>
     );

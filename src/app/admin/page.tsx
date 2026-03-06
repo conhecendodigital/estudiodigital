@@ -117,10 +117,10 @@ export default function AdminDashboard() {
                     setOriginalKpis(k);
                     const apiSparks = k.sparklines || defaultSparklines;
                     setKpiData([
-                        { label: 'Faturamento Mensal', value: `R$ ${Number(k.faturamento_mensal).toLocaleString('pt-BR')}`, change: '+12.5%', trend: 'up', icon: 'payments', iconBg: 'bg-emerald-500/20', iconColor: 'text-emerald-400', sparkline: apiSparks.faturamento, sparkColor: '#34d399' },
-                        { label: 'Alunos Ativos', value: String(k.alunos_ativos).replace(/\B(?=(\d{3})+(?!\d))/g, '.'), change: `+${k.mensagens_hoje}`, trend: 'up', icon: 'group', iconBg: 'bg-primary/20', iconColor: 'text-primary', sparkline: apiSparks.alunos, sparkColor: '#7b61ff' },
-                        { label: 'Taxa de Churn', value: `${k.taxa_churn}%`, change: `-${k.taxa_churn}%`, trend: 'down', icon: 'person_off', iconBg: 'bg-rose-500/20', iconColor: 'text-rose-400', sparkline: apiSparks.churn, sparkColor: '#f43f5e' },
-                        { label: 'MRR Atual', value: `R$ ${Number(k.mrr).toLocaleString('pt-BR')}`, change: '+5.2%', trend: 'up', icon: 'attach_money', iconBg: 'bg-blue-500/20', iconColor: 'text-blue-400', sparkline: apiSparks.mrr, sparkColor: '#60a5fa' },
+                        { label: 'Faturamento Mensal', value: `R$ ${Number(k.faturamento_mensal).toLocaleString('pt-BR')}`, change: `${k.mrr_change >= 0 ? '+' : ''}${k.mrr_change}%`, trend: k.mrr_change >= 0 ? 'up' : 'down', icon: 'payments', iconBg: 'bg-emerald-500/20', iconColor: 'text-emerald-400', sparkline: apiSparks.faturamento, sparkColor: '#34d399' },
+                        { label: 'Alunos Ativos', value: String(k.alunos_ativos).replace(/\B(?=(\d{3})+(?!\d))/g, '.'), change: `${k.alunos_change >= 0 ? '+' : ''}${k.alunos_change}%`, trend: k.alunos_change >= 0 ? 'up' : 'down', icon: 'group', iconBg: 'bg-primary/20', iconColor: 'text-primary', sparkline: apiSparks.alunos, sparkColor: '#7b61ff', subtitle: `${k.mensagens_hoje} mensagens hoje` },
+                        { label: 'Taxa de Churn', value: `${k.taxa_churn}%`, change: `${k.taxa_churn}%`, trend: 'down', icon: 'person_off', iconBg: 'bg-rose-500/20', iconColor: 'text-rose-400', sparkline: apiSparks.churn, sparkColor: '#f43f5e' },
+                        { label: 'MRR Atual', value: `R$ ${Number(k.mrr).toLocaleString('pt-BR')}`, change: `${k.mrr_change >= 0 ? '+' : ''}${k.mrr_change}%`, trend: k.mrr_change >= 0 ? 'up' : 'down', icon: 'attach_money', iconBg: 'bg-blue-500/20', iconColor: 'text-blue-400', sparkline: apiSparks.mrr, sparkColor: '#60a5fa' },
                     ]);
                     if (k.barChartData) {
                         setChartData(k.barChartData);
@@ -177,7 +177,58 @@ export default function AdminDashboard() {
                             <span className="material-symbols-outlined text-[18px]">receipt_long</span>
                             Faturamento
                         </Link>
-                        <button className="btn-magnetic bg-primary hover:bg-primary-dark text-white font-sora font-semibold px-6 py-3 rounded-xl flex items-center gap-2.5 transition-all shadow-[0_0_15px_rgba(123,97,255,0.3)] hover:shadow-[0_0_30px_rgba(123,97,255,0.5)] border border-white/10">
+                        <button
+                            onClick={async () => {
+                                try {
+                                    const res = await fetch('/api/admin/dashboard');
+                                    const data = await res.json();
+                                    const k = data.kpis;
+                                    const now = new Date();
+                                    const monthName = now.toLocaleString('pt-BR', { month: 'long', year: 'numeric' });
+
+                                    let csv = `Relatório Mensal - ${monthName}\n\n`;
+                                    csv += `MÉTRICAS PRINCIPAIS\n`;
+                                    csv += `Faturamento Mensal,R$ ${Number(k.faturamento_mensal).toLocaleString('pt-BR')}\n`;
+                                    csv += `MRR,R$ ${Number(k.mrr).toLocaleString('pt-BR')}\n`;
+                                    csv += `Alunos Ativos,${k.alunos_ativos}\n`;
+                                    csv += `Taxa de Churn,${k.taxa_churn}%\n`;
+                                    csv += `Retidos,${k.retidos}\n`;
+                                    csv += `Cancelados,${k.cancelados}\n`;
+                                    csv += `Variação MRR,${k.mrr_change}%\n`;
+                                    csv += `Variação Alunos,${k.alunos_change}%\n`;
+                                    csv += `Agentes Ativos,${k.agentes_ativos}\n`;
+                                    csv += `Mensagens Hoje,${k.mensagens_hoje}\n\n`;
+
+                                    if (k.barChartData?.length) {
+                                        csv += `EVOLUÇÃO MENSAL\nMês,Faturamento,Novos Alunos\n`;
+                                        k.barChartData.forEach((d: any) => {
+                                            csv += `${d.month},R$ ${d.revenue},${d.students}\n`;
+                                        });
+                                        csv += `\n`;
+                                    }
+
+                                    if (data.recent_activity?.length) {
+                                        csv += `ÚLTIMAS MOVIMENTAÇÕES\nNome,Email,Status,Plano,Valor,Data\n`;
+                                        data.recent_activity.forEach((item: any) => {
+                                            const profile = item.profiles || {};
+                                            const plan = item.plans || {};
+                                            csv += `${profile.full_name || 'N/A'},${profile.email || ''},${item.status},${plan.name || item.plan_type || ''},R$ ${Number(item.monthly_value || 0).toFixed(2)},${new Date(item.created_at).toLocaleDateString('pt-BR')}\n`;
+                                        });
+                                    }
+
+                                    const blob = new Blob(['\ufeff' + csv], { type: 'text/csv;charset=utf-8;' });
+                                    const url = URL.createObjectURL(blob);
+                                    const link = document.createElement('a');
+                                    link.href = url;
+                                    link.download = `relatorio_${now.getFullYear()}_${String(now.getMonth() + 1).padStart(2, '0')}.csv`;
+                                    link.click();
+                                    URL.revokeObjectURL(url);
+                                } catch {
+                                    alert('Erro ao gerar relatório. Tente novamente.');
+                                }
+                            }}
+                            className="btn-magnetic bg-primary hover:bg-primary-dark text-white font-sora font-semibold px-6 py-3 rounded-xl flex items-center gap-2.5 transition-all shadow-[0_0_15px_rgba(123,97,255,0.3)] hover:shadow-[0_0_30px_rgba(123,97,255,0.5)] border border-white/10"
+                        >
                             <span className="material-symbols-outlined text-[20px]">download</span>
                             Baixar Relatório Mensal
                         </button>
@@ -350,7 +401,7 @@ export default function AdminDashboard() {
                                     <div className="size-2 rounded-full bg-primary shadow-[0_0_6px_rgba(123,97,255,0.5)]"></div>
                                     <p className="text-[11px] text-slate-400">Retidos</p>
                                 </div>
-                                <p className="text-xl font-bold text-primary font-sora">1.163</p>
+                                <p className="text-xl font-bold text-primary font-sora">{originalKpis?.retidos ?? 0}</p>
                             </div>
                             <div className="w-px bg-white/5"></div>
                             <div className="text-center">
@@ -358,7 +409,7 @@ export default function AdminDashboard() {
                                     <div className="size-2 rounded-full bg-rose-500 shadow-[0_0_6px_rgba(244,63,94,0.5)]"></div>
                                     <p className="text-[11px] text-slate-400">Cancelados</p>
                                 </div>
-                                <p className="text-xl font-bold text-rose-400 font-sora">41</p>
+                                <p className="text-xl font-bold text-rose-400 font-sora">{originalKpis?.cancelados ?? 0}</p>
                             </div>
                         </div>
                     </div>

@@ -37,9 +37,13 @@ export default function CadastroPage() {
         if (authError) {
             // Handle rate limit specific error
             if (authError.message.includes('rate limit')) {
-                setError('Limite de tentativas excedido no Supabase. Como você já tentou várias vezes, sua conta já deve ter sido criada. Tente fazer o login com esta mesma senha.');
+                setError('Limite de tentativas. Como você tentou várias vezes, sua conta já deve ter sido criada. Tente fazer o login.');
+            } else if (authError.message.includes('User already registered')) {
+                setError('Este e-mail já está cadastrado em nosso sistema.');
+            } else if (authError.message.includes('Password should be at least')) {
+                setError('Sua senha deve ter no mínimo 6 caracteres.');
             } else {
-                setError(authError.message || 'Erro ao criar conta. Tente novamente.');
+                setError('Erro ao criar conta. Verifique seus dados e tente novamente.');
             }
             setIsLoading(false);
             return;

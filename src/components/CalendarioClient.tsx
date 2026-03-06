@@ -69,6 +69,36 @@ export default function CalendarioClient() {
     const [formViews, setFormViews] = useState('');
     const [formLikes, setFormLikes] = useState('');
     const [formComments, setFormComments] = useState('');
+    const [isGenerating, setIsGenerating] = useState(false);
+
+    const handleGenerateAI = async () => {
+        if (!formTitle.trim()) {
+            alert('Preencha o título antes de gerar com IA.');
+            return;
+        }
+        setIsGenerating(true);
+        try {
+            const res = await fetch('/api/calendar/generate', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    title: formTitle,
+                    format: formFormat,
+                    platform: formPlatform,
+                }),
+            });
+            const data = await res.json();
+            if (data.content) {
+                setFormScript(data.content);
+            } else {
+                alert('Erro ao gerar: ' + (data.error || 'Tente novamente'));
+            }
+        } catch {
+            alert('Falha de conexão. Tente novamente.');
+        } finally {
+            setIsGenerating(false);
+        }
+    };
 
     const nextMonth = () => setCurrentDate(addMonths(currentDate, 1));
     const prevMonth = () => setCurrentDate(subMonths(currentDate, 1));
@@ -193,7 +223,8 @@ export default function CalendarioClient() {
                 days.push(
                     <div
                         key={day.toString()}
-                        className={`min-h-[120px] rounded-xl border p-2 flex flex-col gap-1 transition-all ${isCurrentMonth ? 'bg-white/5 border-white/10 hover:border-primary/50' : 'bg-transparent border-transparent opacity-30'} ${isToday ? 'border-primary/50 bg-primary/5' : ''}`}
+                        onClick={() => isCurrentMonth && dayPosts.length === 0 ? openModal(cloneDay) : null}
+                        className={`min-h-[120px] rounded-xl border p-2 flex flex-col gap-1 transition-all group ${isCurrentMonth ? 'bg-white/5 border-white/10 hover:border-primary/50 cursor-pointer' : 'bg-transparent border-transparent opacity-30'} ${isToday ? 'border-primary/50 bg-primary/5' : ''}`}
                     >
                         <div className="flex justify-between items-center mb-1">
                             <span className={`text-xs font-bold ${isCurrentMonth ? 'text-slate-300' : 'text-slate-600'} ${isToday ? 'text-primary' : ''}`}>
@@ -202,7 +233,7 @@ export default function CalendarioClient() {
                             </span>
                             {isCurrentMonth && (
                                 <button
-                                    onClick={() => openModal(cloneDay)}
+                                    onClick={(e) => { e.stopPropagation(); openModal(cloneDay); }}
                                     className="opacity-0 group-hover:opacity-100 hover:text-primary transition-opacity text-slate-500"
                                 >
                                     <PlusCircle className="size-4" />
@@ -285,7 +316,7 @@ export default function CalendarioClient() {
 
                 {/* Side Panel for Event Creation/Editing */}
                 {isModalOpen && (
-                    <div className="absolute top-0 right-0 bottom-0 w-[400px] bg-sidebar-dark border-l border-white/10 shadow-2xl z-50 flex flex-col animate-in slide-in-from-right duration-300">
+                    <div className="fixed top-0 right-0 bottom-0 w-[400px] bg-sidebar-dark border-l border-white/10 shadow-2xl z-50 flex flex-col animate-in slide-in-from-right duration-300">
                         <div className="p-6 border-b border-white/5 flex justify-between items-center bg-black/20">
                             <div>
                                 <h3 className="text-lg font-bold font-sora text-slate-100">{editingPost ? 'Editar Post' : 'Novo Post'}</h3>
@@ -296,7 +327,7 @@ export default function CalendarioClient() {
                             </button>
                         </div>
 
-                        <div className="flex-1 overflow-y-auto p-6 space-y-6 custom-scrollbar">
+                        <div className="flex-1 overflow-y-auto p-6 space-y-5 custom-scrollbar flex flex-col min-h-0">
                             {/* Title */}
                             <div className="space-y-2">
                                 <label className="text-xs font-bold text-slate-400 uppercase tracking-wider">Título *</label>
@@ -316,13 +347,13 @@ export default function CalendarioClient() {
                                     <select
                                         value={formFormat}
                                         onChange={(e) => setFormFormat(e.target.value as PostFormat)}
-                                        className="w-full bg-black/20 border border-white/10 rounded-xl px-4 py-3 text-sm text-slate-200 focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all appearance-none"
+                                        className="w-full bg-[#1a1a2e] border border-white/10 rounded-xl px-4 py-3 text-sm text-slate-200 focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all"
                                     >
-                                        <option value="Reels">Reels</option>
-                                        <option value="Carrossel">Carrossel</option>
-                                        <option value="Story">Story</option>
-                                        <option value="TikTok">TikTok</option>
-                                        <option value="YouTube">YouTube</option>
+                                        <option value="Reels" className="bg-[#1a1a2e] text-slate-200">Reels</option>
+                                        <option value="Carrossel" className="bg-[#1a1a2e] text-slate-200">Carrossel</option>
+                                        <option value="Story" className="bg-[#1a1a2e] text-slate-200">Story</option>
+                                        <option value="TikTok" className="bg-[#1a1a2e] text-slate-200">TikTok</option>
+                                        <option value="YouTube" className="bg-[#1a1a2e] text-slate-200">YouTube</option>
                                     </select>
                                 </div>
                                 <div className="space-y-2">
@@ -330,12 +361,12 @@ export default function CalendarioClient() {
                                     <select
                                         value={formPlatform}
                                         onChange={(e) => setFormPlatform(e.target.value)}
-                                        className="w-full bg-black/20 border border-white/10 rounded-xl px-4 py-3 text-sm text-slate-200 focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all appearance-none"
+                                        className="w-full bg-[#1a1a2e] border border-white/10 rounded-xl px-4 py-3 text-sm text-slate-200 focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all"
                                     >
-                                        <option value="Instagram">Instagram</option>
-                                        <option value="TikTok">TikTok</option>
-                                        <option value="YouTube">YouTube</option>
-                                        <option value="LinkedIn">LinkedIn</option>
+                                        <option value="Instagram" className="bg-[#1a1a2e] text-slate-200">Instagram</option>
+                                        <option value="TikTok" className="bg-[#1a1a2e] text-slate-200">TikTok</option>
+                                        <option value="YouTube" className="bg-[#1a1a2e] text-slate-200">YouTube</option>
+                                        <option value="LinkedIn" className="bg-[#1a1a2e] text-slate-200">LinkedIn</option>
                                     </select>
                                 </div>
                             </div>
@@ -347,11 +378,11 @@ export default function CalendarioClient() {
                                     <select
                                         value={formStatus}
                                         onChange={(e) => setFormStatus(e.target.value as PostStatus)}
-                                        className="w-full bg-black/20 border border-white/10 rounded-xl px-4 py-3 text-sm text-slate-200 focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all appearance-none"
+                                        className="w-full bg-[#1a1a2e] border border-white/10 rounded-xl px-4 py-3 text-sm text-slate-200 focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all"
                                     >
-                                        <option value="Planejado">Planejado</option>
-                                        <option value="Produção">Em Produção</option>
-                                        <option value="Publicado">Publicado</option>
+                                        <option value="Planejado" className="bg-[#1a1a2e] text-slate-200">Planejado</option>
+                                        <option value="Produção" className="bg-[#1a1a2e] text-slate-200">Em Produção</option>
+                                        <option value="Publicado" className="bg-[#1a1a2e] text-slate-200">Publicado</option>
                                     </select>
                                 </div>
                                 <div className="space-y-2">
@@ -366,19 +397,26 @@ export default function CalendarioClient() {
                             </div>
 
                             {/* Script/Content */}
-                            <div className="space-y-2">
-                                <label className="text-xs font-bold text-slate-400 uppercase tracking-wider flex justify-between items-center">
+                            <div className="space-y-2 flex-1 flex flex-col min-h-[200px]">
+                                <label className="text-xs font-bold text-slate-400 uppercase tracking-wider flex justify-between items-center shrink-0">
                                     Conteúdo / Roteiro
-                                    <button className="text-primary hover:text-white flex items-center gap-1 text-[10px] bg-primary/10 px-2 py-0.5 rounded-full transition-colors">
-                                        <span className="material-symbols-outlined text-[12px]">auto_awesome</span> Gerar com IA
+                                    <button
+                                        onClick={handleGenerateAI}
+                                        disabled={isGenerating}
+                                        className="text-primary hover:text-white flex items-center gap-1 text-[10px] bg-primary/10 px-2 py-0.5 rounded-full transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                                    >
+                                        {isGenerating ? (
+                                            <><span className="animate-spin material-symbols-outlined text-[12px]">progress_activity</span> Gerando...</>
+                                        ) : (
+                                            <><span className="material-symbols-outlined text-[12px]">auto_awesome</span> Gerar com IA</>
+                                        )}
                                     </button>
                                 </label>
                                 <textarea
                                     value={formScript}
                                     onChange={(e) => setFormScript(e.target.value)}
                                     placeholder="Escreva a legenda, roteiro do vídeo ou tópicos do carrossel..."
-                                    rows={5}
-                                    className="w-full bg-black/20 border border-white/10 rounded-xl px-4 py-3 text-sm text-slate-200 focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all custom-scrollbar placeholder:text-slate-600 resize-none"
+                                    className="w-full flex-1 bg-black/20 border border-white/10 rounded-xl px-4 py-3 text-sm text-slate-200 focus:border-primary focus:ring-1 focus:ring-primary outline-none transition-all custom-scrollbar placeholder:text-slate-600 resize-none leading-relaxed"
                                 />
                             </div>
 
@@ -408,7 +446,7 @@ export default function CalendarioClient() {
                         </div>
 
                         {/* Footer Actions */}
-                        <div className="p-6 border-t border-white/5 bg-black/20 flex gap-3">
+                        <div className="p-4 border-t border-white/5 bg-sidebar-dark/95 backdrop-blur-sm flex gap-3 shrink-0">
                             {editingPost && (
                                 <button
                                     onClick={() => handleDeletePost(editingPost.id)}
