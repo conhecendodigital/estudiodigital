@@ -108,6 +108,37 @@ export async function GET() {
         barChartData.push({ month: capitalizedMonth, revenue: monthlyRevenue, students: newStudents });
     }
 
+    // 7. Counts for Donut chart
+    const { count: cancelledTotal } = await supabase
+        .from('subscriptions')
+        .select('*', { count: 'exact', head: true })
+        .eq('status', 'cancelado');
+
+    const retainedCount = activeSubs?.length || 0;
+    const cancelledCount = cancelledTotal || 0;
+
+    // 8. Previous month MRR for variation calculation
+    const prevMonthStart = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+    const prevMonthEnd = new Date(now.getFullYear(), now.getMonth(), 0);
+
+    const { data: prevMonthSubs } = await supabase
+        .from('subscriptions')
+        .select('monthly_value, status, cancelled_at')
+        .lte('created_at', prevMonthEnd.toISOString());
+
+    let prevMrr = 0;
+    let prevActive = 0;
+    prevMonthSubs?.forEach(sub => {
+        const wasCancelled = sub.status === 'cancelado' && sub.cancelled_at && new Date(sub.cancelled_at) <= prevMonthEnd;
+        if (!wasCancelled) {
+            prevMrr += Number(sub.monthly_value || 0);
+            prevActive++;
+        }
+    });
+
+    const mrrChange = prevMrr > 0 ? (((mrr - prevMrr) / prevMrr) * 100).toFixed(1) : '0';
+    const alunosChange = prevActive > 0 ? (((retainedCount - prevActive) / prevActive) * 100).toFixed(1) : '0';
+
     return NextResponse.json({
         kpis: {
             faturamento_mensal: mrr,
@@ -117,7 +148,12 @@ export async function GET() {
             agentes_ativos: activeAgents || 0,
             mensagens_hoje: messagesToday || 0,
             sparklines,
-            barChartData
+            barChartData,
+            // New: real donut and variation data
+            retidos: retainedCount,
+            cancelados: cancelledCount,
+            mrr_change: Number(mrrChange),
+            alunos_change: Number(alunosChange),
         },
         recent_activity: recentActivity || [],
     });
